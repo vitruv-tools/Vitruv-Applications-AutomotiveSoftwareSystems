@@ -140,7 +140,7 @@ public abstract class ASEMSysMLTest extends VitruviusEMFCasestudyTest {
             // Start change recorder to record changes on the model.
             VURI modelVURIAfterSync = VURI.getInstance(resource);
             this.changeRecorder.beginRecording(modelVURIAfterSync,
-                    Collections.<Notifier> unmodifiableList(CollectionLiterals.<Notifier> newArrayList(rootElement)));
+                    Collections.<Notifier> unmodifiableList(CollectionLiterals.<Notifier> newArrayList(resource)));
 
         } catch (IOException e) {
             // TODO [BR] Replace with logger message!?
