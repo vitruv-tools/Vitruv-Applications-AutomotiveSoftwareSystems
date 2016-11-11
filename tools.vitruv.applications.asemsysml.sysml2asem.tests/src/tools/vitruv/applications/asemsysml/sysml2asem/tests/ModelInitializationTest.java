@@ -1,6 +1,5 @@
 package tools.vitruv.applications.asemsysml.sysml2asem.tests;
 
-import static tools.vitruv.applications.asemsysml.sysml2asem.global.ASEMSysMLConstants.SYSML_FILE_EXTENSION;
 import static tools.vitruv.applications.asemsysml.sysml2asem.global.ASEMSysMLConstants.TEST_SYSML_MODEL_NAME;
 
 import org.eclipse.emf.ecore.resource.Resource;
@@ -9,6 +8,7 @@ import org.junit.Test;
 import tools.vitruv.applications.asemsysml.sysml2asem.global.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.sysml2asem.tests.util.ASEMSysMLTest;
 import tools.vitruv.applications.asemsysml.sysml2asem.tests.util.ASEMSysMLTestHelper;
+import tools.vitruv.domains.sysml.SysMlMetamodel;
 
 /**
  * Class for all model initialization tests. The following models are needed: ASEM model and SysML
@@ -20,7 +20,7 @@ import tools.vitruv.applications.asemsysml.sysml2asem.tests.util.ASEMSysMLTestHe
 public class ModelInitializationTest extends ASEMSysMLTest {
 
     private final String umlProjectModelPath = ASEMSysMLHelper.getProjectModelPath(TEST_SYSML_MODEL_NAME,
-            SYSML_FILE_EXTENSION);
+            SysMlMetamodel.FILE_EXTENSION);
 
     @Override
     protected void init() {

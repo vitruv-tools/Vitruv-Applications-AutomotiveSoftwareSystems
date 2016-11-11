@@ -2,7 +2,6 @@ package tools.vitruv.applications.asemsysml.sysml2asem.tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static tools.vitruv.applications.asemsysml.sysml2asem.global.ASEMSysMLConstants.SYSML_FILE_EXTENSION;
 import static tools.vitruv.applications.asemsysml.sysml2asem.global.ASEMSysMLConstants.TEST_SYSML_MODEL_NAME;
 
 import org.eclipse.emf.ecore.resource.Resource;
@@ -12,10 +11,10 @@ import org.junit.Test;
 
 import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import edu.kit.ipd.sdq.ASEM.classifiers.Module;
-
 import tools.vitruv.applications.asemsysml.sysml2asem.global.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.sysml2asem.tests.util.ASEMSysMLTest;
 import tools.vitruv.applications.asemsysml.sysml2asem.tests.util.ASEMSysMLTestHelper;
+import tools.vitruv.domains.sysml.SysMlMetamodel;
 
 /**
  * Class for all SysML block mapping tests. A SysML block will be mapped to an ASEM model containing
@@ -28,7 +27,7 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
     private Block sysmlBlock;
 
     private final String umlProjectModelPath = ASEMSysMLHelper.getProjectModelPath(TEST_SYSML_MODEL_NAME,
-            SYSML_FILE_EXTENSION);
+            SysMlMetamodel.FILE_EXTENSION);
 
     @Override
     protected void init() {

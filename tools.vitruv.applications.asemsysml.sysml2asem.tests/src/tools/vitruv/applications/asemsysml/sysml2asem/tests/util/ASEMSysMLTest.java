@@ -1,23 +1,12 @@
 package tools.vitruv.applications.asemsysml.sysml2asem.tests.util;
 
-import static tools.vitruv.applications.asemsysml.sysml2asem.global.ASEMSysMLConstants.ASEM_FILE_EXTENSION;
-import static tools.vitruv.applications.asemsysml.sysml2asem.global.ASEMSysMLConstants.ASEM_FILE_EXTENSIONS;
-import static tools.vitruv.applications.asemsysml.sysml2asem.global.ASEMSysMLConstants.ASEM_METAMODEL_NAMESPACE;
-import static tools.vitruv.applications.asemsysml.sysml2asem.global.ASEMSysMLConstants.ASEM_METAMODEL_NAMESPACE_URIS;
-import static tools.vitruv.applications.asemsysml.sysml2asem.global.ASEMSysMLConstants.SYSML_FILE_EXTENSION;
-import static tools.vitruv.applications.asemsysml.sysml2asem.global.ASEMSysMLConstants.SYSML_FILE_EXTENSIONS;
 import static tools.vitruv.applications.asemsysml.sysml2asem.global.ASEMSysMLConstants.TEST_SYSML_MODEL_NAME;
-import static tools.vitruv.applications.asemsysml.sysml2asem.global.ASEMSysMLConstants.UML_METAMODEL_NAMESPACE;
-import static tools.vitruv.applications.asemsysml.sysml2asem.global.ASEMSysMLConstants.UML_METAMODEL_NAMESPACE_URIS;
 import static tools.vitruv.applications.asemsysml.sysml2asem.global.ASEMSysMLConstants.getASEMModelName;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.emf.common.util.URI;
@@ -30,6 +19,8 @@ import org.junit.runner.Description;
 
 import tools.vitruv.applications.asemsysml.sysml2asem.global.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.sysml2asem.global.SysML2ASEMChangePropagationSpecification;
+import tools.vitruv.domains.asem.metamodel.AsemMetamodel;
+import tools.vitruv.domains.sysml.SysMlMetamodel;
 import tools.vitruv.framework.change.description.VitruviusChangeFactory;
 import tools.vitruv.framework.change.processing.ChangePropagationSpecification;
 import tools.vitruv.framework.metamodel.Metamodel;
@@ -57,19 +48,8 @@ public abstract class ASEMSysMLTest extends VitruviusEMFCasestudyTest {
 
         List<Metamodel> createdMetaModels = new ArrayList<Metamodel>();
 
-        // ASEM
-        final VURI asemMetaModelURI = VURI.getInstance(ASEM_METAMODEL_NAMESPACE);
-        final Set<String> asemNSURIs = new HashSet<String>();
-        asemNSURIs.addAll(Arrays.asList(ASEM_METAMODEL_NAMESPACE_URIS));
-        final Metamodel asemMetaModel = new Metamodel(asemNSURIs, asemMetaModelURI, ASEM_FILE_EXTENSIONS);
-        createdMetaModels.add(asemMetaModel);
-
-        // UML
-        final VURI umlMetaModelURI = VURI.getInstance(UML_METAMODEL_NAMESPACE);
-        final Set<String> umlNSURIs = new HashSet<String>();
-        umlNSURIs.addAll(Arrays.asList(UML_METAMODEL_NAMESPACE_URIS));
-        final Metamodel umlMetaModel = new Metamodel(umlNSURIs, umlMetaModelURI, SYSML_FILE_EXTENSIONS);
-        createdMetaModels.add(umlMetaModel);
+        createdMetaModels.add(AsemMetamodel.getInstance());
+        createdMetaModels.add(SysMlMetamodel.getInstance());
 
         return createdMetaModels;
 
@@ -109,7 +89,7 @@ public abstract class ASEMSysMLTest extends VitruviusEMFCasestudyTest {
     protected void initializeSysMLAsSourceModel() {
 
         Model sysmlModel = SysMLResource.createSysMLModel(this.resourceSet, "SysMLResource", TEST_SYSML_MODEL_NAME);
-        createAndSyncSourceModel(TEST_SYSML_MODEL_NAME, SYSML_FILE_EXTENSION, sysmlModel);
+        createAndSyncSourceModel(TEST_SYSML_MODEL_NAME, SysMlMetamodel.FILE_EXTENSION, sysmlModel);
     }
 
     private void createAndSyncSourceModel(final String modelName, final String modelFileExtension,
@@ -225,7 +205,7 @@ public abstract class ASEMSysMLTest extends VitruviusEMFCasestudyTest {
             this.triggerSynchronization(instance);
 
         } catch (IOException e) {
-         // TODO [BR] Replace with logger message!?
+            // TODO [BR] Replace with logger message!?
             System.err.println("[ASEMSysML] Could not save and synchronize changes of " + object);
             e.printStackTrace();
         }
@@ -244,7 +224,7 @@ public abstract class ASEMSysMLTest extends VitruviusEMFCasestudyTest {
         final String asemModelName = getASEMModelName(sysmlBlockName);
 
         // Get ASEM model resource for the SysML block.
-        final String asemProjectModelPath = ASEMSysMLHelper.getProjectModelPath(asemModelName, ASEM_FILE_EXTENSION);
+        final String asemProjectModelPath = ASEMSysMLHelper.getProjectModelPath(asemModelName, AsemMetamodel.FILE_EXTENSION);
         Resource asemModelResource = this.getModelResource(asemProjectModelPath);
 
         return asemModelResource;
