@@ -20,28 +20,42 @@ execute actions in asem
 reaction Debug {
 	after any change
 	call {
-		System.out.println("[ASEMSysML] [Change] " + change);
+//		System.out.println("[ASEMSysML] [Change] " + change);
 	}
 }
 
-reaction CreatedSysMLBlock {
-	// Create corresponding ASEM element without a name, because changing the name is a separate change.
-	// Therefore the ChangedNameOfSysMLBlock reaction is needed. The element will be persisted in the
-	// ChangeNameOfSysMLBlock.
+/*
+ * SysML block reactions
+ * ---------------------------------------------------------------------------------------------------
+ */
+reaction SysMLBlockCreated {
 	
-	// TODO [BR] Check if correspondence already exists.
-	
-	after list entry created and inserted in uml::Model[packagedElement]
-		with change.newValue.getAppliedStereotype("SysML::Blocks::Block") != null 
-			&& UMLUtil.getStereotypeApplication(change.newValue, Block).isEncapsulated
+	after value replaced for sysml::Block[base_Class]
+		with change.affectedEObject.encapsulated == true
 	
 	call {
+		// A new SysML block was created. The isEncapsulated flag isn't set at this moment and its initial value is false.
+		// So this reaction should never be called. The creation of the ASEM element will be done in the SysMLBlockIsEncapsulatedChanged reaction.
+		val blocksBaseClass = change.newValue;
+		val block = change.affectedEObject;
+		val isEncapsulated = block.encapsulated;
+		System.out.println("[ASEMSysML] A SysML block was created! Its name is: " + blocksBaseClass.name + " and the isEncapsulated flag is: " + isEncapsulated);
 		
-		System.out.println("[ASEMSysML] Create ASEM component ...");
+	}
+	
+}
+
+reaction SysMLBlockIsEncapsulatedChanged {
+	
+	after value replaced for sysml::Block[isEncapsulated]
+		with change.newValue == true
 		
-		val changedClass = change.newValue;
-		val block = UMLUtil.getStereotypeApplication(changedClass, Block);
-			
+	call {
+		// The isEncapsulated flag of a SysMLBlock was set to true. Therefore create and persist the ASEM element.
+		val block = change.affectedEObject;
+		
+		System.out.println("[ASEMSysML] A SysML block (" + block.base_Class.name + ") was created and its isEncapsulated flag is true!");
+		
 		// Let user select the ASEM component to map the SysML block to.
 		var Set<Class<?>> asemComponents = new HashSet
 		asemComponents += #[Module, edu.kit.ipd.sdq.ASEM.classifiers.Class]
@@ -73,10 +87,13 @@ routine createASEMModelWithRootElement(sysml::Block block, String componentClass
 		}
 	}
 }
-
 routine createASEMModelWithModuleAsRootElement(sysml::Block block) {
 	action {
-		val rootElement = create asem::Module		
+		val rootElement = create asem::Module and initialize {
+			rootElement.name = block.base_Class.name;
+			
+			persistProjectRelative(block, rootElement, ASEMSysMLReactionHelper.getASEMProjectModelPath(block.base_Class.name));
+		}
 		add correspondence between block and rootElement
 	}
 }
@@ -96,7 +113,7 @@ reaction ChangeNameOfSysMLBlock {
 }
 routine changeNameOfSysMLBlockCorrespondence(sysml::Block block) {
 	match {
-		val asemComponent = retrieve asem::Module corresponding to block	
+		val asemComponent = retrieve asem::Component corresponding to block	
 	}	
 	action {
 		call {
