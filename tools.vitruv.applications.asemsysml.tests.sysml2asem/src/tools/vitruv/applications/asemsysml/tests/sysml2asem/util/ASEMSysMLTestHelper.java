@@ -4,6 +4,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.Collections;
+
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.papyrus.sysml14.blocks.Block;
 import org.eclipse.papyrus.sysml14.blocks.BlocksPackage;
@@ -11,12 +13,59 @@ import org.eclipse.uml2.uml.Class;
 import org.eclipse.uml2.uml.Model;
 import org.eclipse.uml2.uml.util.UMLUtil.StereotypeApplicationHelper;
 
+import tools.vitruv.applications.asemsysml.reactions.sysml2asem.global.SysML2ASEMChangePropagationSpecification;
+import tools.vitruv.framework.change.processing.ChangePropagationSpecification;
+
 /**
  * A helper class which contains useful methods for the ASEMSysML test cases.
  * 
  * @author Benjamin Rupp
  */
 public class ASEMSysMLTestHelper {
+
+    /**
+     * Available transformation types. The following transformations are available at the moment:
+     * 
+     * <ul>
+     * <li>transformation using <b>reactions</b>
+     * (tools.vitruv.applications.asemsysml.reactions.sysml2asem)</li>
+     * <li>transformation using <b>java</b>
+     * (tools.vitruv.applications.asemsysml.java.sysml2asem)</li>
+     * </ul>
+     * 
+     * @author Benjamin Rupp
+     *
+     */
+    public static enum TransformationType {
+        RESPONSES, JAVA
+    };
+
+    /**
+     * Get the change propagation specifications of the transformation type which should be used for
+     * the transformations.
+     * 
+     * @param transformationType
+     *            The {@link TransformationType type of the transformation} which should be used.
+     * @return The change propagation specifications for the given transformation type. If no change
+     *         propagation specification is available <code>null</code> is returned.
+     * @see ChangePropagationSpecification
+     */
+    public static Iterable<ChangePropagationSpecification> getChangePropagationSpecificationsByTransformationType(
+            final TransformationType transformationType) {
+
+        switch (transformationType) {
+        case RESPONSES:
+            return Collections.singletonList(new SysML2ASEMChangePropagationSpecification());
+
+        case JAVA:
+            // FIXME [BR] Use the java change propagation specification here.
+            return Collections.singletonList(new SysML2ASEMChangePropagationSpecification());
+
+        default:
+            return null;
+        }
+
+    }
 
     /**
      * Create a SysML block and add it to the SysML model.

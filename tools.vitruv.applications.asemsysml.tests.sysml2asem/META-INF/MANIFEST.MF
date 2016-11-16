@@ -6,6 +6,7 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.junit,
  tools.vitruv.applications.asemsysml.reactions.sysml2asem;bundle-version="1.0.0",
+ tools.vitruv.applications.asemsysml.java.sysml2asem;bundle-version="1.0.0",
  tools.vitruv.framework.util;bundle-version="1.0.0",
  tools.vitruv.framework.tests.util;bundle-version="1.0.0",
  tools.vitruv.framework.tests.change;bundle-version="1.0.0",

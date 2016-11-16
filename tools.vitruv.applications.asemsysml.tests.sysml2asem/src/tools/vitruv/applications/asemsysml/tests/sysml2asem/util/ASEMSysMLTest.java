@@ -18,7 +18,7 @@ import org.eclipse.xtext.xbase.lib.CollectionLiterals;
 import org.junit.runner.Description;
 
 import tools.vitruv.applications.asemsysml.reactions.sysml2asem.global.ASEMSysMLHelper;
-import tools.vitruv.applications.asemsysml.reactions.sysml2asem.global.SysML2ASEMChangePropagationSpecification;
+import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTestHelper.TransformationType;
 import tools.vitruv.domains.asem.metamodel.AsemMetamodel;
 import tools.vitruv.domains.sysml.SysMlMetamodel;
 import tools.vitruv.framework.change.description.VitruviusChangeFactory;
@@ -38,6 +38,8 @@ import tools.vitruv.framework.util.datatypes.VURI;
  */
 public abstract class ASEMSysMLTest extends VitruviusEMFCasestudyTest {
 
+    private final TransformationType transformationType = TransformationType.RESPONSES;
+    
     /*
      * TEST CASE methods. -------------------------------------------------------------------------
      * VitruviusEMFCasestudyTest methods which should be implemented.
@@ -57,7 +59,7 @@ public abstract class ASEMSysMLTest extends VitruviusEMFCasestudyTest {
 
     @Override
     protected Iterable<ChangePropagationSpecification> createChangePropagationSpecifications() {
-        return Collections.singletonList(new SysML2ASEMChangePropagationSpecification());
+        return ASEMSysMLTestHelper.getChangePropagationSpecificationsByTransformationType(this.transformationType);
     }
 
     @Override
