@@ -40,7 +40,7 @@ import tools.vitruv.framework.util.datatypes.VURI;
  */
 public abstract class ASEMSysMLTest extends VitruviusEMFCasestudyTest {
 
-    private final TransformationType transformationType = TransformationType.RESPONSES;
+    private final TransformationType transformationType = TransformationType.REACTIONS;
 
     /*
      * TEST CASE methods. -------------------------------------------------------------------------

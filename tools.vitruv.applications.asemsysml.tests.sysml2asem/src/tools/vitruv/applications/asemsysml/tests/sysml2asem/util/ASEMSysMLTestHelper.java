@@ -37,7 +37,7 @@ public class ASEMSysMLTestHelper {
      *
      */
     public static enum TransformationType {
-        RESPONSES, JAVA
+        REACTIONS, JAVA
     };
 
     /**
@@ -54,7 +54,7 @@ public class ASEMSysMLTestHelper {
             final TransformationType transformationType) {
 
         switch (transformationType) {
-        case RESPONSES:
+        case REACTIONS:
             return Collections.singletonList(new SysML2ASEMChangePropagationSpecification());
 
         case JAVA:
