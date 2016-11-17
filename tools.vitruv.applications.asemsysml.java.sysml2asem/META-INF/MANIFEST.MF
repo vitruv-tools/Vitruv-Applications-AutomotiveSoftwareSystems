@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: SysML2ASEM-Java
+Bundle-SymbolicName: tools.vitruv.applications.asemsysml.java.sysml2asem
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Require-Bundle: tools.vitruv.framework.change;bundle-version="1.0.0",
+ tools.vitruv.framework.change.processing;bundle-version="1.0.0",
+ tools.vitruv.framework.correspondence;bundle-version="1.0.0",
+ tools.vitruv.framework.util;bundle-version="1.0.0",
+ org.eclipse.papyrus.sysml14;bundle-version="0.9.1",
+ edu.kit.ipd.sdq.asem;bundle-version="1.0.0",
+ org.apache.log4j;bundle-version="1.2.15",
+ tools.vitruv.framework.tuid;bundle-version="1.0.0"
+Export-Package: tools.vitruv.applications.asemsysml.java.sysml2asem.global
