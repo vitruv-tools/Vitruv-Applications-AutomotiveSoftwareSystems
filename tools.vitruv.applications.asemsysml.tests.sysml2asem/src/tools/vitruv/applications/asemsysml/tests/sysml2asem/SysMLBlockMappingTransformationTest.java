@@ -14,7 +14,7 @@ import edu.kit.ipd.sdq.ASEM.classifiers.Module;
 import tools.vitruv.applications.asemsysml.reactions.sysml2asem.global.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTest;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTestHelper;
-import tools.vitruv.domains.sysml.SysMlMetamodel;
+import tools.vitruv.domains.sysml.SysMlNamspace;
 
 /**
  * Class for all SysML block mapping tests. A SysML block will be mapped to an ASEM model containing
@@ -27,7 +27,7 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
     private Block sysmlBlock;
 
     private final String umlProjectModelPath = ASEMSysMLHelper.getProjectModelPath(TEST_SYSML_MODEL_NAME,
-            SysMlMetamodel.FILE_EXTENSION);
+            SysMlNamspace.FILE_EXTENSION);
 
     @Override
     protected void init() {

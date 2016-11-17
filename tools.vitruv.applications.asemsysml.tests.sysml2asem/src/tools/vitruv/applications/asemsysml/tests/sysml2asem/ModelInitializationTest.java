@@ -8,7 +8,7 @@ import org.junit.Test;
 import tools.vitruv.applications.asemsysml.reactions.sysml2asem.global.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTest;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTestHelper;
-import tools.vitruv.domains.sysml.SysMlMetamodel;
+import tools.vitruv.domains.sysml.SysMlNamspace;
 
 /**
  * Class for all model initialization tests. The following models are needed: ASEM model and SysML
@@ -20,7 +20,7 @@ import tools.vitruv.domains.sysml.SysMlMetamodel;
 public class ModelInitializationTest extends ASEMSysMLTest {
 
     private final String umlProjectModelPath = ASEMSysMLHelper.getProjectModelPath(TEST_SYSML_MODEL_NAME,
-            SysMlMetamodel.FILE_EXTENSION);
+            SysMlNamspace.FILE_EXTENSION);
 
     @Override
     protected void init() {

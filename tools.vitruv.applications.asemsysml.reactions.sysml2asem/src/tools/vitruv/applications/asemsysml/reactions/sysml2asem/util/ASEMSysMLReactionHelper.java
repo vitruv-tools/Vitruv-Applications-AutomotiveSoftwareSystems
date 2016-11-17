@@ -3,7 +3,7 @@ package tools.vitruv.applications.asemsysml.reactions.sysml2asem.util;
 import static tools.vitruv.applications.asemsysml.reactions.sysml2asem.global.ASEMSysMLConstants.getASEMModelName;
 
 import tools.vitruv.applications.asemsysml.reactions.sysml2asem.global.ASEMSysMLHelper;
-import tools.vitruv.domains.asem.metamodel.AsemMetamodel;
+import tools.vitruv.domains.asem.AsemNamespace;
 
 /**
  * A helper class containing methods which are useful for the transformation using reactions.
@@ -22,7 +22,7 @@ public class ASEMSysMLReactionHelper {
     public static String getASEMProjectModelPath(final String blockName) {
 
         String modelName = getASEMModelName(blockName);
-        String projectModelPath = ASEMSysMLHelper.getProjectModelPath(modelName, AsemMetamodel.FILE_EXTENSION);
+        String projectModelPath = ASEMSysMLHelper.getProjectModelPath(modelName, AsemNamespace.FILE_EXTENSION);
 
         return projectModelPath;
 
