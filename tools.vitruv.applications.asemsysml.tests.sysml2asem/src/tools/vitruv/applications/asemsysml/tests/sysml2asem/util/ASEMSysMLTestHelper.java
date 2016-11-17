@@ -13,6 +13,7 @@ import org.eclipse.uml2.uml.Class;
 import org.eclipse.uml2.uml.Model;
 import org.eclipse.uml2.uml.util.UMLUtil.StereotypeApplicationHelper;
 
+import tools.vitruv.applications.asemsysml.java.sysml2asem.global.SysML2ASEMJavaChangePropagationSpecification;
 import tools.vitruv.applications.asemsysml.reactions.sysml2asem.global.SysML2ASEMChangePropagationSpecification;
 import tools.vitruv.framework.change.processing.ChangePropagationSpecification;
 
@@ -58,8 +59,7 @@ public class ASEMSysMLTestHelper {
             return Collections.singletonList(new SysML2ASEMChangePropagationSpecification());
 
         case JAVA:
-            // FIXME [BR] Use the java change propagation specification here.
-            return Collections.singletonList(new SysML2ASEMChangePropagationSpecification());
+            return Collections.singletonList(new SysML2ASEMJavaChangePropagationSpecification());
 
         default:
             return null;
