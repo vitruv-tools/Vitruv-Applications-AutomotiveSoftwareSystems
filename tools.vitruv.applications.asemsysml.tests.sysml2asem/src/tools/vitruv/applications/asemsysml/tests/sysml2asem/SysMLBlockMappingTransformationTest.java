@@ -2,7 +2,7 @@ package tools.vitruv.applications.asemsysml.tests.sysml2asem;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static tools.vitruv.applications.asemsysml.reactions.sysml2asem.global.ASEMSysMLConstants.TEST_SYSML_MODEL_NAME;
+import static tools.vitruv.applications.asemsysml.ASEMSysMLConstants.TEST_SYSML_MODEL_NAME;
 
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.papyrus.sysml14.blocks.Block;
@@ -11,7 +11,7 @@ import org.junit.Test;
 
 import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import edu.kit.ipd.sdq.ASEM.classifiers.Module;
-import tools.vitruv.applications.asemsysml.reactions.sysml2asem.global.ASEMSysMLHelper;
+import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTest;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTestHelper;
 import tools.vitruv.domains.sysml.SysMlNamspace;

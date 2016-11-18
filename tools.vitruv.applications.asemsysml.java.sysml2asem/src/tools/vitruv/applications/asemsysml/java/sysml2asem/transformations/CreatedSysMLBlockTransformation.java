@@ -14,6 +14,9 @@ import tools.vitruv.framework.change.echange.feature.attribute.ReplaceSingleValu
 import tools.vitruv.framework.tuid.TuidManager;
 import tools.vitruv.framework.userinteraction.UserInteracting;
 import tools.vitruv.framework.util.datatypes.VURI;
+import tools.vitruv.applications.asemsysml.ASEMSysMLConstants;
+import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
+import tools.vitruv.domains.asem.AsemNamespace;
 
 /**
  * The transformation class for transforming a added SysML block.<br>
@@ -85,10 +88,12 @@ public class CreatedSysMLBlockTransformation extends AbstractTransformationReali
             oldVURI = VURI.getInstance(module.eResource());
         }
 
-        // FIXME [BR] Use ASEMSysMLHelper instead!
-        String asemProjectModelPath = ((("model/" + "ASEM-Model-" + block.getBase_Class().getName()) + ".") + "asem");
+        String asemModelName = ASEMSysMLHelper.getASEMModelName(block.getBase_Class().getName());
+        String asemProjectModelPath = ASEMSysMLHelper.getProjectModelPath(asemModelName, AsemNamespace.FILE_EXTENSION);
+
         String sysmlBlockURI = VURI.getInstance(block.eResource()).getEMFUri().toPlatformString(false);
-        String uriPrefix = sysmlBlockURI.substring(0, sysmlBlockURI.lastIndexOf("model/"));
+        String uriPrefix = sysmlBlockURI.substring(0,
+                sysmlBlockURI.lastIndexOf(ASEMSysMLConstants.MODEL_DIR_NAME + "/"));
         String asemURIString = uriPrefix + asemProjectModelPath;
         VURI asemModuleVURI = VURI.getInstance(URI.createPlatformResourceURI(asemURIString, true));
 

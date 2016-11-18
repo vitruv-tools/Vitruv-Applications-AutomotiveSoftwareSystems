@@ -1,7 +1,6 @@
 package tools.vitruv.applications.asemsysml.tests.sysml2asem.util;
 
-import static tools.vitruv.applications.asemsysml.reactions.sysml2asem.global.ASEMSysMLConstants.TEST_SYSML_MODEL_NAME;
-import static tools.vitruv.applications.asemsysml.reactions.sysml2asem.global.ASEMSysMLConstants.getASEMModelName;
+import static tools.vitruv.applications.asemsysml.ASEMSysMLConstants.TEST_SYSML_MODEL_NAME;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,7 +16,7 @@ import org.eclipse.uml2.uml.Model;
 import org.eclipse.xtext.xbase.lib.CollectionLiterals;
 import org.junit.runner.Description;
 
-import tools.vitruv.applications.asemsysml.reactions.sysml2asem.global.ASEMSysMLHelper;
+import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTestHelper.TransformationType;
 import tools.vitruv.domains.asem.AsemDomain;
 import tools.vitruv.domains.asem.AsemNamespace;
@@ -225,7 +224,7 @@ public abstract class ASEMSysMLTest extends VitruviusEMFCasestudyTest {
      */
     protected Resource getASEMModelResource(final String sysmlBlockName) {
 
-        final String asemModelName = getASEMModelName(sysmlBlockName);
+        final String asemModelName = ASEMSysMLHelper.getASEMModelName(sysmlBlockName);
 
         // Get ASEM model resource for the SysML block.
         final String asemProjectModelPath = ASEMSysMLHelper.getProjectModelPath(asemModelName,

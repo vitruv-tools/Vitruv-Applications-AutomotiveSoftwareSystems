@@ -4,7 +4,8 @@ Bundle-Name: ASEM to SysML transformation
 Bundle-SymbolicName: tools.vitruv.applications.asemsysml.reactions.sysml2asem
 Bundle-Version: 1.0.0.qualifier
 Export-Package: tools.vitruv.applications.asemsysml.reactions.sysml2asem.global
-Require-Bundle: org.eclipse.papyrus.sysml14;bundle-version="0.9.1",
+Require-Bundle: tools.vitruv.applications.asemsysml;bundle-version="1.0.0",
+ org.eclipse.papyrus.sysml14;bundle-version="0.9.1",
  org.apache.log4j,
  com.google.guava,
  org.eclipse.emf.ecore,

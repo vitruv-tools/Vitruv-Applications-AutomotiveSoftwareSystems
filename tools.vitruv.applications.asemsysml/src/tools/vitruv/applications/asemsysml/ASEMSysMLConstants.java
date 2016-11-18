@@ -1,4 +1,4 @@
-package tools.vitruv.applications.asemsysml.reactions.sysml2asem.global;
+package tools.vitruv.applications.asemsysml;
 
 /**
  * Class to encapsulate all the ASEMSysML constants. They can be used in the reflections and in the
@@ -17,6 +17,8 @@ public final class ASEMSysMLConstants {
 
     private ASEMSysMLConstants() {
     }
+    
+    public static final String MODEL_DIR_NAME = "model";
 
     // ASEM
     /**
@@ -27,19 +29,6 @@ public final class ASEMSysMLConstants {
      */
     public static final String TEST_ASEM_MODEL_NAME_PREFIX = "ASEM-Model";
     public static final String TEST_ASEM_MODEL_NAME_SEPARATOR = "-";
-
-    /**
-     * Get the ASEM model name which is composed of the {@link #TEST_ASEM_MODEL_NAME_PREFIX ASEM
-     * model prefix}, a {@link #TEST_ASEM_MODEL_NAME_SEPARATOR separator} and the given SysML block
-     * name.
-     * 
-     * @param blockName
-     *            Name of the SysML block for which the ASEM model exists.
-     * @return The complete ASEM model name.
-     */
-    public static final String getASEMModelName(final String blockName) {
-        return TEST_ASEM_MODEL_NAME_PREFIX + TEST_ASEM_MODEL_NAME_SEPARATOR + blockName;
-    }
 
     // SysML
     public static final String TEST_SYSML_MODEL_NAME = "SysML-Model";
