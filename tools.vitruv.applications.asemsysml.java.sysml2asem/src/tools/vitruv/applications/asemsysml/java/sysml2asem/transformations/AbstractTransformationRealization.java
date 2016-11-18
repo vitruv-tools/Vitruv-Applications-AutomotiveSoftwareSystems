@@ -1,11 +1,20 @@
 package tools.vitruv.applications.asemsysml.java.sysml2asem.transformations;
 
+import java.util.Collections;
+
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.util.EcoreUtil;
+
+import edu.kit.ipd.sdq.ASEM.base.Named;
+import tools.vitruv.applications.asemsysml.ASEMSysMLConstants;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.util.TransformationExecutionState;
 import tools.vitruv.framework.change.echange.EChange;
 import tools.vitruv.framework.correspondence.CorrespondenceModel;
 import tools.vitruv.framework.tuid.TuidManager;
 import tools.vitruv.framework.userinteraction.UserInteracting;
 import tools.vitruv.framework.util.command.ChangePropagationResult;
+import tools.vitruv.framework.util.datatypes.VURI;
 
 /**
  * Abstract class for the java transformation implementations.
@@ -83,5 +92,52 @@ public abstract class AbstractTransformationRealization implements JavaTransform
         }
 
         return executionState.getTransformationResult();
+    }
+
+    /**
+     * Persist an ASEM element.
+     * 
+     * @param alreadyPersistedObject
+     *            An object that already exists. This is needed to get the correct URI (test project
+     *            name, etc.).
+     * @param element
+     *            The ASEM element which should be persisted.
+     * @param asemProjectModelPath
+     *            The project model path which starts with
+     *            {@link ASEMSysMLConstants#MODEL_DIR_NAME}.
+     */
+    protected void persistASEMElement(final EObject alreadyPersistedObject, final Named element,
+            final String asemProjectModelPath) {
+
+        VURI oldVURI = null;
+        if (element.eResource() != null) {
+            oldVURI = VURI.getInstance(element.eResource());
+        }
+
+        String existingElementURI = VURI.getInstance(alreadyPersistedObject.eResource()).getEMFUri()
+                .toPlatformString(false);
+        String uriPrefix = existingElementURI.substring(0,
+                existingElementURI.lastIndexOf(ASEMSysMLConstants.MODEL_DIR_NAME + "/"));
+        String asemURIString = uriPrefix + asemProjectModelPath;
+        VURI asemElementVURI = VURI.getInstance(URI.createPlatformResourceURI(asemURIString, true));
+
+        EcoreUtil.remove(element);
+        executionState.getTransformationResult().addRootEObjectToSave(element, asemElementVURI);
+        executionState.getTransformationResult().addVuriToDeleteIfNotNull(oldVURI);
+
+    }
+
+    /**
+     * Add correspondence between a SysML and an ASEM element.
+     * 
+     * @param sysmlElement
+     *            The SysML element which corresponds to the ASEM element.
+     * @param asemElement
+     *            The ASEM element which corresponds to the SysML element.
+     */
+    protected void addCorrespondence(final EObject sysmlElement, final Named asemElement) {
+        TuidManager.getInstance().updateTuidsOfRegisteredObjects();
+        executionState.getCorrespondenceModel().createAndAddCorrespondence(Collections.singletonList(sysmlElement),
+                Collections.singletonList(asemElement));
     }
 }
