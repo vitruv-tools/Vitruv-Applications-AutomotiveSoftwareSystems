@@ -83,6 +83,13 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
 
         this.assertSysMLBlockAndASEMModuleNamesAreEqual(sysmlBlock);
 
+        final String newName = "NewBlockName";
+        
+        this.sysmlBlock.getBase_Class().setName(newName);
+        this.saveAndSynchronizeChanges(this.sysmlBlock);
+
+        this.assertASEMComponentNameHasChangedAfterBlockNameChanged(sysmlBlock);
+
     }
 
     private void assertASEMModelForSysMLBlockExists(final Block sysmlBlock) {
@@ -113,6 +120,21 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
 
         assertEquals("The name of the ASEM module is not equal to the name of the SysML block!", asemModuleName,
                 sysmlBlockName);
+
+    }
+
+    private void assertASEMComponentNameHasChangedAfterBlockNameChanged(final Block sysmlBlock) {
+
+        Resource asemModelResource = this.getASEMModelResource(sysmlBlock.getBase_Class().getName());
+
+        ASEMSysMLTestHelper.assertResourceExists(asemModelResource);
+        ASEMSysMLTestHelper.assertRootElementExists(asemModelResource);
+        ASEMSysMLTestHelper.assertRootElementIsTypeOf(asemModelResource, Component.class);
+
+        Component asemRootComponent = (Component) asemModelResource.getContents().get(0);
+
+        assertEquals("The name of the ASEM component is not equal to its SysML block name!",
+                asemRootComponent.getName(), sysmlBlock.getBase_Class().getName());
 
     }
 
