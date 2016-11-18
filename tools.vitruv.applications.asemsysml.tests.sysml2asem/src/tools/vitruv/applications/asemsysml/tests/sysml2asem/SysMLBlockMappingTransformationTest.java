@@ -52,9 +52,9 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
      * component (e.g. a class or module) as root element.
      */
     @Test
-    public void testIfASysMLBlockIsMappedToAnASEMModel() {
+    public void testIfASysMLBlockIsMappedToAnASEMComponent() {
 
-        this.assertASEMModelForSysMLBlockExists(sysmlBlock);
+        this.assertASEMComponentForSysMLBlockExists(sysmlBlock);
 
     }
 
@@ -92,7 +92,7 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
 
     }
 
-    private void assertASEMModelForSysMLBlockExists(final Block sysmlBlock) {
+    private void assertASEMComponentForSysMLBlockExists(final Block sysmlBlock) {
 
         Resource asemModelResource = this.getASEMModelResource(sysmlBlock.getBase_Class().getName());
 
