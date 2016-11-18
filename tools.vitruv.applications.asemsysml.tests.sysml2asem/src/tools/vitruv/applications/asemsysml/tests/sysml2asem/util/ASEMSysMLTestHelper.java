@@ -144,4 +144,20 @@ public class ASEMSysMLTestHelper {
         }
     }
 
+    /**
+     * For a valid model resource the resource itself must exist and must contain a root element
+     * which must be typed by the given class.
+     * 
+     * @param modelResource
+     *            The model resource to check.
+     * @param rootElementClass
+     *            The class of the root element.
+     */
+    public static void assertValidModelResource(final Resource modelResource,
+            final java.lang.Class<?> rootElementClass) {
+        ASEMSysMLTestHelper.assertResourceExists(modelResource);
+        ASEMSysMLTestHelper.assertRootElementExists(modelResource);
+        ASEMSysMLTestHelper.assertRootElementIsTypeOf(modelResource, rootElementClass);
+    }
+
 }

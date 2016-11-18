@@ -96,9 +96,7 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
 
         Resource asemModelResource = this.getASEMModelResource(sysmlBlock.getBase_Class().getName());
 
-        ASEMSysMLTestHelper.assertResourceExists(asemModelResource);
-        ASEMSysMLTestHelper.assertRootElementExists(asemModelResource);
-        ASEMSysMLTestHelper.assertRootElementIsTypeOf(asemModelResource, Component.class);
+        ASEMSysMLTestHelper.assertValidModelResource(asemModelResource, Component.class);
 
     }
 
@@ -106,9 +104,7 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
 
         Resource asemModelResource = this.getASEMModelResource(sysmlBlock.getBase_Class().getName());
 
-        ASEMSysMLTestHelper.assertResourceExists(asemModelResource);
-        ASEMSysMLTestHelper.assertRootElementExists(asemModelResource);
-        ASEMSysMLTestHelper.assertRootElementIsTypeOf(asemModelResource, Component.class);
+        ASEMSysMLTestHelper.assertValidModelResource(asemModelResource, Component.class);
 
         Component asemRootComponent = (Component) asemModelResource.getContents().get(0);
 
@@ -127,9 +123,7 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
 
         Resource asemModelResource = this.getASEMModelResource(sysmlBlock.getBase_Class().getName());
 
-        ASEMSysMLTestHelper.assertResourceExists(asemModelResource);
-        ASEMSysMLTestHelper.assertRootElementExists(asemModelResource);
-        ASEMSysMLTestHelper.assertRootElementIsTypeOf(asemModelResource, Component.class);
+        ASEMSysMLTestHelper.assertValidModelResource(asemModelResource, Component.class);
 
         Component asemRootComponent = (Component) asemModelResource.getContents().get(0);
 
