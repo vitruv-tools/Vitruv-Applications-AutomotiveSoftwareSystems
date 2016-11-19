@@ -26,7 +26,7 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
 
     private Block sysmlBlock;
 
-    private final String umlProjectModelPath = ASEMSysMLHelper.getProjectModelPath(TEST_SYSML_MODEL_NAME,
+    private final String sysmlProjectModelPath = ASEMSysMLHelper.getProjectModelPath(TEST_SYSML_MODEL_NAME,
             SysMlNamspace.FILE_EXTENSION);
 
     @Override
@@ -42,32 +42,42 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
     @Before
     public void setUp() {
 
-        Resource sysmlModelResource = this.getModelResource(umlProjectModelPath);
+        Resource sysmlModelResource = this.getModelResource(sysmlProjectModelPath);
         this.sysmlBlock = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "SampleBlock", true, this);
 
     }
 
     /**
      * After adding a SysML block to a SysML model, a ASEM model should be created with a ASEM
-     * component (e.g. a class or module) as root element.
+     * component (e.g. a class or module) as root element. The user decides if a SysML block shall
+     * be mapped to an ASEM class or an ASEM module.<br>
+     * <br>
+     * 
+     * [Requirement 1.a)][Requirement 2.a)]
      */
     @Test
     public void testIfASysMLBlockIsMappedToAnASEMComponent() {
 
         this.assertASEMComponentForSysMLBlockExists(sysmlBlock);
 
+        // TODO [BR] Check for ASEM class, too.
+        this.assertExpectedASEMComponentType(Module.class);
+
     }
 
     /**
      * A SysML block should only be transformed to an ASEM component if the
-     * <code>isEncapsulated</code> attribute is set to <code>true</code>. [Requirement 1.b)]
+     * <code>isEncapsulated</code> attribute is set to <code>true</code>.<br>
+     * <br>
+     * 
+     * [Requirement 1.b)]
      */
     @Test
     public void testEncapsulatedRestriction() {
 
         final Boolean isEncapsulated = false;
 
-        Resource sysmlModelResource = this.getModelResource(this.umlProjectModelPath);
+        Resource sysmlModelResource = this.getModelResource(this.sysmlProjectModelPath);
         Block blockWhichShouldNotBeTransformed = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource,
                 "BlockWhichShouldNotBeTransformed", isEncapsulated, this);
         assertASEMModelDoesNotExistForSysMLBlock(blockWhichShouldNotBeTransformed);
@@ -76,7 +86,10 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
 
     /**
      * The name of the ASEM module should be equal to the name of the SysML block (the name of its
-     * base class). [Requirement 1.c)]
+     * base class).<br>
+     * <br>
+     * 
+     * [Requirement 1.c)]
      */
     @Test
     public void testIfNamesAreEqual() {
@@ -84,7 +97,7 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
         this.assertSysMLBlockAndASEMModuleNamesAreEqual(sysmlBlock);
 
         final String newName = "NewBlockName";
-        
+
         this.sysmlBlock.getBase_Class().setName(newName);
         this.saveAndSynchronizeChanges(this.sysmlBlock);
 
@@ -139,6 +152,27 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
 
         assertTrue("An ASEM model does exist for SysML block " + block.getBase_Class().getName() + "!",
                 resourceDoesNotExist);
+
+    }
+
+    private void assertExpectedASEMComponentType(final Class<? extends Component> expectedComponentType) {
+
+        final String sysmlBlockName = "BlockTo" + expectedComponentType.getSimpleName();
+        Resource sysmlModelResource = this.getModelResource(sysmlProjectModelPath);
+
+        // FIXME [BR] Remove magic numbers!
+        int selection = 0;
+        if (expectedComponentType.getSimpleName().equals("Module")) {
+            selection = 0;
+        } else if (expectedComponentType.getSimpleName().equals("Class")) {
+            selection = 1;
+        }
+
+        this.testUserInteractor.addNextSelections(selection);
+        ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, sysmlBlockName, true, this);
+
+        Resource asemModelResource = this.getASEMModelResource(sysmlBlockName);
+        ASEMSysMLTestHelper.assertValidModelResource(asemModelResource, expectedComponentType);
 
     }
 

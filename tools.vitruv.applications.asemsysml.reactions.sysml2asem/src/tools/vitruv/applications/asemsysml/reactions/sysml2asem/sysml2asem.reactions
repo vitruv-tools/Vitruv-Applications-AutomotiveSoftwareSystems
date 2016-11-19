@@ -58,7 +58,7 @@ reaction SysMLBlockIsEncapsulatedChanged {
 		
 		// Let user select the ASEM component to map the SysML block to.
 		var Set<Class<?>> asemComponents = new HashSet
-		asemComponents += #[Module, edu.kit.ipd.sdq.ASEM.classifiers.Class]
+		asemComponents.addAll(#[Module, edu.kit.ipd.sdq.ASEM.classifiers.Class]);
 		
 		val List<String> asemComponentNames = new ArrayList<String>(asemComponents.size)
 		for (asemComponent : asemComponents) {

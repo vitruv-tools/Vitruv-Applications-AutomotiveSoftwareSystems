@@ -77,7 +77,7 @@ public class ASEMSysMLTestHelper {
      * @param isEncapsulated
      *            Encapsulated flag, see {@link Block#isEncapsulated()}
      * @param testCaseClass
-     *            Test case class. Needed for synchronization.
+     *            Test case class. Needed for accessing synchronization method.
      * @return The created {@link Block SysML Block}.
      * 
      * @see Block#isEncapsulated
