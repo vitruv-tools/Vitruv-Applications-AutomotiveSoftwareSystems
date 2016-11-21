@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -38,6 +39,8 @@ import tools.vitruv.framework.util.datatypes.VURI;
  *
  */
 public abstract class ASEMSysMLTest extends VitruviusEMFCasestudyTest {
+
+    private static Logger logger = Logger.getLogger(ASEMSysMLTest.class);
 
     private final TransformationType transformationType = TransformationType.REACTIONS;
 
@@ -126,8 +129,7 @@ public abstract class ASEMSysMLTest extends VitruviusEMFCasestudyTest {
                     Collections.<Notifier> unmodifiableList(CollectionLiterals.<Notifier> newArrayList(resource)));
 
         } catch (IOException e) {
-            // TODO [BR] Replace with logger message!?
-            System.err.println("[ASEMSysML] Model resource for " + modelName + " could not be saved!");
+            logger.error("[ASEMSysML] Model resource for " + modelName + " could not be saved!");
             e.printStackTrace();
         }
 
@@ -200,16 +202,13 @@ public abstract class ASEMSysMLTest extends VitruviusEMFCasestudyTest {
 
         try {
 
-            // TODO [BR] Remove second resource variable (code used from code generation)?!
             Resource eResource = object.eResource();
             EcoreResourceBridge.saveResource(eResource);
-            Resource eResource1 = object.eResource();
-            VURI instance = VURI.getInstance(eResource1);
+            VURI instance = VURI.getInstance(eResource);
             this.triggerSynchronization(instance);
 
         } catch (IOException e) {
-            // TODO [BR] Replace with logger message!?
-            System.err.println("[ASEMSysML] Could not save and synchronize changes of " + object);
+            logger.error("[ASEMSysML] Could not save and synchronize changes of " + object);
             e.printStackTrace();
         }
     }
