@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.AbstractTransformationRealization;
-import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.JavaTransformationRealization;
+import tools.vitruv.applications.asemsysml.java.sysml2asem.AbstractTransformationRealization;
+import tools.vitruv.applications.asemsysml.java.sysml2asem.JavaTransformationRealization;
 import tools.vitruv.framework.change.echange.EChange;
 
 /**

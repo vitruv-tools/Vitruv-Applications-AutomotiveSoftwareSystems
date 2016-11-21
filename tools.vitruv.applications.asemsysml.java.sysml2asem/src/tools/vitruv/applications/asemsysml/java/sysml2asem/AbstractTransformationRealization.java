@@ -1,4 +1,4 @@
-package tools.vitruv.applications.asemsysml.java.sysml2asem.transformations;
+package tools.vitruv.applications.asemsysml.java.sysml2asem;
 
 import java.util.Collections;
 

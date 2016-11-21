@@ -8,7 +8,6 @@ import org.eclipse.uml2.uml.UMLPackage;
 import edu.kit.ipd.sdq.ASEM.ASEMPackage;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.CreatedSysMLBlockTransformation;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.DebugTransformation;
-import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.JavaTransformationRealization;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.util.Change2TransformationMap;
 import tools.vitruv.framework.change.echange.EChange;
 import tools.vitruv.framework.change.processing.impl.AbstractEChangePropagationSpecification;

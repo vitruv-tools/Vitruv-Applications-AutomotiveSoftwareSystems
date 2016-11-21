@@ -3,6 +3,7 @@ package tools.vitruv.applications.asemsysml.java.sysml2asem.transformations;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import tools.vitruv.applications.asemsysml.java.sysml2asem.AbstractTransformationRealization;
 import tools.vitruv.framework.change.echange.EChange;
 import tools.vitruv.framework.userinteraction.UserInteracting;
 

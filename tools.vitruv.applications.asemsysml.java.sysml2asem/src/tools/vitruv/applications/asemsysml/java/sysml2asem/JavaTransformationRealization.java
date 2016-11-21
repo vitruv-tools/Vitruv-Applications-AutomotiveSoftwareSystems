@@ -1,4 +1,4 @@
-package tools.vitruv.applications.asemsysml.java.sysml2asem.transformations;
+package tools.vitruv.applications.asemsysml.java.sysml2asem;
 
 import tools.vitruv.framework.change.echange.EChange;
 import tools.vitruv.framework.correspondence.CorrespondenceModel;
