@@ -7,6 +7,8 @@ import org.eclipse.papyrus.sysml14.blocks.Block
 import org.eclipse.uml2.uml.util.UMLUtil
 import tools.vitruv.applications.asemsysml.reactions.sysml2asem.util.ASEMSysMLReactionHelper
 import tools.vitruv.framework.userinteraction.UserInteractionType
+import tools.vitruv.applications.asemsysml.ASEMSysMLHelper
+import org.eclipse.uml2.uml.Port
 
 import "edu.kit.ipd.sdq.asem" as asem
 import "http://www.eclipse.org/papyrus/sysml/1.4/SysML" as sysml
@@ -119,6 +121,76 @@ routine changeNameOfSysMLBlockCorrespondence(sysml::Block block) {
 		call {
 			asemComponent.name = block.base_Class.name
 			persistProjectRelative(block, asemComponent, ASEMSysMLReactionHelper.getASEMProjectModelPath(block.base_Class.name));
+		}
+	}
+}
+
+reaction PortTransformation {
+	
+	after value replaced for uml::Port[name]
+		with change.affectedEObject.owner instanceof org.eclipse.uml2.uml.Class &&
+			change.affectedEObject.owner.getAppliedStereotype("SysML::Blocks::Block") != null
+
+	call {
+		val port = change.affectedEObject
+		System.out.println("[ASEMSysML] Port with name " + change.newValue + " was created.");
+		createPortCorrespondence(port);
+	}
+}
+routine createPortCorrespondence(uml::Port port) {
+	match {
+		val asemModule = retrieve asem::Module corresponding to UMLUtil.getStereotypeApplication(port.owner, Block)
+	}
+	action {
+		val asemMessage = create asem::Message and initialize {
+			
+			// [Requirement 1.d)i]
+			asemMessage.name = port.name;
+			
+		}
+		call {
+			asemModule.typedElements.add(asemMessage)
+		}
+		add correspondence between port and asemMessage
+	}
+}
+
+reaction PortDirectionTransformation {
+	after value replaced for sysml::BindingConnector[base_Connector]
+	call {
+		val bindingConnector = change.affectedEObject;
+		for(connectorEnds: bindingConnector.base_Connector.ends) {
+			if(connectorEnds.role instanceof Port) {
+				setMessageAccessProperties(connectorEnds.role as Port);
+			}
+		}
+	}
+}
+routine setMessageAccessProperties(uml::Port port) {
+	match {
+		val asemMessage = retrieve asem::Message corresponding to port
+	}
+	action {
+		call {
+		
+			// [Requirement 1.d)ii]
+			val flowProperty = ASEMSysMLHelper.getFlowProperty(port);
+			val flowDirection = flowProperty.direction;
+			switch(flowDirection) {
+				case IN: {
+					asemMessage.readable = true;
+					asemMessage.writable = false;
+				}
+				case INOUT: {
+					asemMessage.readable = true;
+					asemMessage.writable = true;
+				}
+				case OUT: {
+					asemMessage.readable = false;
+					asemMessage.writable = true;
+				}
+			}
+			
 		}
 	}
 }

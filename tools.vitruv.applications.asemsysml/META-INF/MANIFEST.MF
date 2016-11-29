@@ -5,3 +5,8 @@ Bundle-SymbolicName: tools.vitruv.applications.asemsysml
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: tools.vitruv.applications.asemsysml
+Require-Bundle: org.eclipse.uml2.uml,
+ org.eclipse.papyrus.sysml14,
+ tools.vitruv.framework.correspondence;bundle-version="1.0.0",
+ tools.vitruv.domains.asem;bundle-version="1.0.0",
+ edu.kit.ipd.sdq.asem;bundle-version="1.0.0"

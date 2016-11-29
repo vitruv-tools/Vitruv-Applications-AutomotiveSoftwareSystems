@@ -24,4 +24,5 @@ Require-Bundle: org.junit,
  edu.kit.ipd.sdq.asem;bundle-version="1.0.0",
  tools.vitruv.domains.sysml;bundle-version="1.0.0",
  tools.vitruv.domains.asem;bundle-version="1.0.0",
- org.apache.log4j;bundle-version="1.2.15"
+ org.apache.log4j;bundle-version="1.2.15",
+ org.eclipse.uml2.uml

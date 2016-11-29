@@ -2,15 +2,23 @@ package tools.vitruv.applications.asemsysml.tests.sysml2asem;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static tools.vitruv.applications.asemsysml.ASEMSysMLConstants.TEST_SYSML_MODEL_NAME;
+
+import java.util.Collection;
+import java.util.HashSet;
 
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.papyrus.sysml14.blocks.Block;
+import org.eclipse.papyrus.sysml14.portsandflows.FlowDirection;
+import org.eclipse.papyrus.sysml14.portsandflows.FlowProperty;
+import org.eclipse.uml2.uml.Port;
 import org.junit.Before;
 import org.junit.Test;
 
 import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import edu.kit.ipd.sdq.ASEM.classifiers.Module;
+import edu.kit.ipd.sdq.ASEM.dataexchange.Message;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTest;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTestHelper;
@@ -53,7 +61,7 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
      * be mapped to an ASEM class or an ASEM module.<br>
      * <br>
      * 
-     * [Requirement 1.a)][Requirement 2.a)]
+     * [Requirement 1.a)] [Requirement 2.a)]
      */
     @Test
     public void testIfASysMLBlockIsMappedToAnASEMComponent() {
@@ -102,6 +110,21 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
         this.saveAndSynchronizeChanges(this.sysmlBlock);
 
         this.assertASEMComponentNameHasChangedAfterBlockNameChanged(sysmlBlock);
+
+    }
+
+    /**
+     * The owned ports of a SysML block shall be mapped to a ASEM message which is part of a ASEM
+     * module or to an argument of a ASEM class method. <br>
+     * <br>
+     * 
+     * [Requirement 1.d)] [Requirement 2.d)]
+     */
+    @Test
+    public void testIfPortsMappedCorrectly() {
+
+        this.assertPortMappingForASEMModuleExists();
+        // TODO [BR] Add port mapping check for ASEM class, too.
 
     }
 
@@ -160,13 +183,7 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
         final String sysmlBlockName = "BlockTo" + expectedComponentType.getSimpleName();
         Resource sysmlModelResource = this.getModelResource(sysmlProjectModelPath);
 
-        // FIXME [BR] Remove magic numbers!
-        int selection = 0;
-        if (expectedComponentType.getSimpleName().equals("Module")) {
-            selection = 0;
-        } else if (expectedComponentType.getSimpleName().equals("Class")) {
-            selection = 1;
-        }
+        int selection = ASEMSysMLTestHelper.getNextUserInteractorSelectionAsNumber(expectedComponentType);
 
         this.testUserInteractor.addNextSelections(selection);
         ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, sysmlBlockName, true, this);
@@ -174,6 +191,112 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
         Resource asemModelResource = this.getASEMModelResource(sysmlBlockName);
         ASEMSysMLTestHelper.assertValidModelResource(asemModelResource, expectedComponentType);
 
+    }
+
+    private void assertPortMappingForASEMModuleExists() {
+
+        Resource sysmlModelResource = this.getModelResource(sysmlProjectModelPath);
+
+        int selection = ASEMSysMLTestHelper.getNextUserInteractorSelectionAsNumber(Module.class);
+        this.testUserInteractor.addNextSelections(selection);
+        Block block = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockWithPort", true, this);
+
+        Collection<Port> portsToTest = new HashSet<Port>();
+        portsToTest.add(ASEMSysMLTestHelper.addPortToBlockAndSync(block, "SamplePortIN", FlowDirection.IN, this));
+        portsToTest.add(ASEMSysMLTestHelper.addPortToBlockAndSync(block, "SamplePortOUT", FlowDirection.OUT, this));
+        portsToTest.add(ASEMSysMLTestHelper.addPortToBlockAndSync(block, "SamplePortINOUT", FlowDirection.INOUT, this));
+
+        for (Port port : portsToTest) {
+            this.assertPortExists(port);
+
+            // [Requirement 1.d)] [Requirement 1.d)i]
+            this.assertMessageExistsWithSameName(port);
+
+            // [Requirement 1.d)ii]
+            this.assertPortDirectionIsMappedCorrectly(port);
+
+        }
+    }
+
+    private void assertMessageExistsWithSameName(final Port port) {
+
+        Message asemMessage = null;
+        try {
+            asemMessage = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), port,
+                    Message.class);
+        } catch (Throwable e) {
+            fail("There was no corresponding ASEM message found for the given port with name " + port.getName());
+            e.printStackTrace();
+        }
+
+        assertTrue("The given ASEM module has no message element.", asemMessage != null);
+        assertEquals("The names of port and message are not equal.", port.getName(), asemMessage.getName());
+    }
+
+    private void assertPortDirectionIsMappedCorrectly(final Port port) {
+        // Check the read and write properties of the ASEM message based on the ports flow
+        // direction.
+        // ([Requirement 1.d)ii])
+
+        FlowProperty flowProperty = ASEMSysMLHelper.getFlowProperty(port);
+        if (flowProperty == null) {
+            fail("There is no flow property available for the current port: " + port);
+            return;
+        }
+
+        FlowDirection flowDirection = flowProperty.getDirection();
+        assertTrue("No flow direction for given flow was found.", flowDirection != null);
+
+        Message asemMessage = null;
+        try {
+            asemMessage = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), port,
+                    Message.class);
+        } catch (Throwable e) {
+            fail("There was no corresponding ASEM message found for the given port with name " + port.getName());
+            e.printStackTrace();
+        }
+        assertTrue("There was no corresponding ASEM message found for the given port with name " + port.getName(),
+                asemMessage != null);
+
+        switch (flowDirection) {
+        case IN:
+            assertTrue("Flow direction (IN) wasn't mapped properly: The message should be readable.",
+                    asemMessage.isReadable());
+            assertTrue("Flow direction (IN) wasn't mapped properly: The message should not be writeable.",
+                    !asemMessage.isWritable());
+            break;
+        case OUT:
+            assertTrue("Flow direction (OUT) wasn't mapped properly: The message should not be readable.",
+                    !asemMessage.isReadable());
+            assertTrue("Flow direction (OUT) wasn't mapped properly: The message should be writable.",
+                    asemMessage.isWritable());
+            break;
+        case INOUT:
+            assertTrue("Flow direction (INOUT) wasn't mapped properly: The message should be readable.",
+                    asemMessage.isReadable());
+            assertTrue("Flow direction (INOUT) wasn't mapped properly: The message should be writeable.",
+                    asemMessage.isWritable());
+            break;
+
+        default:
+            break;
+        }
+
+    }
+
+    private void assertPortExists(final Port portThatShallExists) {
+        Resource sysmlModelResource = this.getModelResource(sysmlProjectModelPath);
+        Collection<Port> ports = ASEMSysMLTestHelper.getSysMLPorts(sysmlModelResource);
+        boolean portExists = false;
+
+        for (Port port : ports) {
+            if (port == portThatShallExists) {
+                portExists = true;
+            }
+        }
+
+        assertTrue("The SysML port " + portThatShallExists.getName() + " doesn't exist in SysML model resource.",
+                portExists);
     }
 
 }
