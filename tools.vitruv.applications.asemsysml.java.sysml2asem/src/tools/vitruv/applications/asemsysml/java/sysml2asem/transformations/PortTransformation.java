@@ -47,7 +47,7 @@ public class PortTransformation extends AbstractTransformationRealization {
 
         @SuppressWarnings("unchecked")
         ReplaceSingleValuedEAttribute<EObject, Object> change = (ReplaceSingleValuedEAttribute<EObject, Object>) untypedChange;
-        
+
         System.out.println("[ASEMSysML][Java] Transforming a SysML port ...");
         createASEMMessageAndSetName(change);
     }

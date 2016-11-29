@@ -13,9 +13,11 @@ import org.eclipse.papyrus.sysml14.blocks.Block;
 import org.eclipse.papyrus.sysml14.portsandflows.FlowDirection;
 import org.eclipse.papyrus.sysml14.portsandflows.FlowProperty;
 import org.eclipse.uml2.uml.Port;
+import org.eclipse.uml2.uml.Type;
 import org.junit.Before;
 import org.junit.Test;
 
+import edu.kit.ipd.sdq.ASEM.classifiers.Classifier;
 import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import edu.kit.ipd.sdq.ASEM.classifiers.Module;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Message;
@@ -23,6 +25,7 @@ import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTest;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTestHelper;
 import tools.vitruv.domains.sysml.SysMlNamspace;
+import tools.vitruv.framework.correspondence.CorrespondenceModel;
 
 /**
  * Class for all SysML block mapping tests. A SysML block will be mapped to an ASEM model containing
@@ -215,6 +218,9 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
             // [Requirement 1.d)ii]
             this.assertPortDirectionIsMappedCorrectly(port);
 
+            // [Requirement 1.d)iii]
+            this.assertPortTypeIsMappedCorrectly(port);
+
         }
     }
 
@@ -284,6 +290,21 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
 
     }
 
+    private void assertPortTypeIsMappedCorrectly(final Port port) {
+
+        final Type portType = port.getType();
+
+        if (portType instanceof org.eclipse.uml2.uml.Class
+                && portType.getAppliedStereotype("SysML::Blocks::Block") != null) {
+
+            assertMessageTypeIsAASEMComponent(port);
+
+        } else {
+            fail("Invalid port type is used.");
+        }
+
+    }
+
     private void assertPortExists(final Port portThatShallExists) {
         Resource sysmlModelResource = this.getModelResource(sysmlProjectModelPath);
         Collection<Port> ports = ASEMSysMLTestHelper.getSysMLPorts(sysmlModelResource);
@@ -299,4 +320,34 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
                 portExists);
     }
 
+    private void assertMessageTypeIsAASEMComponent(final Port port) {
+        // The port type is a block, therefore the message type has to be an 1) ASEM module, if the
+        // block (which is the type of the port) corresponds to a module, or an 2) ASEM class if the
+        // block corresponds to a class.
+
+        CorrespondenceModel correspondenceModel = null;
+        try {
+            correspondenceModel = getCorrespondenceModel();
+        } catch (Throwable e) {
+            fail("No correspondence model was found.");
+            e.printStackTrace();
+        }
+
+        final Message message = ASEMSysMLHelper.getFirstCorrespondingASEMElement(correspondenceModel, port,
+                Message.class);
+        final Classifier messageType = message.getType();
+
+        assertTrue("Message type is not set.", messageType != null);
+        assertTrue("Message type is not a ASEM component.", messageType instanceof Component);
+
+        final Block portsBlock = ASEMSysMLHelper.getPortsBlock(port);
+        final Component correspondingASEMComponent = ASEMSysMLHelper
+                .getFirstCorrespondingASEMElement(correspondenceModel, portsBlock, Component.class);
+
+        Class<?> componentType = correspondingASEMComponent.getClass();
+        Class<?> msgType = messageType.getClass();
+
+        assertEquals("The message which corresponds to the given port has the wrong type.", componentType, msgType);
+
+    }
 }

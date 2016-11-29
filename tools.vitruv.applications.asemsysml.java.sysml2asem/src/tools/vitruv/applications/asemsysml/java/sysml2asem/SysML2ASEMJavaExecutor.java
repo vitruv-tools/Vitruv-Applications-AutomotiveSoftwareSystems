@@ -8,6 +8,7 @@ import org.eclipse.uml2.uml.UMLPackage;
 import edu.kit.ipd.sdq.ASEM.ASEMPackage;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.CreatedSysMLBlockTransformation;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.PortTransformation;
+import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.PortTypeTransformation;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.DebugTransformation;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.PortDirectionTransformation;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.RenameSysMLBlock;
@@ -52,6 +53,7 @@ public class SysML2ASEMJavaExecutor extends AbstractEChangePropagationSpecificat
         this.addTransformation(new RenameSysMLBlock(this.getUserInteracting()));
         this.addTransformation(new PortTransformation(this.getUserInteracting()));
         this.addTransformation(new PortDirectionTransformation(this.getUserInteracting()));
+        this.addTransformation(new PortTypeTransformation(this.getUserInteracting()));
 
     }
 

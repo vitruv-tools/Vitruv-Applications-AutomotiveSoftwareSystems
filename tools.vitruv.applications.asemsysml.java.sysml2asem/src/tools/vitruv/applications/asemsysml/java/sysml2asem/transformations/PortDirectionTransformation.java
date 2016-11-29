@@ -22,7 +22,7 @@ import tools.vitruv.framework.change.echange.feature.reference.ReplaceSingleValu
 import tools.vitruv.framework.userinteraction.UserInteracting;
 
 /**
- * The transformation class for transforming a the direction of a SysML port.<br>
+ * The transformation class for transforming the direction of a SysML port.<br>
  * <br>
  * 
  * To transform the port direction the following elements must exist:

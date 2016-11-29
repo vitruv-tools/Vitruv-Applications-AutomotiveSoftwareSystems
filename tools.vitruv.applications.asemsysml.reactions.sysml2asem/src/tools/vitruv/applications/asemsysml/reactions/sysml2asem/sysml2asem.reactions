@@ -4,11 +4,11 @@ import java.util.HashSet
 import java.util.List
 import java.util.Set
 import org.eclipse.papyrus.sysml14.blocks.Block
+import org.eclipse.uml2.uml.Port
 import org.eclipse.uml2.uml.util.UMLUtil
+import tools.vitruv.applications.asemsysml.ASEMSysMLHelper
 import tools.vitruv.applications.asemsysml.reactions.sysml2asem.util.ASEMSysMLReactionHelper
 import tools.vitruv.framework.userinteraction.UserInteractionType
-import tools.vitruv.applications.asemsysml.ASEMSysMLHelper
-import org.eclipse.uml2.uml.Port
 
 import "edu.kit.ipd.sdq.asem" as asem
 import "http://www.eclipse.org/papyrus/sysml/1.4/SysML" as sysml
@@ -190,6 +190,32 @@ routine setMessageAccessProperties(uml::Port port) {
 					asemMessage.writable = true;
 				}
 			}
+			
+		}
+	}
+}
+
+reaction PortTypeTransformation {
+	after value replaced for uml::Port[type]
+	call {
+		val port = change.affectedEObject;
+		val block = UMLUtil.getStereotypeApplication(change.newValue, Block);
+		
+		if(block != null) {
+			transformPortType(port, block);		
+		}
+	}
+}
+routine transformPortType(uml::Port port, sysml::Block block){
+	match {
+		val asemMessage = retrieve asem::Message corresponding to port
+		val asemComponent = retrieve asem::Component corresponding to block
+	}
+	action {
+		call {
+			
+			// [Requirement 1.d)iii]
+			asemMessage.type = asemComponent;
 			
 		}
 	}
