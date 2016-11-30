@@ -42,7 +42,7 @@ import tools.vitruv.framework.userinteraction.UserInteracting;
  */
 public class PortDirectionTransformation extends AbstractTransformationRealization {
 
-    private final Logger logger = Logger.getLogger(PortDirectionTransformation.class);
+    private static Logger logger = Logger.getLogger(PortDirectionTransformation.class);
 
     public PortDirectionTransformation(UserInteracting userInteracting) {
         super(userInteracting);
@@ -59,7 +59,8 @@ public class PortDirectionTransformation extends AbstractTransformationRealizati
         @SuppressWarnings("unchecked")
         ReplaceSingleValuedEReference<EObject, EObject> change = (ReplaceSingleValuedEReference<EObject, EObject>) untypedChange;
 
-        System.out.println("[ASEMSysML][Java] Transform direction of a SysML port ...");
+        logger.info("[ASEMSysML][Java] Transform direction of a SysML port ...");
+
         setMessageAccess(change);
     }
 

@@ -1,5 +1,6 @@
 package tools.vitruv.applications.asemsysml.java.sysml2asem.transformations;
 
+import org.apache.log4j.Logger;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.papyrus.sysml14.blocks.Block;
 import org.eclipse.papyrus.sysml14.blocks.BlocksPackage;
@@ -32,6 +33,8 @@ import tools.vitruv.framework.userinteraction.UserInteracting;
  */
 public class CreatedSysMLBlockTransformation extends AbstractTransformationRealization {
 
+    private static Logger logger = Logger.getLogger(CreatedSysMLBlockTransformation.class);
+    
     public CreatedSysMLBlockTransformation(UserInteracting userInteracting) {
         super(userInteracting);
     }
@@ -56,7 +59,7 @@ public class CreatedSysMLBlockTransformation extends AbstractTransformationReali
     @Override
     protected void executeTransformation(EChange change) {
 
-        System.out.println("[ASEMSysML][Java] Transforming a SysML Block ...");
+        logger.info("[ASEMSysML][Java] Transforming a SysML Block ...");
 
         createASEMModule((ReplaceSingleValuedEAttribute<EObject, Object>) change);
 

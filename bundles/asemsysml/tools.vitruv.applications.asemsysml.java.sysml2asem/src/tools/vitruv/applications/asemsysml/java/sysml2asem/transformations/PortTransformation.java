@@ -1,5 +1,6 @@
 package tools.vitruv.applications.asemsysml.java.sysml2asem.transformations;
 
+import org.apache.log4j.Logger;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.papyrus.sysml14.blocks.Block;
 import org.eclipse.uml2.uml.Port;
@@ -33,6 +34,8 @@ import tools.vitruv.framework.userinteraction.UserInteracting;
  */
 public class PortTransformation extends AbstractTransformationRealization {
 
+    private static Logger logger = Logger.getLogger(PortTransformation.class);
+
     public PortTransformation(UserInteracting userInteracting) {
         super(userInteracting);
     }
@@ -48,7 +51,8 @@ public class PortTransformation extends AbstractTransformationRealization {
         @SuppressWarnings("unchecked")
         ReplaceSingleValuedEAttribute<EObject, Object> change = (ReplaceSingleValuedEAttribute<EObject, Object>) untypedChange;
 
-        System.out.println("[ASEMSysML][Java] Transforming a SysML port ...");
+        logger.info("[ASEMSysML][Java] Transforming a SysML port ...");
+
         createASEMMessageAndSetName(change);
     }
 
