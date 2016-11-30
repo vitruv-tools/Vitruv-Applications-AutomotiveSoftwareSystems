@@ -28,9 +28,9 @@ import tools.vitruv.framework.userinteraction.UserInteracting;
  * @author Benjamin Rupp
  *
  */
-public class RenameSysMLBlock extends AbstractTransformationRealization {
+public class BlockNameTransformation extends AbstractTransformationRealization {
 
-    public RenameSysMLBlock(UserInteracting userInteracting) {
+    public BlockNameTransformation(UserInteracting userInteracting) {
         super(userInteracting);
     }
 

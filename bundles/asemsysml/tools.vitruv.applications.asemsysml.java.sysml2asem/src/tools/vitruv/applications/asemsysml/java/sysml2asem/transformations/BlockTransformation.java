@@ -31,11 +31,11 @@ import tools.vitruv.framework.userinteraction.UserInteracting;
  * @author Benjamin Rupp
  *
  */
-public class CreatedSysMLBlockTransformation extends AbstractTransformationRealization {
+public class BlockTransformation extends AbstractTransformationRealization {
 
-    private static Logger logger = Logger.getLogger(CreatedSysMLBlockTransformation.class);
+    private static Logger logger = Logger.getLogger(BlockTransformation.class);
     
-    public CreatedSysMLBlockTransformation(UserInteracting userInteracting) {
+    public BlockTransformation(UserInteracting userInteracting) {
         super(userInteracting);
     }
 
