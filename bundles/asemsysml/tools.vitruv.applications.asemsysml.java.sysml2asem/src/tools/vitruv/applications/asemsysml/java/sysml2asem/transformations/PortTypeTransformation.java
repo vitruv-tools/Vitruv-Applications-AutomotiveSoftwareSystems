@@ -8,6 +8,7 @@ import org.eclipse.uml2.uml.UMLPackage;
 import org.eclipse.uml2.uml.util.UMLUtil;
 
 import edu.kit.ipd.sdq.ASEM.classifiers.Classifier;
+import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import edu.kit.ipd.sdq.ASEM.classifiers.Module;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Message;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
@@ -91,11 +92,11 @@ public class PortTypeTransformation extends AbstractTransformationRealization {
         if (portType instanceof org.eclipse.uml2.uml.Class) {
             org.eclipse.uml2.uml.Class baseClass = (org.eclipse.uml2.uml.Class) portType;
             Block portTypeBlock = UMLUtil.getStereotypeApplication(baseClass, Block.class);
-            // TODO [BR] Replace Module.class with the type of the correspondence of portTypeBlock.
-            Module correspondingModule = ASEMSysMLHelper.getFirstCorrespondingASEMElement(
-                    this.executionState.getCorrespondenceModel(), portTypeBlock, Module.class);
 
-            return correspondingModule;
+            Component correspondingComponent = ASEMSysMLHelper.getFirstCorrespondingASEMElement(
+                    this.executionState.getCorrespondenceModel(), portTypeBlock, Component.class);
+
+            return correspondingComponent;
 
         }
         // TODO [BR] Handle ValueTypes, too.
