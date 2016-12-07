@@ -17,6 +17,8 @@ public class DebugTransformation extends AbstractTransformationRealization {
 
     private static Logger logger = Logger.getLogger(DebugTransformation.class);
 
+    private static boolean debug = false;
+
     public DebugTransformation(UserInteracting userInteracting) {
         super(userInteracting);
 
@@ -36,7 +38,9 @@ public class DebugTransformation extends AbstractTransformationRealization {
 
     @Override
     protected void executeTransformation(EChange change) {
-        logger.debug("[ASEMSysML][Java][Change] " + change);
+        if (debug) {
+            logger.debug("[ASEMSysML][Java][Change] " + change);
+        }
     }
 
 }

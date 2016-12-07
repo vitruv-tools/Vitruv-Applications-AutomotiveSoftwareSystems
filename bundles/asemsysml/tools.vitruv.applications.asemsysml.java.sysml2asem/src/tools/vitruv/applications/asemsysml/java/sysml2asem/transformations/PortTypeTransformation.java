@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.papyrus.sysml14.blocks.Block;
 import org.eclipse.uml2.uml.Port;
+import org.eclipse.uml2.uml.PrimitiveType;
 import org.eclipse.uml2.uml.Type;
 import org.eclipse.uml2.uml.UMLPackage;
 import org.eclipse.uml2.uml.util.UMLUtil;
@@ -13,6 +14,7 @@ import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import edu.kit.ipd.sdq.ASEM.classifiers.Module;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Message;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
+import tools.vitruv.applications.asemsysml.ASEMSysMLPrimitiveTypeHelper;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.AbstractTransformationRealization;
 import tools.vitruv.domains.asem.AsemNamespace;
 import tools.vitruv.framework.change.echange.EChange;
@@ -35,7 +37,7 @@ import tools.vitruv.framework.userinteraction.UserInteracting;
 public class PortTypeTransformation extends AbstractTransformationRealization {
 
     private static Logger logger = Logger.getLogger(PortTypeTransformation.class);
-    
+
     public PortTypeTransformation(UserInteracting userInteracting) {
         super(userInteracting);
     }
@@ -101,8 +103,18 @@ public class PortTypeTransformation extends AbstractTransformationRealization {
 
             return correspondingComponent;
 
+        } else if (portType instanceof PrimitiveType) {
+
+            final PrimitiveType primitivePortType = (PrimitiveType) portType;
+            
+            final Class<? extends edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType> primitiveMessageType;
+            primitiveMessageType = ASEMSysMLPrimitiveTypeHelper.PRIMITIVE_TYPE_MAP.get(primitivePortType);
+
+            final edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType messageType = ASEMSysMLPrimitiveTypeHelper
+                    .getASEMPrimitiveTypeFromRepository(primitiveMessageType, portType);
+
+            return messageType;
         }
-        // TODO [BR] Handle ValueTypes, too.
 
         return null;
 

@@ -13,6 +13,7 @@ import org.eclipse.papyrus.sysml14.blocks.Block;
 import org.eclipse.papyrus.sysml14.portsandflows.FlowDirection;
 import org.eclipse.papyrus.sysml14.portsandflows.FlowProperty;
 import org.eclipse.uml2.uml.Port;
+import org.eclipse.uml2.uml.PrimitiveType;
 import org.eclipse.uml2.uml.Type;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,6 +23,7 @@ import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import edu.kit.ipd.sdq.ASEM.classifiers.Module;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Message;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
+import tools.vitruv.applications.asemsysml.ASEMSysMLPrimitiveTypeHelper;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTest;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTestHelper;
 import tools.vitruv.domains.sysml.SysMlNamspace;
@@ -186,7 +188,7 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
         final String sysmlBlockName = "BlockTo" + expectedComponentType.getSimpleName();
         Resource sysmlModelResource = this.getModelResource(sysmlProjectModelPath);
 
-        int selection = ASEMSysMLTestHelper.getNextUserInteractorSelectionAsNumber(expectedComponentType);
+        int selection = ASEMSysMLTestHelper.getNextUserInteractorSelectionForASEMComponent(expectedComponentType);
 
         this.testUserInteractor.addNextSelections(selection);
         ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, sysmlBlockName, true, this);
@@ -200,14 +202,32 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
 
         Resource sysmlModelResource = this.getModelResource(sysmlProjectModelPath);
 
-        int selection = ASEMSysMLTestHelper.getNextUserInteractorSelectionAsNumber(Module.class);
-        this.testUserInteractor.addNextSelections(selection);
+        // Add a block which owns all ports for this test.
+        int componentSelection = ASEMSysMLTestHelper.getNextUserInteractorSelectionForASEMComponent(Module.class);
+        this.testUserInteractor.addNextSelections(componentSelection);
         Block block = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockWithPort", true, this);
 
+        // The different port types to test.
+        // TODO [BR] String and unlimited natural are ignored at the moment.
+        Type blockType = block.getBase_Class();
+        PrimitiveType pBoolean = ASEMSysMLPrimitiveTypeHelper.PRIMITIVE_TYPE_BOOLEAN;
+        PrimitiveType pInteger = ASEMSysMLPrimitiveTypeHelper.PRIMITIVE_TYPE_INTEGER;
+        PrimitiveType pReal = ASEMSysMLPrimitiveTypeHelper.PRIMITIVE_TYPE_REAL;
+
+        // Add ports and test if their transformation was successfully.
         Collection<Port> portsToTest = new HashSet<Port>();
-        portsToTest.add(ASEMSysMLTestHelper.addPortToBlockAndSync(block, "SamplePortIN", FlowDirection.IN, this));
-        portsToTest.add(ASEMSysMLTestHelper.addPortToBlockAndSync(block, "SamplePortOUT", FlowDirection.OUT, this));
-        portsToTest.add(ASEMSysMLTestHelper.addPortToBlockAndSync(block, "SamplePortINOUT", FlowDirection.INOUT, this));
+        portsToTest.add(
+                ASEMSysMLTestHelper.addPortToBlockAndSync(block, "SamplePortIN", FlowDirection.IN, blockType, this));
+        portsToTest.add(
+                ASEMSysMLTestHelper.addPortToBlockAndSync(block, "SamplePortOUT", FlowDirection.OUT, blockType, this));
+        portsToTest.add(ASEMSysMLTestHelper.addPortToBlockAndSync(block, "SamplePortINOUT", FlowDirection.INOUT,
+                blockType, this));
+        portsToTest.add(ASEMSysMLTestHelper.addPortToBlockAndSync(block, "SampleBooleanPortIN", FlowDirection.IN,
+                pBoolean, this));
+        portsToTest.add(ASEMSysMLTestHelper.addPortToBlockAndSync(block, "SampleIntegerPortIN", FlowDirection.IN,
+                pInteger, this));
+        portsToTest.add(
+                ASEMSysMLTestHelper.addPortToBlockAndSync(block, "SampleRealPortIN", FlowDirection.IN, pReal, this));
 
         for (Port port : portsToTest) {
             this.assertPortExists(port);
@@ -218,7 +238,7 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
             // [Requirement 1.d)ii]
             this.assertPortDirectionIsMappedCorrectly(port);
 
-            // [Requirement 1.d)iii]
+            // [Requirement 1.d)iii] [Requirement 1.d)iv]
             this.assertPortTypeIsMappedCorrectly(port);
 
         }
@@ -297,7 +317,13 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
         if (portType instanceof org.eclipse.uml2.uml.Class
                 && portType.getAppliedStereotype("SysML::Blocks::Block") != null) {
 
-            assertMessageTypeIsAASEMComponent(port);
+            // [Requirement 1.d)iii]
+            assertMessageTypeIsASEMComponent(port);
+
+        } else if (portType instanceof PrimitiveType) {
+
+            // [Requirement 1.d)iv]
+            assertMessageTypeIsPrimitiveType(port);
 
         } else {
             fail("Invalid port type is used.");
@@ -320,7 +346,7 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
                 portExists);
     }
 
-    private void assertMessageTypeIsAASEMComponent(final Port port) {
+    private void assertMessageTypeIsASEMComponent(final Port port) {
         // The port type is a block, therefore the message type has to be an 1) ASEM module, if the
         // block (which is the type of the port) corresponds to a module, or an 2) ASEM class if the
         // block corresponds to a class.
@@ -348,6 +374,33 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
         Class<?> msgType = messageType.getClass();
 
         assertEquals("The message which corresponds to the given port has the wrong type.", componentType, msgType);
+
+    }
+
+    private void assertMessageTypeIsPrimitiveType(final Port port) {
+
+        final PrimitiveType portType = (PrimitiveType) port.getType();
+
+        CorrespondenceModel correspondenceModel = null;
+        try {
+            correspondenceModel = getCorrespondenceModel();
+        } catch (Throwable e) {
+            fail("No correspondence model was found.");
+            e.printStackTrace();
+        }
+
+        final Message message = ASEMSysMLHelper.getFirstCorrespondingASEMElement(correspondenceModel, port,
+                Message.class);
+        final Classifier messageType = message.getType();
+        assertTrue("The message typ of message " + message.getName() + " isn't set!", messageType != null);
+
+        final Class<? extends edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType> expectedMessageType;
+        expectedMessageType = ASEMSysMLPrimitiveTypeHelper.PRIMITIVE_TYPE_MAP.get(portType);
+
+        assertTrue(
+                "Message has wrong type! Type is " + messageType.getClass().getSimpleName() + ". Expected type was:"
+                        + expectedMessageType.getSimpleName(),
+                expectedMessageType.isAssignableFrom(messageType.getClass()));
 
     }
 }

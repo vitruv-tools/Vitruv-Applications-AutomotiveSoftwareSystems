@@ -166,6 +166,8 @@ public final class ASEMSysMLTestHelper {
      *            The name of the port.
      * @param flowDirection
      *            The flow direction of the port.
+     * @param portType
+     *            The type of the port and its property.
      * @param testCaseClass
      *            Test case class. Needed for accessing synchronization method.
      * @return The added port.
@@ -173,9 +175,9 @@ public final class ASEMSysMLTestHelper {
      * @see FlowDirection
      */
     public static Port addPortToBlockAndSync(final Block block, final String portName,
-            final FlowDirection flowDirection, final ASEMSysMLTest testCaseClass) {
+            final FlowDirection flowDirection, final Type portType, final ASEMSysMLTest testCaseClass) {
 
-        Port port = addPortToBlock(block, portName, flowDirection);
+        Port port = addPortToBlock(block, portName, flowDirection, portType);
         testCaseClass.saveAndSynchronizeChanges(port);
 
         return port;
@@ -248,7 +250,7 @@ public final class ASEMSysMLTestHelper {
      * @return The magic number for the {@link TestUserInteractor}
      * @see TestUserInteractor#addNextSelections(Integer...)
      */
-    public static int getNextUserInteractorSelectionAsNumber(
+    public static int getNextUserInteractorSelectionForASEMComponent(
             final java.lang.Class<? extends Component> expectedComponentType) {
         // FIXME [BR] Remove magic numbers!
         // The order must be the same as in the transformation!
@@ -270,25 +272,19 @@ public final class ASEMSysMLTestHelper {
         return sysmlRootModel;
     }
 
-    private static Port addPortToBlock(final Block block, final String portName, final FlowDirection flowDirection) {
+    private static Port addPortToBlock(final Block block, final String portName, final FlowDirection flowDirection,
+            final Type portType) {
 
-        // 1) Set the port type.
-        // We add a UML port to the block, not a SysML (full or proxy) port! Therefore we have to
-        // use a other block or a primitive type as port type.
-        // TODO [BR] At the moment the block of the port is used as type. If a more realistic usage
-        // is needed, the following part should be reworked.
-        Type portType = block.getBase_Class();
-
-        // 2) Add SysML flow property to block.
+        // 1) Add SysML flow property to block.
         Property portProperty = block.getBase_Class().createOwnedAttribute(portName + "Property", portType);
         FlowProperty flowProperty = (FlowProperty) StereotypeApplicationHelper.getInstance(null)
                 .applyStereotype(portProperty, PortsandflowsPackage.eINSTANCE.getFlowProperty());
         flowProperty.setDirection(flowDirection);
 
-        // 3) Create UML port for the block.
+        // 2) Create UML port for the block.
         Port port = block.getBase_Class().createOwnedPort(portName, portType);
 
-        // 4) Create SysML binding connector between property and port.
+        // 3) Create SysML binding connector between property and port.
         Connector connector = block.getBase_Class()
                 .createOwnedConnector("BindingConnector_" + portProperty.getName() + "<->" + port.getName());
         ConnectorEnd propertyEnd = connector.createEnd();

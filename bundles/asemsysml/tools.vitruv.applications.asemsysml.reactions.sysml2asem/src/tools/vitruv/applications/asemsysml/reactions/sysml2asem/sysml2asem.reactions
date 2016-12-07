@@ -5,9 +5,10 @@ import java.util.List
 import java.util.Set
 import org.eclipse.papyrus.sysml14.blocks.Block
 import org.eclipse.uml2.uml.Port
+import org.eclipse.uml2.uml.PrimitiveType
 import org.eclipse.uml2.uml.util.UMLUtil
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper
-import tools.vitruv.applications.asemsysml.reactions.sysml2asem.util.ASEMSysMLReactionHelper
+import tools.vitruv.applications.asemsysml.ASEMSysMLPrimitiveTypeHelper
 import tools.vitruv.framework.userinteraction.UserInteractionType
 
 import "edu.kit.ipd.sdq.asem" as asem
@@ -94,7 +95,7 @@ routine createASEMModelWithModuleAsRootElement(sysml::Block block) {
 		val rootElement = create asem::Module and initialize {
 			rootElement.name = block.base_Class.name;
 			
-			persistProjectRelative(block, rootElement, ASEMSysMLReactionHelper.getASEMProjectModelPath(block.base_Class.name));
+			persistProjectRelative(block, rootElement, ASEMSysMLHelper.getASEMProjectModelPath(block.base_Class.name));
 		}
 		add correspondence between block and rootElement
 	}
@@ -120,11 +121,15 @@ routine changeNameOfSysMLBlockCorrespondence(sysml::Block block) {
 	action {
 		call {
 			asemComponent.name = block.base_Class.name
-			persistProjectRelative(block, asemComponent, ASEMSysMLReactionHelper.getASEMProjectModelPath(block.base_Class.name));
+			persistProjectRelative(block, asemComponent, ASEMSysMLHelper.getASEMProjectModelPath(block.base_Class.name));
 		}
 	}
 }
 
+/*
+ * Port transformation
+ * ---------------------------------------------------
+ */
 reaction PortTransformation {
 	
 	after value replaced for uml::Port[name]
@@ -203,6 +208,8 @@ reaction PortTypeTransformation {
 		
 		if(block != null) {
 			transformPortType(port, block);		
+		} else if(change.newValue instanceof PrimitiveType) {
+			transformPrimitivePortType(port);
 		}
 	}
 }
@@ -217,6 +224,63 @@ routine transformPortType(uml::Port port, sysml::Block block){
 			// [Requirement 1.d)iii]
 			asemMessage.type = asemComponent;
 			
+		}
+	}
+}
+routine transformPrimitivePortType(uml::Port port) {
+	match {
+		val asemMessage = retrieve asem::Message corresponding to port
+	}
+	action {
+		
+		call {			
+			val messageType = ASEMSysMLPrimitiveTypeHelper.PRIMITIVE_TYPE_MAP.get(port.type);
+			asemMessage.type = ASEMSysMLPrimitiveTypeHelper.getASEMPrimitiveTypeFromRepository(messageType, asemMessage);
+		}
+	}
+}
+
+/*
+ * SysML primitive type transformation
+ * ---------------------------------------------------------------------------------------------------
+ */
+reaction PrimitiveTypeTransformation {
+	after list entry created and inserted in uml::Model[packagedElement]
+		with change.newValue instanceof PrimitiveType
+
+	call {
+		val primitiveType = change.newValue as PrimitiveType
+		System.out.println("[ASEMSysML] Primitive type " + primitiveType.name + " added.");
+		
+		// Add all ASEM primitive types to primitive types model.
+		if(!ASEMSysMLPrimitiveTypeHelper.isPrimitiveTypeModelInitialized(primitiveType)) {
+			System.out.println("[ASEMSysML] Initialize primitive types for " + primitiveType.eResource);
+			addASEMPrimitiveTypes(primitiveType);
+		}
+	}
+}
+routine addASEMPrimitiveTypes(uml::PrimitiveType primitiveType) {
+	action {
+		val pUnsignedDiscrete = create asem::UnsignedDiscreteType and initialize {
+			pUnsignedDiscrete.name = "UnsignedDiscrete";
+		}
+		val pSignedDiscrete = create asem::SignedDiscreteType and initialize {
+			pSignedDiscrete.name = "SignedDiscrete";
+		}
+		val pBoolean = create asem::BooleanType and initialize {
+			pBoolean.name = "Boolean";
+		}
+		val pContinuous = create asem::ContinuousType and initialize {
+			pContinuous.name = "Continuous";
+		}
+		val pRepo = create asem::PrimitiveTypeRepository and initialize {
+			pRepo.name = "PrimitveTypeRepo";
+			pRepo.primitiveTypes.add(pUnsignedDiscrete);
+			pRepo.primitiveTypes.add(pSignedDiscrete);
+			pRepo.primitiveTypes.add(pBoolean);
+			pRepo.primitiveTypes.add(pContinuous);
+			
+			persistProjectRelative(primitiveType, pRepo, ASEMSysMLPrimitiveTypeHelper.primitiveTypeProjectModelPath);
 		}
 	}
 }

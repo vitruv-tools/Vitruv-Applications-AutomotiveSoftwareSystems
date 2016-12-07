@@ -18,6 +18,7 @@ import org.eclipse.xtext.xbase.lib.CollectionLiterals;
 import org.junit.runner.Description;
 
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
+import tools.vitruv.applications.asemsysml.ASEMSysMLPrimitiveTypeHelper;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTestHelper.TransformationType;
 import tools.vitruv.domains.asem.AsemDomain;
 import tools.vitruv.domains.asem.AsemNamespace;
@@ -42,7 +43,7 @@ public abstract class ASEMSysMLTest extends VitruviusEMFCasestudyTest {
 
     private static Logger logger = Logger.getLogger(ASEMSysMLTest.class);
 
-    private final TransformationType transformationType = TransformationType.REACTIONS;
+    private final TransformationType transformationType = TransformationType.JAVA;
 
     /*
      * TEST CASE methods. -------------------------------------------------------------------------
@@ -96,6 +97,17 @@ public abstract class ASEMSysMLTest extends VitruviusEMFCasestudyTest {
 
         Model sysmlModel = SysMLResource.createSysMLModel(this.resourceSet, "SysMLResource", TEST_SYSML_MODEL_NAME);
         createAndSyncSourceModel(TEST_SYSML_MODEL_NAME, SysMlNamspace.FILE_EXTENSION, sysmlModel);
+
+        // Add primitive types to SysML model after the model element was saved and synchronized!
+        // This is necessary for VITRUV to detect the primitive type changes.
+        sysmlModel.getPackagedElements().add(ASEMSysMLPrimitiveTypeHelper.PRIMITIVE_TYPE_BOOLEAN);
+        sysmlModel.getPackagedElements().add(ASEMSysMLPrimitiveTypeHelper.PRIMITIVE_TYPE_INTEGER);
+        sysmlModel.getPackagedElements().add(ASEMSysMLPrimitiveTypeHelper.PRIMITIVE_TYPE_REAL);
+        sysmlModel.getPackagedElements().add(ASEMSysMLPrimitiveTypeHelper.PRIMITIVE_TYPE_UNLIMITED_NATURAL);
+        sysmlModel.getPackagedElements().add(ASEMSysMLPrimitiveTypeHelper.PRIMITIVE_TYPE_STRING);
+
+        saveAndSynchronizeChanges(sysmlModel);
+
     }
 
     private void createAndSyncSourceModel(final String modelName, final String modelFileExtension,

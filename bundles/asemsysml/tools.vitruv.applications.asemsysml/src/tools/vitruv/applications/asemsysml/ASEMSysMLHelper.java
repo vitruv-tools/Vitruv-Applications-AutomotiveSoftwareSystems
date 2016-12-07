@@ -53,6 +53,22 @@ public class ASEMSysMLHelper {
     }
 
     /**
+     * Get the project model path for the ASEM model which corresponds to a SysML Block.
+     * 
+     * @param blockName
+     *            Name of the corresponding SysML block.
+     * @return Project model path of the ASEM model.
+     */
+    public static String getASEMProjectModelPath(final String blockName) {
+
+        String modelName = ASEMSysMLHelper.getASEMModelName(blockName);
+        String projectModelPath = ASEMSysMLHelper.getProjectModelPath(modelName, AsemNamespace.FILE_EXTENSION);
+
+        return projectModelPath;
+
+    }
+
+    /**
      * Get all ASEM elements which correspond to the given SysML element.
      * 
      * @param correspondenceModel

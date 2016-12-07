@@ -17,7 +17,7 @@ public final class ASEMSysMLConstants {
 
     private ASEMSysMLConstants() {
     }
-    
+
     public static final String MODEL_DIR_NAME = "model";
 
     // ASEM
