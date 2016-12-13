@@ -12,12 +12,17 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.papyrus.sysml14.blocks.Block;
 import org.eclipse.papyrus.sysml14.portsandflows.FlowDirection;
 import org.eclipse.papyrus.sysml14.portsandflows.FlowProperty;
+import org.eclipse.uml2.uml.AggregationKind;
 import org.eclipse.uml2.uml.Port;
 import org.eclipse.uml2.uml.PrimitiveType;
+import org.eclipse.uml2.uml.Property;
 import org.eclipse.uml2.uml.Type;
+import org.eclipse.uml2.uml.UMLPackage;
+import org.eclipse.uml2.uml.util.UMLUtil.StereotypeApplicationHelper;
 import org.junit.Before;
 import org.junit.Test;
 
+import edu.kit.ipd.sdq.ASEM.base.TypedElement;
 import edu.kit.ipd.sdq.ASEM.classifiers.Classifier;
 import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import edu.kit.ipd.sdq.ASEM.classifiers.Module;
@@ -130,6 +135,25 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
 
         this.assertPortMappingForASEMModuleExists();
         // TODO [BR] Add port mapping check for ASEM class, too.
+
+    }
+
+    /**
+     * If a SysML <code>block</code> corresponds to a ASEM <code>Module</code> its parts shall be
+     * mapped to an <i>ASEM Module -> ASEM Module</i> reference (if the part of the SysML block
+     * corresponds to a ASEM Module), or to an <i>ASEM Module -> ASEM Class</i> reference (if the
+     * part of the SysML block corresponds to a ASEM Class). <br>
+     * If the SysML <code>block</code> corresponds to a ASEM <code>Class</code> the references are
+     * <i>ASEM Class -> ASEM Module</i> or <i>ASEM Class -> ASEM Class</i>. <br>
+     * <br>
+     * 
+     * [Requirement 1.e)] [Requirement 1.f)] [Requirement 2.f)] [Requirement 2.g)]
+     */
+    @Test
+    public void testIfPartsMappedCorrectly() {
+
+        this.assertPartMappingForASEMModuleExists();
+        // TODO [BR] Add part mapping check for ASEM class, too.
 
     }
 
@@ -246,14 +270,8 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
 
     private void assertMessageExistsWithSameName(final Port port) {
 
-        Message asemMessage = null;
-        try {
-            asemMessage = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), port,
-                    Message.class);
-        } catch (Throwable e) {
-            fail("There was no corresponding ASEM message found for the given port with name " + port.getName());
-            e.printStackTrace();
-        }
+        Message asemMessage = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), port,
+                Message.class);
 
         assertTrue("The given ASEM module has no message element.", asemMessage != null);
         assertEquals("The names of port and message are not equal.", port.getName(), asemMessage.getName());
@@ -273,14 +291,9 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
         FlowDirection flowDirection = flowProperty.getDirection();
         assertTrue("No flow direction for given flow was found.", flowDirection != null);
 
-        Message asemMessage = null;
-        try {
-            asemMessage = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), port,
-                    Message.class);
-        } catch (Throwable e) {
-            fail("There was no corresponding ASEM message found for the given port with name " + port.getName());
-            e.printStackTrace();
-        }
+        Message asemMessage = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), port,
+                Message.class);
+
         assertTrue("There was no corresponding ASEM message found for the given port with name " + port.getName(),
                 asemMessage != null);
 
@@ -351,13 +364,7 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
         // block (which is the type of the port) corresponds to a module, or an 2) ASEM class if the
         // block corresponds to a class.
 
-        CorrespondenceModel correspondenceModel = null;
-        try {
-            correspondenceModel = getCorrespondenceModel();
-        } catch (Throwable e) {
-            fail("No correspondence model was found.");
-            e.printStackTrace();
-        }
+        CorrespondenceModel correspondenceModel = this.getCorrespondenceModel();
 
         final Message message = ASEMSysMLHelper.getFirstCorrespondingASEMElement(correspondenceModel, port,
                 Message.class);
@@ -381,13 +388,7 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
 
         final PrimitiveType portType = (PrimitiveType) port.getType();
 
-        CorrespondenceModel correspondenceModel = null;
-        try {
-            correspondenceModel = getCorrespondenceModel();
-        } catch (Throwable e) {
-            fail("No correspondence model was found.");
-            e.printStackTrace();
-        }
+        CorrespondenceModel correspondenceModel = this.getCorrespondenceModel();
 
         final Message message = ASEMSysMLHelper.getFirstCorrespondingASEMElement(correspondenceModel, port,
                 Message.class);
@@ -401,6 +402,53 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
                 "Message has wrong type! Type is " + messageType.getClass().getSimpleName() + ". Expected type was:"
                         + expectedMessageType.getSimpleName(),
                 expectedMessageType.isAssignableFrom(messageType.getClass()));
+
+    }
+
+    private void assertPartMappingForASEMModuleExists() {
+
+        Resource sysmlModelResource = this.getModelResource(sysmlProjectModelPath);
+
+        final int componentSelectionModule = ASEMSysMLTestHelper
+                .getNextUserInteractorSelectionForASEMComponent(Module.class);
+
+        // Add a block A with a part (block B).
+        // TODO [BR] Add a block B2 which corresponds to an ASEM class, too.
+        this.testUserInteractor.addNextSelections(componentSelectionModule);
+        Block blockA = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockA", true, this);
+        this.testUserInteractor.addNextSelections(componentSelectionModule);
+        Block blockB1 = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockB1", true, this);
+
+        Property partPropertyB1 = blockA.getBase_Class().createOwnedAttribute("partReferenceB1",
+                blockB1.getBase_Class());
+        partPropertyB1.setAggregation(AggregationKind.COMPOSITE_LITERAL);
+        
+        saveAndSynchronizeChanges(blockA);
+        assertTrue("Block A doesn't contain a part!", !blockA.getParts().isEmpty());
+
+        // Check if the corresponding ASEM module of block A contains a reference to the
+        // corresponding ASEM component (module or class) of block B.
+
+        Resource asemResource = this
+                .getModelResource(ASEMSysMLHelper.getASEMProjectModelPath(blockA.getBase_Class().getName()));
+
+        Module moduleA = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), blockA,
+                Module.class);
+        Module moduleB1 = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), blockB1,
+                Module.class);
+
+        assertTrue("Module doesn't contain a typed element!", !moduleA.getTypedElements().isEmpty());
+
+        boolean correctPartReferenceMapping = false;
+        for (TypedElement typedElement : moduleA.getTypedElements()) {
+            Classifier c = typedElement.getType();
+            if (typedElement.getType().equals(moduleB1)) {
+                correctPartReferenceMapping = true;
+            }
+        }
+        assertTrue("Wrong part reference mapping in ASEM module " + moduleA.getName(), correctPartReferenceMapping);
+
+        // TODO [BR] Check if reference will be deleted if the part of block A was deleted.
 
     }
 }
