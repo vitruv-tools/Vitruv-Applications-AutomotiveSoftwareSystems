@@ -286,16 +286,16 @@ routine transformPrimitivePortType(uml::Port port) {
  		val asemPartComponent = retrieve asem::Component corresponding to UMLUtil.getStereotypeApplication(partProperty.type, Block)
  	}
  	action {
- 		val asemMessage = create asem::Message and initialize {
- 			asemMessage.name = partProperty.name;
- 			asemMessage.type = asemPartComponent;
+ 		val asemConstant = create asem::Constant and initialize {
+ 			asemConstant.name = partProperty.name;
+ 			asemConstant.type = asemPartComponent;
  		}
  		call {
- 			asemBlockComponent.typedElements.add(asemMessage)
+ 			asemBlockComponent.typedElements.add(asemConstant)
  			val test2 = asemBlockComponent.eResource;
  			val test = asemBlockComponent.eResource;
  		}
- 		add correspondence between partProperty and asemMessage
+ 		add correspondence between partProperty and asemConstant
  	}
  }
 

@@ -8,6 +8,7 @@ import static tools.vitruv.applications.asemsysml.ASEMSysMLConstants.TEST_SYSML_
 import java.util.Collection;
 import java.util.HashSet;
 
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.papyrus.sysml14.blocks.Block;
 import org.eclipse.papyrus.sysml14.portsandflows.FlowDirection;
@@ -17,8 +18,6 @@ import org.eclipse.uml2.uml.Port;
 import org.eclipse.uml2.uml.PrimitiveType;
 import org.eclipse.uml2.uml.Property;
 import org.eclipse.uml2.uml.Type;
-import org.eclipse.uml2.uml.UMLPackage;
-import org.eclipse.uml2.uml.util.UMLUtil.StereotypeApplicationHelper;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -26,6 +25,7 @@ import edu.kit.ipd.sdq.ASEM.base.TypedElement;
 import edu.kit.ipd.sdq.ASEM.classifiers.Classifier;
 import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import edu.kit.ipd.sdq.ASEM.classifiers.Module;
+import edu.kit.ipd.sdq.ASEM.dataexchange.Constant;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Message;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.ASEMSysMLPrimitiveTypeHelper;
@@ -421,14 +421,20 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
 
         Property partPropertyB1 = blockA.getBase_Class().createOwnedAttribute("partReferenceB1",
                 blockB1.getBase_Class());
+        // Aggregation kind is needed for getParts() method.
         partPropertyB1.setAggregation(AggregationKind.COMPOSITE_LITERAL);
-        
+
         saveAndSynchronizeChanges(blockA);
         assertTrue("Block A doesn't contain a part!", !blockA.getParts().isEmpty());
 
         // Check if the corresponding ASEM module of block A contains a reference to the
         // corresponding ASEM component (module or class) of block B.
 
+        // TODO [BR] Only for debugging.
+        EList<Property> parts = blockA.getParts();
+        Constant asemConstant = ASEMSysMLHelper.getFirstCorrespondingASEMElement(getCorrespondenceModel(), parts.get(0),
+                Constant.class);
+        // TODO [BR] Only for debugging.
         Resource asemResource = this
                 .getModelResource(ASEMSysMLHelper.getASEMProjectModelPath(blockA.getBase_Class().getName()));
 
@@ -441,7 +447,6 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
 
         boolean correctPartReferenceMapping = false;
         for (TypedElement typedElement : moduleA.getTypedElements()) {
-            Classifier c = typedElement.getType();
             if (typedElement.getType().equals(moduleB1)) {
                 correctPartReferenceMapping = true;
             }
