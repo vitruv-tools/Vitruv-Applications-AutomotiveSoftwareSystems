@@ -31,7 +31,7 @@ import tools.vitruv.framework.userinteraction.UserInteracting;
 public class PrimitiveTypeTransformation extends AbstractTransformationRealization {
 
     private static Logger logger = Logger.getLogger(PrimitiveTypeTransformation.class);
-    
+
     public PrimitiveTypeTransformation(UserInteracting userInteracting) {
         super(userInteracting);
     }
@@ -47,7 +47,8 @@ public class PrimitiveTypeTransformation extends AbstractTransformationRealizati
         @SuppressWarnings("unchecked")
         InsertEReference<EObject, EObject> change = (InsertEReference<EObject, EObject>) untypedChange;
 
-        if (!ASEMSysMLPrimitiveTypeHelper.isPrimitiveTypeModelInitialized(change.getAffectedEObject())) {
+        if (!ASEMSysMLPrimitiveTypeHelper.isPrimitiveTypeModelInitialized(change.getAffectedEObject(),
+                this.executionState.getCorrespondenceModel().getResource().getResourceSet())) {
             logger.info("[ASEMSysML][Java] Initialize ASEM primitive types.");
             initializeASEMPrimitveTypeRepo(change.getAffectedEObject());
         }

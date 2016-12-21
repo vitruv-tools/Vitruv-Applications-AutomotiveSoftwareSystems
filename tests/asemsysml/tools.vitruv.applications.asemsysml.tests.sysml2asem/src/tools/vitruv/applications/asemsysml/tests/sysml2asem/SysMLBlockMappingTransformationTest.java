@@ -7,9 +7,16 @@ import static tools.vitruv.applications.asemsysml.ASEMSysMLConstants.TEST_SYSML_
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.papyrus.sysml14.blocks.Block;
 import org.eclipse.papyrus.sysml14.portsandflows.FlowDirection;
 import org.eclipse.papyrus.sysml14.portsandflows.FlowProperty;
@@ -23,6 +30,7 @@ import org.junit.Test;
 
 import edu.kit.ipd.sdq.ASEM.base.TypedElement;
 import edu.kit.ipd.sdq.ASEM.classifiers.Classifier;
+import edu.kit.ipd.sdq.ASEM.classifiers.ClassifiersPackage;
 import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import edu.kit.ipd.sdq.ASEM.classifiers.Module;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Constant;
@@ -33,6 +41,9 @@ import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTest;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTestHelper;
 import tools.vitruv.domains.sysml.SysMlNamspace;
 import tools.vitruv.framework.correspondence.CorrespondenceModel;
+import tools.vitruv.framework.util.datatypes.ModelInstance;
+import tools.vitruv.framework.util.datatypes.VURI;
+import tools.vitruv.framework.vsum.InternalVirtualModel;
 
 /**
  * Class for all SysML block mapping tests. A SysML block will be mapped to an ASEM model containing
@@ -438,10 +449,14 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
         Resource asemResource = this
                 .getModelResource(ASEMSysMLHelper.getASEMProjectModelPath(blockA.getBase_Class().getName()));
 
+        test();
+
         Module moduleA = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), blockA,
                 Module.class);
         Module moduleB1 = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), blockB1,
                 Module.class);
+
+        EcoreUtil.resolveAll(moduleA.getTypedElements().get(0));
 
         assertTrue("Module doesn't contain a typed element!", !moduleA.getTypedElements().isEmpty());
 
@@ -454,6 +469,46 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
         assertTrue("Wrong part reference mapping in ASEM module " + moduleA.getName(), correctPartReferenceMapping);
 
         // TODO [BR] Check if reference will be deleted if the part of block A was deleted.
+
+    }
+
+    private void test() {
+
+        InternalVirtualModel iVM = getVirtualModel();
+
+        // model/ASEM-Model-BlockA.asem
+        String asemProjectModelPath = ASEMSysMLHelper.getASEMProjectModelPath("BlockA");
+        // MockupProject_testIfPartsMappedCorrectly_Tue_Dec_20_10_33_40_CET_2016/model/ASEM-Model-BlockA.asem
+        String asemPlatformModelPath = this.getPlatformModelPath(asemProjectModelPath);
+
+        VURI asemModelVURI = VURI.getInstance(asemPlatformModelPath);
+
+        ModelInstance asemModelInstance = iVM.getModelInstance(asemModelVURI);
+        ResourceSet rs = asemModelInstance.getResource().getResourceSet();
+        ResourceSet rsTest = this.resourceSet;
+
+        Resource asemModelResource = asemModelInstance.getResource();
+        boolean isLoaded = asemModelResource.isLoaded();
+
+        // boolean isTrackingModification = asemModelResource.isTrackingModification();
+        // boolean isModified = asemModelResource.isModified();
+
+        EObject asemRootElement = asemModelInstance.getFirstRootEObject();
+        Module asemRootModule = (Module) asemRootElement;
+        boolean isProxy = asemRootModule.getTypedElements().get(0).getType().eIsProxy();
+
+        Constant moduleConstant = (Constant) asemRootModule.getTypedElements().get(0);
+        EReference typeRef = (EReference) moduleConstant.eClass().getEStructuralFeature("type");
+        boolean isResolveProxies = typeRef.isResolveProxies();
+
+        ResourceSet rsConstant = moduleConstant.eResource().getResourceSet();
+
+        Classifier constantType = moduleConstant.getType();
+
+        Object o = EcoreUtil.getObjectByType(asemModelResource.getContents(), ClassifiersPackage.eINSTANCE.getModule());
+
+        Iterator<EObject> asemResourceContents = EcoreUtil.getAllContents(asemModelResource, true);
+        Iterator<EObject> asemModuleContents = EcoreUtil.getAllContents(asemRootModule, true);
 
     }
 }

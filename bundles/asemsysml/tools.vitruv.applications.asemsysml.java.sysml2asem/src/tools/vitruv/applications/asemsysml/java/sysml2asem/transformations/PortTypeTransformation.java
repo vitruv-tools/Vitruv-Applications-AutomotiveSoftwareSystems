@@ -2,6 +2,7 @@ package tools.vitruv.applications.asemsysml.java.sysml2asem.transformations;
 
 import org.apache.log4j.Logger;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.papyrus.sysml14.blocks.Block;
 import org.eclipse.uml2.uml.Port;
 import org.eclipse.uml2.uml.PrimitiveType;
@@ -110,8 +111,9 @@ public class PortTypeTransformation extends AbstractTransformationRealization {
             final Class<? extends edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType> primitiveMessageType;
             primitiveMessageType = ASEMSysMLPrimitiveTypeHelper.PRIMITIVE_TYPE_MAP.get(primitivePortType);
 
+            ResourceSet rs = this.executionState.getCorrespondenceModel().getResource().getResourceSet();
             final edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType messageType = ASEMSysMLPrimitiveTypeHelper
-                    .getASEMPrimitiveTypeFromRepository(primitiveMessageType, portType);
+                    .getASEMPrimitiveTypeFromRepository(primitiveMessageType, portType, rs);
 
             return messageType;
         }

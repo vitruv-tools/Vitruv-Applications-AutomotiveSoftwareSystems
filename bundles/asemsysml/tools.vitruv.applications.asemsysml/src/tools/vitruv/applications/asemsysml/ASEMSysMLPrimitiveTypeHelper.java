@@ -7,7 +7,6 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.uml2.types.TypesPackage;
 import org.eclipse.uml2.uml.PrimitiveType;
 import org.eclipse.uml2.uml.UMLFactory;
@@ -88,11 +87,11 @@ public final class ASEMSysMLPrimitiveTypeHelper {
      */
     @SuppressWarnings("unchecked")
     public static <T extends edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType> edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType getASEMPrimitiveTypeFromRepository(final Class<T> type,
-            final EObject alreadyPersistedObject) {
+            final EObject alreadyPersistedObject, ResourceSet resourceSet) {
 
         edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType primitiveType = null;
 
-        Resource resource = getPrimitiveTypesResource(alreadyPersistedObject);
+        Resource resource = getPrimitiveTypesResource(alreadyPersistedObject, resourceSet);
         PrimitiveTypeRepository pRepo = (PrimitiveTypeRepository) resource.getContents().get(0);
 
         for (edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType pType : pRepo.getPrimitiveTypes()) {
@@ -114,13 +113,13 @@ public final class ASEMSysMLPrimitiveTypeHelper {
      * @return <code>True</code> if the primitive types model resource contains at least one
      *         element, otherwise <code>false</code>.
      */
-    public static boolean isPrimitiveTypeModelInitialized(final EObject alreadyPersistedObject) {
+    public static boolean isPrimitiveTypeModelInitialized(final EObject alreadyPersistedObject, ResourceSet resourceSet) {
 
         boolean isInitialized = false;
 
         Resource resource = null;
         try {
-            resource = getPrimitiveTypesResource(alreadyPersistedObject);
+            resource = getPrimitiveTypesResource(alreadyPersistedObject, resourceSet);
         } catch (Exception e) {
             isInitialized = false;
         }
@@ -132,15 +131,15 @@ public final class ASEMSysMLPrimitiveTypeHelper {
         return isInitialized;
     }
 
-    private static Resource getPrimitiveTypesResource(final EObject alreadyPersistedObject) {
+    private static Resource getPrimitiveTypesResource(final EObject alreadyPersistedObject, ResourceSet resourceSet) {
 
         String existingElementURI = VURI.getInstance(alreadyPersistedObject.eResource()).getEMFUri()
                 .toPlatformString(false);
         String uriPrefix = existingElementURI.substring(0,
                 existingElementURI.lastIndexOf(ASEMSysMLConstants.MODEL_DIR_NAME + "/"));
         String asemURIString = uriPrefix + getPrimitiveTypeProjectModelPath();
-
-        ResourceSet resourceSet = new ResourceSetImpl();
+        
+//        ResourceSet resourceSet = alreadyPersistedObject.eResource().getResourceSet();
         URI uri = URI.createURI(asemURIString);
         Resource primitiveTypesResource = resourceSet.getResource(uri, true);
 

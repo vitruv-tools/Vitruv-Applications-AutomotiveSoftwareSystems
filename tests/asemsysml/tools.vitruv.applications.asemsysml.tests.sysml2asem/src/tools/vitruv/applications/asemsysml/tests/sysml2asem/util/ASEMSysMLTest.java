@@ -13,6 +13,7 @@ import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.papyrus.sysml14.util.SysMLResource;
 import org.eclipse.uml2.uml.Model;
 import org.eclipse.xtext.xbase.lib.CollectionLiterals;
@@ -195,6 +196,7 @@ public abstract class ASEMSysMLTest extends VitruviusEMFCasestudyTest {
 
         try {
             resource = this.resourceSet.getResource(eMFUri, true);
+            EcoreUtil.resolveAll(resource);
         } catch (Exception e) {
             // Return null if the resource could not be loaded. E.g. if no
             // resource exists.

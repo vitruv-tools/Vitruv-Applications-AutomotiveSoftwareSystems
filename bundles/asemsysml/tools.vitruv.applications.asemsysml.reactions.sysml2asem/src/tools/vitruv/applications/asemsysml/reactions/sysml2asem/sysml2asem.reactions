@@ -11,7 +11,6 @@ import org.eclipse.uml2.uml.util.UMLUtil
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper
 import tools.vitruv.applications.asemsysml.ASEMSysMLPrimitiveTypeHelper
 import tools.vitruv.framework.userinteraction.UserInteractionType
-import org.eclipse.uml2.uml.Property
 
 import "edu.kit.ipd.sdq.asem" as asem
 import "http://www.eclipse.org/papyrus/sysml/1.4/SysML" as sysml
@@ -237,7 +236,7 @@ routine transformPrimitivePortType(uml::Port port) {
 		
 		call {			
 			val messageType = ASEMSysMLPrimitiveTypeHelper.PRIMITIVE_TYPE_MAP.get(port.type);
-			asemMessage.type = ASEMSysMLPrimitiveTypeHelper.getASEMPrimitiveTypeFromRepository(messageType, asemMessage);
+			asemMessage.type = ASEMSysMLPrimitiveTypeHelper.getASEMPrimitiveTypeFromRepository(messageType, asemMessage, this.correspondenceModel.resource.resourceSet);
 		}
 	}
 }
@@ -292,8 +291,6 @@ routine transformPrimitivePortType(uml::Port port) {
  		}
  		call {
  			asemBlockComponent.typedElements.add(asemConstant)
- 			val test2 = asemBlockComponent.eResource;
- 			val test = asemBlockComponent.eResource;
  		}
  		add correspondence between partProperty and asemConstant
  	}
@@ -312,7 +309,7 @@ reaction PrimitiveTypeTransformation {
 		System.out.println("[ASEMSysML] Primitive type " + primitiveType.name + " added.");
 		
 		// Add all ASEM primitive types to primitive types model.
-		if(!ASEMSysMLPrimitiveTypeHelper.isPrimitiveTypeModelInitialized(primitiveType)) {
+		if(!ASEMSysMLPrimitiveTypeHelper.isPrimitiveTypeModelInitialized(primitiveType, this.correspondenceModel.resource.resourceSet)) {
 			System.out.println("[ASEMSysML] Initialize primitive types for " + primitiveType.eResource);
 			addASEMPrimitiveTypes(primitiveType);
 		}
