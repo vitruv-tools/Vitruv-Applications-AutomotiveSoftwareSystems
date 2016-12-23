@@ -27,7 +27,7 @@ import tools.vitruv.framework.util.datatypes.VURI;
 public final class ASEMSysMLPrimitiveTypeHelper {
 
     private static final String PRIMITIVE_TYPE_MODEL_NAME = "PrimitiveTypes";
-    
+
     /*
      * Add constants for UML primitive types, because I found no possibility to get a UML Type of
      * the ECORE EDatatType which will be returned for example by
@@ -62,11 +62,11 @@ public final class ASEMSysMLPrimitiveTypeHelper {
         PRIMITIVE_TYPE_MAP.put(PRIMITIVE_TYPE_STRING, null);
         PRIMITIVE_TYPE_MAP.put(PRIMITIVE_TYPE_UNLIMITED_NATURAL, null);
     }
-    
+
     /** Utility classes should not have a public or default constructor. */
     private ASEMSysMLPrimitiveTypeHelper() {
     }
-    
+
     /**
      * Get the project model path for the primitive types model.
      * 
@@ -87,8 +87,8 @@ public final class ASEMSysMLPrimitiveTypeHelper {
      * @return The primitive type instance or <code>null</code> if no instance of this type exists.
      */
     @SuppressWarnings("unchecked")
-    public static <T extends edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType> edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType getASEMPrimitiveTypeFromRepository(final Class<T> type,
-            final EObject alreadyPersistedObject) {
+    public static <T extends edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType> edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType getASEMPrimitiveTypeFromRepository(
+            final Class<T> type, final EObject alreadyPersistedObject) {
 
         edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType primitiveType = null;
 

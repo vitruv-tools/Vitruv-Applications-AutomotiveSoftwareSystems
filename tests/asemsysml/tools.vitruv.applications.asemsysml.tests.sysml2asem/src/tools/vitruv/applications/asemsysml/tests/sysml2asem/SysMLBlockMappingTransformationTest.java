@@ -8,7 +8,6 @@ import static tools.vitruv.applications.asemsysml.ASEMSysMLConstants.TEST_SYSML_
 import java.util.Collection;
 import java.util.HashSet;
 
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.papyrus.sysml14.blocks.Block;
 import org.eclipse.papyrus.sysml14.portsandflows.FlowDirection;
@@ -25,7 +24,6 @@ import edu.kit.ipd.sdq.ASEM.base.TypedElement;
 import edu.kit.ipd.sdq.ASEM.classifiers.Classifier;
 import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import edu.kit.ipd.sdq.ASEM.classifiers.Module;
-import edu.kit.ipd.sdq.ASEM.dataexchange.Constant;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Message;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.ASEMSysMLPrimitiveTypeHelper;
@@ -429,15 +427,6 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
 
         // Check if the corresponding ASEM module of block A contains a reference to the
         // corresponding ASEM component (module or class) of block B.
-
-        // TODO [BR] Only for debugging.
-        EList<Property> parts = blockA.getParts();
-        Constant asemConstant = ASEMSysMLHelper.getFirstCorrespondingASEMElement(getCorrespondenceModel(), parts.get(0),
-                Constant.class);
-        // TODO [BR] Only for debugging.
-        Resource asemResource = this
-                .getModelResource(ASEMSysMLHelper.getASEMProjectModelPath(blockA.getBase_Class().getName()));
-
         Module moduleA = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), blockA,
                 Module.class);
         Module moduleB1 = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), blockB1,
