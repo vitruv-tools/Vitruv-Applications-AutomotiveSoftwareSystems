@@ -1,5 +1,6 @@
 package tools.vitruv.applications.asemsysml.tests.sysml2asem.util;
 
+import static org.junit.Assert.fail;
 import static tools.vitruv.applications.asemsysml.ASEMSysMLConstants.TEST_SYSML_MODEL_NAME;
 
 import java.io.IOException;
@@ -26,6 +27,7 @@ import tools.vitruv.domains.sysml.SysMlDomain;
 import tools.vitruv.domains.sysml.SysMlNamspace;
 import tools.vitruv.framework.change.description.VitruviusChangeFactory;
 import tools.vitruv.framework.change.processing.ChangePropagationSpecification;
+import tools.vitruv.framework.correspondence.CorrespondenceModel;
 import tools.vitruv.framework.metamodel.Metamodel;
 import tools.vitruv.framework.tests.VitruviusEMFCasestudyTest;
 import tools.vitruv.framework.util.bridges.EcoreResourceBridge;
@@ -243,5 +245,27 @@ public abstract class ASEMSysMLTest extends VitruviusEMFCasestudyTest {
         Resource asemModelResource = this.getModelResource(asemProjectModelPath);
 
         return asemModelResource;
+    }
+
+    /**
+     * Get the correspondence model. If accessing the correspondence model fails, the test will
+     * fail, too.
+     * 
+     * @return The current correspondence model.
+     */
+    @Override
+    protected CorrespondenceModel getCorrespondenceModel() {
+        // Override the method of VitruviusEMFCasestudyTest to handle the exception in one place.
+
+        CorrespondenceModel correspondenceModel = null;
+
+        try {
+            correspondenceModel = super.getCorrespondenceModel();
+        } catch (Throwable e) {
+            fail("No correspondence model was found.");
+            e.printStackTrace();
+        }
+
+        return correspondenceModel;
     }
 }

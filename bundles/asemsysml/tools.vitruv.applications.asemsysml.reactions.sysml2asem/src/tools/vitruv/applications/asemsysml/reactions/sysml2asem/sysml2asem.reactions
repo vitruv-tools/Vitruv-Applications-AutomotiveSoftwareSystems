@@ -4,6 +4,7 @@ import java.util.HashSet
 import java.util.List
 import java.util.Set
 import org.eclipse.papyrus.sysml14.blocks.Block
+import org.eclipse.uml2.uml.Class
 import org.eclipse.uml2.uml.Port
 import org.eclipse.uml2.uml.PrimitiveType
 import org.eclipse.uml2.uml.util.UMLUtil
@@ -60,7 +61,7 @@ reaction SysMLBlockIsEncapsulatedChanged {
 		System.out.println("[ASEMSysML] A SysML block (" + block.base_Class.name + ") was created and its isEncapsulated flag is true!");
 		
 		// Let user select the ASEM component to map the SysML block to.
-		var Set<Class<?>> asemComponents = new HashSet
+		var Set<java.lang.Class<?>> asemComponents = new HashSet
 		asemComponents.addAll(#[Module, edu.kit.ipd.sdq.ASEM.classifiers.Class]);
 		
 		val List<String> asemComponentNames = new ArrayList<String>(asemComponents.size)
@@ -70,7 +71,7 @@ reaction SysMLBlockIsEncapsulatedChanged {
 		
 		val String selectComponentMsg = "Please select an ASEM component type the SysML block should mapped to."
 		val int selectedComponentType = userInteracting.selectFromMessage(UserInteractionType.MODAL, selectComponentMsg, asemComponentNames)
-		val Class<?> selectedComponentTypeClass = asemComponents.get(selectedComponentType)
+		val java.lang.Class<?> selectedComponentTypeClass = asemComponents.get(selectedComponentType)
 		
 		createASEMModelWithRootElement(block, selectedComponentTypeClass.name);
 	}
@@ -133,7 +134,7 @@ routine changeNameOfSysMLBlockCorrespondence(sysml::Block block) {
 reaction PortTransformation {
 	
 	after value replaced for uml::Port[name]
-		with change.affectedEObject.owner instanceof org.eclipse.uml2.uml.Class &&
+		with change.affectedEObject.owner instanceof Class &&
 			change.affectedEObject.owner.getAppliedStereotype("SysML::Blocks::Block") != null
 
 	call {
@@ -239,6 +240,49 @@ routine transformPrimitivePortType(uml::Port port) {
 		}
 	}
 }
+
+/*
+ * Part transformation
+ * ---------------------------------------------------
+ */
+ reaction PartTransformation {
+ 	// For the part transformation the part name and type are necessary.
+ 	// A property is a part property if
+ 	// 	- the containing element of the property is a block
+ 	// 	- the type of the property is a block
+ 	//	- the property is not a port
+ 	after value replaced for uml::Property[type]
+ 		with change.affectedEObject.eContainer instanceof Class &&
+ 		(change.affectedEObject.eContainer as Class).getAppliedStereotype("SysML::Blocks::Block") != null &&
+ 		change.newValue.getAppliedStereotype("SysML::Blocks::Block") != null &&
+ 		!(change.affectedEObject instanceof Port)
+ 		
+ 	call {
+ 		val partProperty = change.affectedEObject;
+ 		val blockBaseClass = partProperty.eContainer as Class;
+ 		System.out.println("[ASEMSysML] Part " + partProperty.name + " for block " + blockBaseClass.name + " added.");
+ 		
+ 		createPartCorrespondence(partProperty, blockBaseClass);
+ 	}
+ }
+ routine createPartCorrespondence(uml::Property partProperty, uml::Class blockBaseClass) {
+ 	match {
+ 		// Corresponding ASEM element of the block.
+ 		val asemBlockComponent = retrieve asem::Component corresponding to UMLUtil.getStereotypeApplication(blockBaseClass, Block)
+ 		// Corresponding ASEM element of the part.
+ 		val asemPartComponent = retrieve asem::Component corresponding to UMLUtil.getStereotypeApplication(partProperty.type, Block)
+ 	}
+ 	action {
+ 		val asemConstant = create asem::Constant and initialize {
+ 			asemConstant.name = partProperty.name;
+ 			asemConstant.type = asemPartComponent;
+ 		}
+ 		call {
+ 			asemBlockComponent.typedElements.add(asemConstant)
+ 		}
+ 		add correspondence between partProperty and asemConstant
+ 	}
+ }
 
 /*
  * SysML primitive type transformation
