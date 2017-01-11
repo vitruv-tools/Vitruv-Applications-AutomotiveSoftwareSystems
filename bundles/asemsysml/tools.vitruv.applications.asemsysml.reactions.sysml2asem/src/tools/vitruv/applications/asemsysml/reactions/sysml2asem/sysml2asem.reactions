@@ -1,8 +1,6 @@
 import edu.kit.ipd.sdq.ASEM.classifiers.Module
 import java.util.ArrayList
-import java.util.HashSet
 import java.util.List
-import java.util.Set
 import org.eclipse.papyrus.sysml14.blocks.Block
 import org.eclipse.uml2.uml.Class
 import org.eclipse.uml2.uml.Port
@@ -61,17 +59,18 @@ reaction SysMLBlockIsEncapsulatedChanged {
 		System.out.println("[ASEMSysML] A SysML block (" + block.base_Class.name + ") was created and its isEncapsulated flag is true!");
 		
 		// Let user select the ASEM component to map the SysML block to.
-		var Set<java.lang.Class<?>> asemComponents = new HashSet
-		asemComponents.addAll(#[Module, edu.kit.ipd.sdq.ASEM.classifiers.Class]);
+		var List<java.lang.Class<?>> asemComponentTypes = new ArrayList<java.lang.Class<?>>();
+		asemComponentTypes.add(Module);
+		asemComponentTypes.add(edu.kit.ipd.sdq.ASEM.classifiers.Class);
 		
-		val List<String> asemComponentNames = new ArrayList<String>(asemComponents.size)
-		for (asemComponent : asemComponents) {
+		val List<String> asemComponentNames = new ArrayList<String>();
+		for (asemComponent : asemComponentTypes) {
 			asemComponentNames.add(asemComponent.name)
 		}
 		
 		val String selectComponentMsg = "Please select an ASEM component type the SysML block should mapped to."
 		val int selectedComponentType = userInteracting.selectFromMessage(UserInteractionType.MODAL, selectComponentMsg, asemComponentNames)
-		val java.lang.Class<?> selectedComponentTypeClass = asemComponents.get(selectedComponentType)
+		val java.lang.Class<?> selectedComponentTypeClass = asemComponentTypes.get(selectedComponentType)
 		
 		createASEMModelWithRootElement(block, selectedComponentTypeClass.name);
 	}
