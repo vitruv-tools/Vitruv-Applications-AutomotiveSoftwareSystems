@@ -25,6 +25,7 @@ import org.eclipse.uml2.uml.Property;
 import org.eclipse.uml2.uml.Type;
 import org.eclipse.uml2.uml.util.UMLUtil.StereotypeApplicationHelper;
 
+import edu.kit.ipd.sdq.ASEM.base.TypedElement;
 import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.global.SysML2ASEMJavaChangePropagationSpecification;
 import tools.vitruv.applications.asemsysml.reactions.sysml2asem.global.SysML2ASEMChangePropagationSpecification;
@@ -263,6 +264,28 @@ public final class ASEMSysMLTestHelper {
         }
 
         return selection;
+    }
+
+    /**
+     * Check if the given parent component references to the given child component.
+     * 
+     * @param parentComponent
+     *            ASEM component which contains a reference to another component.
+     * @param childComponent
+     *            ASEm component which is referenced by another component.
+     */
+    public static void assertPartReferenceExists(final Component parentComponent, final Component childComponent) {
+
+        boolean correctPartReferenceMapping = false;
+
+        for (TypedElement typedElement : parentComponent.getTypedElements()) {
+            if (typedElement.getType().equals(childComponent)) {
+                correctPartReferenceMapping = true;
+            }
+        }
+
+        assertTrue("Wrong part reference mapping in ASEM component " + parentComponent.getName(),
+                correctPartReferenceMapping);
     }
 
     private static Model getSysMLRootModelElement(final Resource sysmlModelResource) {

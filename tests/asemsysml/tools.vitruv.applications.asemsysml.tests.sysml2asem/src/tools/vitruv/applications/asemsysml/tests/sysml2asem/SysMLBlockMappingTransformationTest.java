@@ -434,15 +434,53 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
 
         assertTrue("Module doesn't contain a typed element!", !moduleA.getTypedElements().isEmpty());
 
-        boolean correctPartReferenceMapping = false;
-        for (TypedElement typedElement : moduleA.getTypedElements()) {
-            if (typedElement.getType().equals(moduleB1)) {
-                correctPartReferenceMapping = true;
-            }
-        }
-        assertTrue("Wrong part reference mapping in ASEM module " + moduleA.getName(), correctPartReferenceMapping);
+        ASEMSysMLTestHelper.assertPartReferenceExists(moduleA, moduleB1);
 
         // TODO [BR] Check if reference will be deleted if the part of block A was deleted.
 
+        assertNestedPartReferencesAreMappedCorrectly();
+
+    }
+
+    private void assertNestedPartReferencesAreMappedCorrectly() {
+
+        Resource sysmlModelResource = this.getModelResource(sysmlProjectModelPath);
+
+        final int componentSelectionModule = ASEMSysMLTestHelper
+                .getNextUserInteractorSelectionForASEMComponent(Module.class);
+
+        this.testUserInteractor.addNextSelections(componentSelectionModule, componentSelectionModule,
+                componentSelectionModule);
+        Block blockN1 = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockN1", true, this);
+        Block blockN2 = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockN2", true, this);
+        Block blockN3 = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockN3", true, this);
+
+        Property partPropertyN1 = blockN1.getBase_Class().createOwnedAttribute("partReferenceN2",
+                blockN2.getBase_Class());
+        partPropertyN1.setAggregation(AggregationKind.COMPOSITE_LITERAL);
+
+        Property partPropertyN2 = blockN2.getBase_Class().createOwnedAttribute("partReferenceN3",
+                blockN3.getBase_Class());
+        partPropertyN2.setAggregation(AggregationKind.COMPOSITE_LITERAL);
+
+        saveAndSynchronizeChanges(blockN1);
+        saveAndSynchronizeChanges(blockN2);
+        saveAndSynchronizeChanges(blockN3);
+
+        assertTrue("BlockN1 doesn't contain a part!", !blockN1.getParts().isEmpty());
+        assertTrue("BlockN2 doesn't contain a part!", !blockN2.getParts().isEmpty());
+
+        Module moduleN1 = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), blockN1,
+                Module.class);
+        Module moduleN2 = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), blockN2,
+                Module.class);
+        Module moduleN3 = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), blockN3,
+                Module.class);
+
+        assertTrue("Module doesn't contain a typed element!", !moduleN1.getTypedElements().isEmpty());
+        assertTrue("Module doesn't contain a typed element!", !moduleN2.getTypedElements().isEmpty());
+
+        ASEMSysMLTestHelper.assertPartReferenceExists(moduleN1, moduleN2);
+        ASEMSysMLTestHelper.assertPartReferenceExists(moduleN2, moduleN3);
     }
 }
