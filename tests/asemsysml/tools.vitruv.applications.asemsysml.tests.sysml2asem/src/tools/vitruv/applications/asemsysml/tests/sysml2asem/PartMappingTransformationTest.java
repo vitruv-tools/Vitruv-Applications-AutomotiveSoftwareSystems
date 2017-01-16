@@ -13,7 +13,6 @@ import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import edu.kit.ipd.sdq.ASEM.classifiers.Module;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.ASEMSysMLUserInteractionHelper;
-import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTest;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTestHelper;
 
 /**
@@ -22,12 +21,7 @@ import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTestHe
  * @author Benjamin Rupp
  *
  */
-public class PartMappingTransformationTest extends ASEMSysMLTest {
-
-    @Override
-    protected void initializeTestModel() {
-        initializeSysMLAsSourceModel();
-    }
+public class PartMappingTransformationTest extends SysML2ASEMTest {
 
     // TODO [BR] Check if part reference will be deleted if the part of block was deleted.
 

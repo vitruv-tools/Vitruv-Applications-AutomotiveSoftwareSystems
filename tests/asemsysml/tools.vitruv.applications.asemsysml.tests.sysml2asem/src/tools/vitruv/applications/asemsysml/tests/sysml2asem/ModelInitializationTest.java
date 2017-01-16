@@ -6,7 +6,6 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.junit.Test;
 
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
-import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTest;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTestHelper;
 import tools.vitruv.domains.sysml.SysMlNamspace;
 
@@ -17,17 +16,10 @@ import tools.vitruv.domains.sysml.SysMlNamspace;
  * @author Benjamin Rupp
  *
  */
-public class ModelInitializationTest extends ASEMSysMLTest {
+public class ModelInitializationTest extends SysML2ASEMTest {
 
     private final String umlProjectModelPath = ASEMSysMLHelper.getProjectModelPath(TEST_SYSML_MODEL_NAME,
             SysMlNamspace.FILE_EXTENSION);
-
-    @Override
-    protected void initializeTestModel() {
-
-        initializeSysMLAsSourceModel();
-
-    }
 
     /**
      * After initializing the test model an ASEM model should exists.

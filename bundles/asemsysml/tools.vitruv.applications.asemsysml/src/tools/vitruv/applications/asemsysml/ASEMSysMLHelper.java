@@ -75,7 +75,8 @@ public class ASEMSysMLHelper {
      *            The correspondence model.
      * @param sysmlElement
      *            The SysML element.
-     * @return Corresponding ASEM elements or an empty collection if no corresponding elements exist.
+     * @return Corresponding ASEM elements or an empty collection if no corresponding elements
+     *         exist.
      */
     public static Collection<EObject> getCorrespondingASEMElements(final CorrespondenceModel correspondenceModel,
             final EObject sysmlElement) {

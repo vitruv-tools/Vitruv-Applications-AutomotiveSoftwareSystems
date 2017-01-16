@@ -23,7 +23,6 @@ import edu.kit.ipd.sdq.ASEM.dataexchange.Message;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.ASEMSysMLPrimitiveTypeHelper;
 import tools.vitruv.applications.asemsysml.ASEMSysMLUserInteractionHelper;
-import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTest;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTestHelper;
 import tools.vitruv.framework.correspondence.CorrespondenceModel;
 
@@ -33,12 +32,7 @@ import tools.vitruv.framework.correspondence.CorrespondenceModel;
  * @author Benjamin Rupp
  *
  */
-public class PortMappingTransformationTest extends ASEMSysMLTest {
-
-    @Override
-    protected void initializeTestModel() {
-        initializeSysMLAsSourceModel();
-    }
+public class PortMappingTransformationTest extends SysML2ASEMTest {
 
     /**
      * The owned ports of a SysML block shall be mapped to a ASEM message which is part of a ASEM
