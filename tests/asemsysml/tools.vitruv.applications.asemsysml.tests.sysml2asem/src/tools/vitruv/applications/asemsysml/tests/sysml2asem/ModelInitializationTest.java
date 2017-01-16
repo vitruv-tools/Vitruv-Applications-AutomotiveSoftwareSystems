@@ -23,7 +23,7 @@ public class ModelInitializationTest extends ASEMSysMLTest {
             SysMlNamspace.FILE_EXTENSION);
 
     @Override
-    protected void init() {
+    protected void initializeTestModel() {
 
         initializeSysMLAsSourceModel();
 
@@ -46,13 +46,6 @@ public class ModelInitializationTest extends ASEMSysMLTest {
     public void testIfModelRootsExist() {
 
         this.assertModelRootExists(umlProjectModelPath);
-
-    }
-
-    private void assertModelExists(final String projectModelPath) {
-
-        final Resource modelResource = this.getModelResource(projectModelPath);
-        ASEMSysMLTestHelper.assertResourceExists(modelResource);
 
     }
 

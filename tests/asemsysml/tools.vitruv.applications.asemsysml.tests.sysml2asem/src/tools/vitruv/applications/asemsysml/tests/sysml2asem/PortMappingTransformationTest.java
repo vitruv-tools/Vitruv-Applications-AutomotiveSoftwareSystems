@@ -36,7 +36,7 @@ import tools.vitruv.framework.correspondence.CorrespondenceModel;
 public class PortMappingTransformationTest extends ASEMSysMLTest {
 
     @Override
-    protected void init() {
+    protected void initializeTestModel() {
         initializeSysMLAsSourceModel();
     }
 

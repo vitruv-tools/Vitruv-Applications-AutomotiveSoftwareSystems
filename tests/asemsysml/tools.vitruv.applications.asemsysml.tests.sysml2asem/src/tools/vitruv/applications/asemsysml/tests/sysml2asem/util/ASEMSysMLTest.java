@@ -16,7 +16,6 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.papyrus.sysml14.util.SysMLResource;
 import org.eclipse.uml2.uml.Model;
 import org.eclipse.xtext.xbase.lib.CollectionLiterals;
-import org.junit.runner.Description;
 
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.ASEMSysMLPrimitiveTypeHelper;
@@ -29,7 +28,7 @@ import tools.vitruv.framework.change.description.VitruviusChangeFactory;
 import tools.vitruv.framework.change.processing.ChangePropagationSpecification;
 import tools.vitruv.framework.correspondence.CorrespondenceModel;
 import tools.vitruv.framework.metamodel.Metamodel;
-import tools.vitruv.framework.tests.VitruviusEMFCasestudyTest;
+import tools.vitruv.framework.tests.VitruviusChangePropagationTest;
 import tools.vitruv.framework.util.bridges.EcoreResourceBridge;
 import tools.vitruv.framework.util.datatypes.VURI;
 
@@ -41,7 +40,7 @@ import tools.vitruv.framework.util.datatypes.VURI;
  * @author Benjamin Rupp
  *
  */
-public abstract class ASEMSysMLTest extends VitruviusEMFCasestudyTest {
+public abstract class ASEMSysMLTest extends VitruviusChangePropagationTest {
 
     private static Logger logger = Logger.getLogger(ASEMSysMLTest.class);
 
@@ -71,12 +70,6 @@ public abstract class ASEMSysMLTest extends VitruviusEMFCasestudyTest {
         return ASEMSysMLTestHelper.getChangePropagationSpecificationsByTransformationType(transformationType);
     }
 
-    @Override
-    public void beforeTest(Description description) throws Throwable {
-        super.beforeTest(description);
-        init();
-    }
-
     /**
      * Set the transformation which shall be tested. Use this method in a JUnit test suite to set
      * the transformation type which shall be used for the test run. The default value is
@@ -97,24 +90,25 @@ public abstract class ASEMSysMLTest extends VitruviusEMFCasestudyTest {
      */
 
     /**
-     * Use this method to initialize the test source model. Therefore you can call the
-     * {@link #initializeSysMLAsSourceModel()} method to use SysML as source model.
-     * 
-     * 
-     * This method will be called {@link #beforeTest(Description) before each test}.
-     * 
-     * @throws Throwable
-     */
-    protected abstract void init();
-
-    /**
      * Initialize a SysML model as source model. The corresponding target model should be generated
      * using a reaction and the persistProjectRelative() method.
      */
     protected void initializeSysMLAsSourceModel() {
 
         Model sysmlModel = SysMLResource.createSysMLModel(this.resourceSet, "SysMLResource", TEST_SYSML_MODEL_NAME);
-        createAndSyncSourceModel(TEST_SYSML_MODEL_NAME, SysMlNamspace.FILE_EXTENSION, sysmlModel);
+
+        // TODO [BR] Use the createAndSychronizeModel() method of the VitruviusChangePropagationTest
+        // instead!?
+        // The VitruviusChangePropagationTest#createAndSychronizeModel() method uses the
+        // root element for initializing the change recorder. The problem is, that SysML changes
+        // like the change of the isEncapsulated flag of a SysML block are not recognized by the
+        // change recorder. In case of that, no block transformation will be triggered.
+
+        // String projectModelPath = ASEMSysMLHelper.getProjectModelPath(TEST_SYSML_MODEL_NAME,
+        // SysMlNamspace.FILE_EXTENSION);
+        // createAndSychronizeModel(projectModelPath, sysmlModel);
+
+        createAndSynchronize(TEST_SYSML_MODEL_NAME, SysMlNamspace.FILE_EXTENSION, sysmlModel);
 
         // Add primitive types to SysML model after the model element was saved and synchronized!
         // This is necessary for VITRUV to detect the primitive type changes.
@@ -128,7 +122,7 @@ public abstract class ASEMSysMLTest extends VitruviusEMFCasestudyTest {
 
     }
 
-    private void createAndSyncSourceModel(final String modelName, final String modelFileExtension,
+    private void createAndSynchronize(final String modelName, final String modelFileExtension,
             final EObject rootElement) {
 
         // Set up model paths and URI.
@@ -170,77 +164,66 @@ public abstract class ASEMSysMLTest extends VitruviusEMFCasestudyTest {
      * Helper methods which are useful for all test cases and need information of the parent test
      * classes. E.g. test project related stuff like currentTestProjectName.
      */
-    /**
-     * Get the platform model path based on the current test project name.
-     * 
-     * @param modelPathInProject
-     *            The project model path. Use
-     *            {@link ASEMSysMLHelper#getProjectModelPath(String, String)}.
-     * @return The platform model path String.
-     */
-    protected String getPlatformModelPath(final String modelPathInProject) {
-        return ((this.currentTestProjectName + "/") + modelPathInProject);
-    }
+    // /**
+    // * Get the platform model path based on the current test project name.
+    // *
+    // * @param modelPathInProject
+    // * The project model path. Use
+    // * {@link ASEMSysMLHelper#getProjectModelPath(String, String)}.
+    // * @return The platform model path String.
+    // */
+    // protected String getPlatformModelPath(final String modelPathInProject) {
+    // return ((this.currentTestProjectName + "/") + modelPathInProject);
+    // }
 
-    /**
-     * Get the model VURI.
-     * 
-     * @param modelPathInProject
-     *            The project model path. Use {@link #getPlatformModelPath(String)}.
-     * @return The model VURI.
-     * @see VURI
-     */
-    protected VURI getModelVURI(final String modelPathInProject) {
-        String platformModelPath = this.getPlatformModelPath(modelPathInProject);
-        return VURI.getInstance(platformModelPath);
-    }
+    // /**
+    // * Get the model VURI.
+    // *
+    // * @param modelPathInProject
+    // * The project model path. Use {@link #getPlatformModelPath(String)}.
+    // * @return The model VURI.
+    // * @see VURI
+    // */
+    // protected VURI getModelVURI(final String modelPathInProject) {
+    // String platformModelPath = this.getPlatformModelPath(modelPathInProject);
+    // return VURI.getInstance(platformModelPath);
+    // }
 
-    /**
-     * Get the model resource if the resource exists otherwise return null.
-     * 
-     * @param projectModelPath
-     *            The project model path. Use {@link #getPlatformModelPath(String)}.
-     * @return The model resource or null.
-     */
-    protected Resource getModelResource(final String projectModelPath) {
-
-        VURI modelVURI = this.getModelVURI(projectModelPath);
-        URI eMFUri = modelVURI.getEMFUri();
-
-        Resource resource;
-
-        try {
-            resource = this.resourceSet.getResource(eMFUri, true);
-        } catch (Exception e) {
-            // Return null if the resource could not be loaded. E.g. if no
-            // resource exists.
-            // TODO [BR] Is there a better way to do this?
-            resource = null;
-        }
-
-        return resource;
-    }
+    // /**
+    // * Get the model resource if the resource exists otherwise return null.
+    // *
+    // * @param projectModelPath
+    // * The project model path. Use {@link #getPlatformModelPath(String)}.
+    // * @return The model resource or null.
+    // */
+    // protected Resource getModelResource(final String projectModelPath) {
+    //
+    // VURI modelVURI = this.getModelVURI(projectModelPath);
+    // URI eMFUri = modelVURI.getEMFUri();
+    //
+    // Resource resource;
+    //
+    // try {
+    // resource = this.resourceSet.getResource(eMFUri, true);
+    // } catch (Exception e) {
+    // // Return null if the resource could not be loaded. E.g. if no
+    // // resource exists.
+    // // TODO [BR] Is there a better way to do this?
+    // resource = null;
+    // }
+    //
+    // return resource;
+    // }
 
     /**
      * Save and synchronize the changes of the given object. This method will save the resource and
      * trigger the synchronization of the virtual model.
-     * 
+     *
      * @param object
      *            EObject which should be saved and synchronized.
      */
     public void saveAndSynchronizeChanges(final EObject object) {
-
-        try {
-
-            Resource eResource = object.eResource();
-            EcoreResourceBridge.saveResource(eResource);
-            VURI instance = VURI.getInstance(eResource);
-            this.triggerSynchronization(instance);
-
-        } catch (IOException e) {
-            logger.error("[ASEMSysML] Could not save and synchronize changes of " + object);
-            e.printStackTrace();
-        }
+        super.saveAndSynchronizeChanges(object);
     }
 
     /**
@@ -252,7 +235,8 @@ public abstract class ASEMSysMLTest extends VitruviusEMFCasestudyTest {
      * @return ASEM model resource.
      */
     protected Resource getASEMModelResource(final String sysmlBlockName) {
-
+        // TODO [BR] Move to ASEMSysMLHelper class.
+        
         final String asemModelName = ASEMSysMLHelper.getASEMModelName(sysmlBlockName);
 
         // Get ASEM model resource for the SysML block.

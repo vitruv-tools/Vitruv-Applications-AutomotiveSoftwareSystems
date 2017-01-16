@@ -25,7 +25,7 @@ import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTestHe
 public class PartMappingTransformationTest extends ASEMSysMLTest {
 
     @Override
-    protected void init() {
+    protected void initializeTestModel() {
         initializeSysMLAsSourceModel();
     }
 
@@ -37,8 +37,8 @@ public class PartMappingTransformationTest extends ASEMSysMLTest {
      * ASEM component which has a reference to the child component. <br>
      * <br>
      * 
-     * ASEM modules can not be used as subcomponents, see {@link #testIfPartMappingToModuleIsIgnored()}.
-     * <br>
+     * ASEM modules can not be used as subcomponents, see
+     * {@link #testIfPartMappingToModuleIsIgnored()}. <br>
      * <br>
      * 
      * [Requirement 1.e)] [Requirement 2.f)]

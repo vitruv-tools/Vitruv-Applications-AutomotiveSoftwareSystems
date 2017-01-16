@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import edu.kit.ipd.sdq.ASEM.classifiers.Module;
+import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.ASEMSysMLUserInteractionHelper;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTest;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTestHelper;
@@ -25,9 +26,9 @@ public class BlockMappingTransformationTest extends ASEMSysMLTest {
     private Block sysmlBlock;
 
     @Override
-    protected void init() {
-        initializeSysMLAsSourceModel();
-    }
+    protected void initializeTestModel() {
+        initializeSysMLAsSourceModel();        
+    };
 
     /**
      * Create a SysML block which is needed in all the test cases.
@@ -145,11 +146,14 @@ public class BlockMappingTransformationTest extends ASEMSysMLTest {
 
     private void assertASEMModelDoesNotExistForSysMLBlock(final Block block) {
 
-        Resource asemModelResource = this.getASEMModelResource(block.getBase_Class().getName());
-        final Boolean resourceDoesNotExist = (asemModelResource == null);
-
-        assertTrue("An ASEM model does exist for SysML block " + block.getBase_Class().getName() + "!",
-                resourceDoesNotExist);
+//        Resource asemModelResource = this.getASEMModelResource(block.getBase_Class().getName());
+//        final Boolean resourceDoesNotExist = (asemModelResource == null);
+//
+//        assertTrue("An ASEM model does exist for SysML block " + block.getBase_Class().getName() + "!",
+//                resourceDoesNotExist);
+        
+        String projectModelPath = ASEMSysMLHelper.getASEMProjectModelPath(block.getBase_Class().getName());
+        assertModelNotExists(projectModelPath);
 
     }
 
