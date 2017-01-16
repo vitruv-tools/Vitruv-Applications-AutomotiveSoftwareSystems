@@ -94,6 +94,18 @@ public class SysML2ASEMJavaExecutor extends AbstractEChangePropagationSpecificat
         return propagationResult;
     }
 
+    @Override
+    public void setUserInteracting(UserInteracting userInteracting) {
+        /*
+         * If the user interacting has changed, set the new user interacting, clean the change to
+         * transformation map and initialize the java transformation classes again.
+         */
+        super.setUserInteracting(userInteracting);
+        
+        this.change2TransformationMap = new Change2TransformationMap();
+        this.setup();
+    }
+
     private Set<JavaTransformationRealization> getRelevantTransformations(final EChange change) {
 
         Set<JavaTransformationRealization> relevantTransformations = new HashSet<JavaTransformationRealization>();

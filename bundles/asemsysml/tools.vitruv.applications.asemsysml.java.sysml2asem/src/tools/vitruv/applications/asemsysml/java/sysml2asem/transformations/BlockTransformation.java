@@ -6,8 +6,10 @@ import org.eclipse.papyrus.sysml14.blocks.Block;
 import org.eclipse.papyrus.sysml14.blocks.BlocksPackage;
 
 import edu.kit.ipd.sdq.ASEM.classifiers.ClassifiersFactory;
+import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import edu.kit.ipd.sdq.ASEM.classifiers.Module;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
+import tools.vitruv.applications.asemsysml.ASEMSysMLUserInteractionHelper;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.AbstractTransformationRealization;
 import tools.vitruv.domains.asem.AsemNamespace;
 import tools.vitruv.framework.change.echange.EChange;
@@ -34,7 +36,7 @@ import tools.vitruv.framework.userinteraction.UserInteracting;
 public class BlockTransformation extends AbstractTransformationRealization {
 
     private static Logger logger = Logger.getLogger(BlockTransformation.class);
-    
+
     public BlockTransformation(UserInteracting userInteracting) {
         super(userInteracting);
     }
@@ -61,7 +63,7 @@ public class BlockTransformation extends AbstractTransformationRealization {
 
         logger.info("[ASEMSysML][Java] Transforming a SysML Block ...");
 
-        createASEMModule((ReplaceSingleValuedEAttribute<EObject, Object>) change);
+        createASEMComponent((ReplaceSingleValuedEAttribute<EObject, Object>) change);
 
     }
 
@@ -71,18 +73,36 @@ public class BlockTransformation extends AbstractTransformationRealization {
                 && (Boolean) change.getNewValue());
     }
 
-    private void createASEMModule(ReplaceSingleValuedEAttribute<EObject, Object> change) {
+    private void createASEMComponent(ReplaceSingleValuedEAttribute<EObject, Object> change) {
 
         Block block = (Block) change.getAffectedEObject();
 
-        Module module = ClassifiersFactory.eINSTANCE.createModule();
-        module.setName(block.getBase_Class().getName());
+        Class<?> asemComponentType = ASEMSysMLUserInteractionHelper
+                .simulateUserInteractionForASEMComponentType(this.userInteracting);
+
+        Component asemComponent;
+
+        if (Module.class.isAssignableFrom(asemComponentType)) {
+
+            Module asemModule = ClassifiersFactory.eINSTANCE.createModule();
+            asemModule.setName(block.getBase_Class().getName());
+            asemComponent = asemModule;
+
+        } else if (edu.kit.ipd.sdq.ASEM.classifiers.Class.class.isAssignableFrom(asemComponentType)) {
+
+            edu.kit.ipd.sdq.ASEM.classifiers.Class asemClass = ClassifiersFactory.eINSTANCE.createClass();
+            asemClass.setName(block.getBase_Class().getName());
+            asemComponent = asemClass;
+
+        } else {
+            return;
+        }
 
         String asemModelName = ASEMSysMLHelper.getASEMModelName(block.getBase_Class().getName());
         String asemProjectModelPath = ASEMSysMLHelper.getProjectModelPath(asemModelName, AsemNamespace.FILE_EXTENSION);
 
-        persistASEMElement(block, module, asemProjectModelPath);
-        addCorrespondence(block, module);
+        persistASEMElement(block, asemComponent, asemProjectModelPath);
+        addCorrespondence(block, asemComponent);
 
     }
 }

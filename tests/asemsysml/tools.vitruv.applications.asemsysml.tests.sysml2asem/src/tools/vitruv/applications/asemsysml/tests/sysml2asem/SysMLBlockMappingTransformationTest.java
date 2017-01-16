@@ -27,6 +27,7 @@ import edu.kit.ipd.sdq.ASEM.classifiers.Module;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Message;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.ASEMSysMLPrimitiveTypeHelper;
+import tools.vitruv.applications.asemsysml.ASEMSysMLUserInteractionHelper;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTest;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTestHelper;
 import tools.vitruv.domains.sysml.SysMlNamspace;
@@ -59,6 +60,10 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
     public void setUp() {
 
         Resource sysmlModelResource = this.getModelResource(sysmlProjectModelPath);
+
+        int selection = ASEMSysMLUserInteractionHelper.getNextUserInteractorSelectionForASEMComponent(Module.class);
+        this.testUserInteractor.addNextSelections(selection);
+
         this.sysmlBlock = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "SampleBlock", true, this);
 
     }
@@ -76,8 +81,8 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
 
         this.assertASEMComponentForSysMLBlockExists(sysmlBlock);
 
-        // TODO [BR] Check for ASEM class, too.
         this.assertExpectedASEMComponentType(Module.class);
+        this.assertExpectedASEMComponentType(edu.kit.ipd.sdq.ASEM.classifiers.Class.class);
 
     }
 
@@ -117,6 +122,7 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
         this.sysmlBlock.getBase_Class().setName(newName);
         this.saveAndSynchronizeChanges(this.sysmlBlock);
 
+        // TODO [BR] Use assertSysMLBlockAndASEMModuleNamesAreEqual() method instead?!
         this.assertASEMComponentNameHasChangedAfterBlockNameChanged(sysmlBlock);
 
     }
@@ -150,8 +156,11 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
     @Test
     public void testIfPartsMappedCorrectly() {
 
-        this.assertPartMappingForASEMModuleExists();
-        // TODO [BR] Add part mapping check for ASEM class, too.
+        this.assertPartMappingExists();
+        this.assertNestedPartMappingExists();
+        this.assertNoPartMappingToModules();
+
+        // TODO [BR] Check if part reference will be deleted if the part of block was deleted.
 
     }
 
@@ -210,7 +219,8 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
         final String sysmlBlockName = "BlockTo" + expectedComponentType.getSimpleName();
         Resource sysmlModelResource = this.getModelResource(sysmlProjectModelPath);
 
-        int selection = ASEMSysMLTestHelper.getNextUserInteractorSelectionForASEMComponent(expectedComponentType);
+        int selection = ASEMSysMLUserInteractionHelper
+                .getNextUserInteractorSelectionForASEMComponent(expectedComponentType);
 
         this.testUserInteractor.addNextSelections(selection);
         ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, sysmlBlockName, true, this);
@@ -225,7 +235,8 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
         Resource sysmlModelResource = this.getModelResource(sysmlProjectModelPath);
 
         // Add a block which owns all ports for this test.
-        int componentSelection = ASEMSysMLTestHelper.getNextUserInteractorSelectionForASEMComponent(Module.class);
+        int componentSelection = ASEMSysMLUserInteractionHelper
+                .getNextUserInteractorSelectionForASEMComponent(Module.class);
         this.testUserInteractor.addNextSelections(componentSelection);
         Block block = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockWithPort", true, this);
 
@@ -403,65 +414,74 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
 
     }
 
-    private void assertPartMappingForASEMModuleExists() {
+    private void assertPartMappingExists() {
+        /*
+         * Add a block BlockA which has a part reference to a block BlockB. In ASEM a module cannot
+         * be used as a subcomponent of another component. Therefore the BlockB must correspond with
+         * a ASEM class, and NOT with a ASEM module.
+         */
 
         Resource sysmlModelResource = this.getModelResource(sysmlProjectModelPath);
+        Class<? extends Component> asemComponentType = edu.kit.ipd.sdq.ASEM.classifiers.Class.class;
 
-        final int componentSelectionModule = ASEMSysMLTestHelper
-                .getNextUserInteractorSelectionForASEMComponent(Module.class);
+        final int componentSelectionClass = ASEMSysMLUserInteractionHelper
+                .getNextUserInteractorSelectionForASEMComponent(asemComponentType);
 
-        // Add a block A with a part (block B).
-        // TODO [BR] Add a block B2 which corresponds to an ASEM class, too.
-        this.testUserInteractor.addNextSelections(componentSelectionModule);
+        this.testUserInteractor.addNextSelections(componentSelectionClass, componentSelectionClass);
+
         Block blockA = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockA", true, this);
-        this.testUserInteractor.addNextSelections(componentSelectionModule);
         Block blockB1 = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockB1", true, this);
 
+        // Add a part property to BlockA. The aggregation kind is needed for the getParts() method.
         Property partPropertyB1 = blockA.getBase_Class().createOwnedAttribute("partReferenceB1",
                 blockB1.getBase_Class());
-        // Aggregation kind is needed for getParts() method.
         partPropertyB1.setAggregation(AggregationKind.COMPOSITE_LITERAL);
 
         saveAndSynchronizeChanges(blockA);
+
         assertTrue("Block A doesn't contain a part!", !blockA.getParts().isEmpty());
 
         // Check if the corresponding ASEM module of block A contains a reference to the
-        // corresponding ASEM component (module or class) of block B.
-        Module moduleA = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), blockA,
-                Module.class);
-        Module moduleB1 = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), blockB1,
-                Module.class);
+        // corresponding ASEM component of block B.
+        Component componentA = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), blockA,
+                asemComponentType);
+        Component componentB1 = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), blockB1,
+                asemComponentType);
 
-        assertTrue("Module doesn't contain a typed element!", !moduleA.getTypedElements().isEmpty());
+        assertTrue("No corresponding element found for " + blockA.getBase_Class().getName(), componentA != null);
+        assertTrue("No corresponding element found for " + blockB1.getBase_Class().getName(), componentB1 != null);
 
-        ASEMSysMLTestHelper.assertPartReferenceExists(moduleA, moduleB1);
-
-        // TODO [BR] Check if reference will be deleted if the part of block A was deleted.
-
-        assertNestedPartReferencesAreMappedCorrectly();
+        ASEMSysMLTestHelper.assertPartReferenceExists(componentA, componentB1);
 
     }
 
-    private void assertNestedPartReferencesAreMappedCorrectly() {
+    private void assertNestedPartMappingExists() {
+        /*
+         * Add a block BlockN1 which has a part reference to a block BlockN2 which itself has a part
+         * reference to a third block BlockN3. In ASEM a module cannot be used as a subcomponent of
+         * another component. Therefore the BlockN2 and BlockN3 must correspond with a ASEM class,
+         * and NOT with a ASEM module.
+         */
 
         Resource sysmlModelResource = this.getModelResource(sysmlProjectModelPath);
+        Class<? extends Component> asemComponentType = edu.kit.ipd.sdq.ASEM.classifiers.Class.class;
 
-        final int componentSelectionModule = ASEMSysMLTestHelper
-                .getNextUserInteractorSelectionForASEMComponent(Module.class);
+        final int componentTypeSelection = ASEMSysMLUserInteractionHelper
+                .getNextUserInteractorSelectionForASEMComponent(asemComponentType);
 
-        this.testUserInteractor.addNextSelections(componentSelectionModule, componentSelectionModule,
-                componentSelectionModule);
+        this.testUserInteractor.addNextSelections(componentTypeSelection, componentTypeSelection,
+                componentTypeSelection);
         Block blockN1 = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockN1", true, this);
         Block blockN2 = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockN2", true, this);
         Block blockN3 = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockN3", true, this);
 
-        Property partPropertyN1 = blockN1.getBase_Class().createOwnedAttribute("partReferenceN2",
+        Property partPropertyN2 = blockN1.getBase_Class().createOwnedAttribute("partReferenceN2",
                 blockN2.getBase_Class());
-        partPropertyN1.setAggregation(AggregationKind.COMPOSITE_LITERAL);
-
-        Property partPropertyN2 = blockN2.getBase_Class().createOwnedAttribute("partReferenceN3",
-                blockN3.getBase_Class());
         partPropertyN2.setAggregation(AggregationKind.COMPOSITE_LITERAL);
+
+        Property partPropertyN3 = blockN2.getBase_Class().createOwnedAttribute("partReferenceN3",
+                blockN3.getBase_Class());
+        partPropertyN3.setAggregation(AggregationKind.COMPOSITE_LITERAL);
 
         saveAndSynchronizeChanges(blockN1);
         saveAndSynchronizeChanges(blockN2);
@@ -470,17 +490,60 @@ public class SysMLBlockMappingTransformationTest extends ASEMSysMLTest {
         assertTrue("BlockN1 doesn't contain a part!", !blockN1.getParts().isEmpty());
         assertTrue("BlockN2 doesn't contain a part!", !blockN2.getParts().isEmpty());
 
-        Module moduleN1 = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), blockN1,
-                Module.class);
-        Module moduleN2 = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), blockN2,
-                Module.class);
-        Module moduleN3 = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), blockN3,
-                Module.class);
+        Component componentN1 = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), blockN1,
+                asemComponentType);
+        Component componentN2 = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), blockN2,
+                asemComponentType);
+        Component componentN3 = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), blockN3,
+                asemComponentType);
 
-        assertTrue("Module doesn't contain a typed element!", !moduleN1.getTypedElements().isEmpty());
-        assertTrue("Module doesn't contain a typed element!", !moduleN2.getTypedElements().isEmpty());
+        assertTrue("No corresponding element found for " + blockN1.getBase_Class().getName(), componentN1 != null);
+        assertTrue("No corresponding element found for " + blockN2.getBase_Class().getName(), componentN2 != null);
+        assertTrue("No corresponding element found for " + blockN3.getBase_Class().getName(), componentN3 != null);
 
-        ASEMSysMLTestHelper.assertPartReferenceExists(moduleN1, moduleN2);
-        ASEMSysMLTestHelper.assertPartReferenceExists(moduleN2, moduleN3);
+        ASEMSysMLTestHelper.assertPartReferenceExists(componentN1, componentN2);
+        ASEMSysMLTestHelper.assertPartReferenceExists(componentN2, componentN3);
+    }
+
+    private void assertNoPartMappingToModules() {
+        /*
+         * An ASEM module can not be used as a subcomponent in other ASEM components. Therefore
+         * SysML part references to a SysML block which corresponds to an ASEM module must be
+         * ignored.
+         */
+        Resource sysmlModelResource = this.getModelResource(sysmlProjectModelPath);
+        Class<? extends Component> asemComponentType = Module.class;
+
+        final int componentTypeSelection = ASEMSysMLUserInteractionHelper
+                .getNextUserInteractorSelectionForASEMComponent(asemComponentType);
+
+        this.testUserInteractor.addNextSelections(componentTypeSelection, componentTypeSelection);
+
+        Block blockA = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockWithModuleAsPart", true, this);
+        Block blockB = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockAsModule", true, this);
+
+        Property partPropertyB = blockA.getBase_Class().createOwnedAttribute("partReferenceB", blockB.getBase_Class());
+        partPropertyB.setAggregation(AggregationKind.COMPOSITE_LITERAL);
+
+        saveAndSynchronizeChanges(blockA);
+        saveAndSynchronizeChanges(blockB);
+
+        assertTrue("BlockA doesn't contain a part!", !blockA.getParts().isEmpty());
+
+        Component componentA = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), blockA,
+                asemComponentType);
+        Component componentB = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), blockB,
+                asemComponentType);
+
+        boolean partReferenceMappingExists = false;
+
+        for (TypedElement typedElement : componentA.getTypedElements()) {
+            if (typedElement.getType().equals(componentB)) {
+                partReferenceMappingExists = true;
+            }
+        }
+
+        assertTrue("A part reference to an ASEM module exists! ", !partReferenceMappingExists);
+
     }
 }

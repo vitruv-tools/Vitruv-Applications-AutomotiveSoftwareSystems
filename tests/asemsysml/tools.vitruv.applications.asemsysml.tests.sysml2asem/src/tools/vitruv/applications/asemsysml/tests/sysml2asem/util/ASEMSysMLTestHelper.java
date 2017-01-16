@@ -242,31 +242,6 @@ public final class ASEMSysMLTestHelper {
     }
 
     /**
-     * Get the number of the given ASEM component type which has to be used to set the next
-     * selection of the {@link TestUserInteractor}.
-     * 
-     * @param expectedComponentType
-     *            Type of the ASEM component which should be selected for the transformation of a
-     *            SysML block.
-     * @return The magic number for the {@link TestUserInteractor}
-     * @see TestUserInteractor#addNextSelections(Integer...)
-     */
-    public static int getNextUserInteractorSelectionForASEMComponent(
-            final java.lang.Class<? extends Component> expectedComponentType) {
-        // FIXME [BR] Remove magic numbers!
-        // The order must be the same as in the transformation!
-
-        int selection = 0;
-        if (expectedComponentType.getSimpleName().equals("Module")) {
-            selection = 0;
-        } else if (expectedComponentType.getSimpleName().equals("Class")) {
-            selection = 1;
-        }
-
-        return selection;
-    }
-
-    /**
      * Check if the given parent component references to the given child component.
      * 
      * @param parentComponent
@@ -277,6 +252,8 @@ public final class ASEMSysMLTestHelper {
     public static void assertPartReferenceExists(final Component parentComponent, final Component childComponent) {
 
         boolean correctPartReferenceMapping = false;
+        
+        assertTrue("Component doesn't contain a typed element!", !parentComponent.getTypedElements().isEmpty());
 
         for (TypedElement typedElement : parentComponent.getTypedElements()) {
             if (typedElement.getType().equals(childComponent)) {

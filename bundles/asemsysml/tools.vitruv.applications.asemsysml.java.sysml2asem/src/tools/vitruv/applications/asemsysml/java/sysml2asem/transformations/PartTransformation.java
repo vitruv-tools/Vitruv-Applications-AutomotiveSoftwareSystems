@@ -8,6 +8,7 @@ import org.eclipse.uml2.uml.Property;
 import org.eclipse.uml2.uml.util.UMLUtil;
 
 import edu.kit.ipd.sdq.ASEM.classifiers.Component;
+import edu.kit.ipd.sdq.ASEM.classifiers.Module;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Constant;
 import edu.kit.ipd.sdq.ASEM.dataexchange.DataexchangeFactory;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
@@ -116,6 +117,12 @@ public class PartTransformation extends AbstractTransformationRealization {
                 this.executionState.getCorrespondenceModel(), parentBlock, Component.class);
         Component correspondingASEMPartComponent = ASEMSysMLHelper.getFirstCorrespondingASEMElement(
                 this.executionState.getCorrespondenceModel(), partBlock, Component.class);
+
+        // ASEM modules cannot be used as subcomponents in ASEM components.
+        if (correspondingASEMPartComponent instanceof Module) {
+            // TODO [BR] Show user feedback.
+            return;
+        }
 
         Constant asemConstant = DataexchangeFactory.eINSTANCE.createConstant();
         asemConstant.setName(partProperty.getName());
