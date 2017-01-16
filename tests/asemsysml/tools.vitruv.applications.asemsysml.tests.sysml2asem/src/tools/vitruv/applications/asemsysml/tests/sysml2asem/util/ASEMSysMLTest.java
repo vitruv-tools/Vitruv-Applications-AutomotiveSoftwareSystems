@@ -46,6 +46,8 @@ public abstract class ASEMSysMLTest extends VitruviusEMFCasestudyTest {
     private static Logger logger = Logger.getLogger(ASEMSysMLTest.class);
 
     private static TransformationType transformationType = TransformationType.REACTIONS;
+    protected final String sysmlProjectModelPath = ASEMSysMLHelper.getProjectModelPath(TEST_SYSML_MODEL_NAME,
+            SysMlNamspace.FILE_EXTENSION);
 
     /*
      * TEST CASE methods. -------------------------------------------------------------------------

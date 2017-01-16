@@ -9,12 +9,14 @@ import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTest;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTestHelper.TransformationType;
 
 /**
- * Unifies all SysML2ASEM test cases. Use this test suite to run and test the <b>reactions transformations</b>.
+ * Unifies all SysML2ASEM test cases. Use this test suite to run and test the <b>reactions
+ * transformations</b>.
  * 
  * @author Benjamin Rupp
  */
 @RunWith(Suite.class)
-@SuiteClasses({ ModelInitializationTest.class, SysMLBlockMappingTransformationTest.class })
+@SuiteClasses({ ModelInitializationTest.class, BlockMappingTransformationTest.class,
+        PartMappingTransformationTest.class, PortMappingTransformationTest.class })
 public final class SysML2ASEMReactionsTestSuite {
 
     /**
