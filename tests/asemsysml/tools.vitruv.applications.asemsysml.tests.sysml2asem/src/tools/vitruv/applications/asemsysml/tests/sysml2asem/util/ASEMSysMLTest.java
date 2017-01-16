@@ -164,56 +164,6 @@ public abstract class ASEMSysMLTest extends VitruviusChangePropagationTest {
      * Helper methods which are useful for all test cases and need information of the parent test
      * classes. E.g. test project related stuff like currentTestProjectName.
      */
-    // /**
-    // * Get the platform model path based on the current test project name.
-    // *
-    // * @param modelPathInProject
-    // * The project model path. Use
-    // * {@link ASEMSysMLHelper#getProjectModelPath(String, String)}.
-    // * @return The platform model path String.
-    // */
-    // protected String getPlatformModelPath(final String modelPathInProject) {
-    // return ((this.currentTestProjectName + "/") + modelPathInProject);
-    // }
-
-    // /**
-    // * Get the model VURI.
-    // *
-    // * @param modelPathInProject
-    // * The project model path. Use {@link #getPlatformModelPath(String)}.
-    // * @return The model VURI.
-    // * @see VURI
-    // */
-    // protected VURI getModelVURI(final String modelPathInProject) {
-    // String platformModelPath = this.getPlatformModelPath(modelPathInProject);
-    // return VURI.getInstance(platformModelPath);
-    // }
-
-    // /**
-    // * Get the model resource if the resource exists otherwise return null.
-    // *
-    // * @param projectModelPath
-    // * The project model path. Use {@link #getPlatformModelPath(String)}.
-    // * @return The model resource or null.
-    // */
-    // protected Resource getModelResource(final String projectModelPath) {
-    //
-    // VURI modelVURI = this.getModelVURI(projectModelPath);
-    // URI eMFUri = modelVURI.getEMFUri();
-    //
-    // Resource resource;
-    //
-    // try {
-    // resource = this.resourceSet.getResource(eMFUri, true);
-    // } catch (Exception e) {
-    // // Return null if the resource could not be loaded. E.g. if no
-    // // resource exists.
-    // // TODO [BR] Is there a better way to do this?
-    // resource = null;
-    // }
-    //
-    // return resource;
-    // }
 
     /**
      * Save and synchronize the changes of the given object. This method will save the resource and
@@ -236,7 +186,7 @@ public abstract class ASEMSysMLTest extends VitruviusChangePropagationTest {
      */
     protected Resource getASEMModelResource(final String sysmlBlockName) {
         // TODO [BR] Move to ASEMSysMLHelper class.
-        
+
         final String asemModelName = ASEMSysMLHelper.getASEMModelName(sysmlBlockName);
 
         // Get ASEM model resource for the SysML block.
