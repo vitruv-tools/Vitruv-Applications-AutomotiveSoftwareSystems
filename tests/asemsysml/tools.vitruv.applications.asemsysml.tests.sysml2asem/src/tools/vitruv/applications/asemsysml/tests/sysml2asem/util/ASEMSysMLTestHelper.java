@@ -30,7 +30,6 @@ import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.global.SysML2ASEMJavaChangePropagationSpecification;
 import tools.vitruv.applications.asemsysml.reactions.sysml2asem.global.SysML2ASEMChangePropagationSpecification;
 import tools.vitruv.framework.change.processing.ChangePropagationSpecification;
-import tools.vitruv.framework.tests.TestUserInteractor;
 
 /**
  * A helper class which contains useful methods for the ASEMSysML test cases.

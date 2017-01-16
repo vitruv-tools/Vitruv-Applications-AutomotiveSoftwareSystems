@@ -45,7 +45,7 @@ public abstract class ASEMSysMLTest extends VitruviusEMFCasestudyTest {
 
     private static Logger logger = Logger.getLogger(ASEMSysMLTest.class);
 
-    private final TransformationType transformationType = TransformationType.REACTIONS;
+    private static TransformationType transformationType = TransformationType.REACTIONS;
 
     /*
      * TEST CASE methods. -------------------------------------------------------------------------
@@ -66,13 +66,27 @@ public abstract class ASEMSysMLTest extends VitruviusEMFCasestudyTest {
 
     @Override
     protected Iterable<ChangePropagationSpecification> createChangePropagationSpecifications() {
-        return ASEMSysMLTestHelper.getChangePropagationSpecificationsByTransformationType(this.transformationType);
+        return ASEMSysMLTestHelper.getChangePropagationSpecificationsByTransformationType(transformationType);
     }
 
     @Override
     public void beforeTest(Description description) throws Throwable {
         super.beforeTest(description);
         init();
+    }
+
+    /**
+     * Set the transformation which shall be tested. Use this method in a JUnit test suite to set
+     * the transformation type which shall be used for the test run. The default value is
+     * {@link TransformationType#REACTIONS}.
+     * 
+     * @see TransformationType
+     * 
+     * @param type
+     *            The transformation type which shall be tested during the test execution.
+     */
+    public static void setTransformationType(final TransformationType type) {
+        transformationType = type;
     }
 
     /*
