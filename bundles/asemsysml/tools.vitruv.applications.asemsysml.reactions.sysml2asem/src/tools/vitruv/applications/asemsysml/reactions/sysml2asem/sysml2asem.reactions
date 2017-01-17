@@ -20,7 +20,7 @@ execute actions in asem
 reaction Debug {
 	after any change
 	call {
-//		System.out.println("[ASEMSysML] [Change] " + change);
+		logger.debug("[ASEMSysML] [Change] " + change);
 	}
 }
 
@@ -39,7 +39,7 @@ reaction SysMLBlockCreated {
 		val blocksBaseClass = change.newValue;
 		val block = change.affectedEObject;
 		val isEncapsulated = block.encapsulated;
-		System.out.println("[ASEMSysML] A SysML block was created! Its name is: " + blocksBaseClass.name + " and the isEncapsulated flag is: " + isEncapsulated);
+		logger.info("[ASEMSysML] A SysML block was created! Its name is: " + blocksBaseClass.name + " and the isEncapsulated flag is: " + isEncapsulated);
 		
 	}
 	
@@ -54,7 +54,7 @@ reaction SysMLBlockIsEncapsulatedChanged {
 		// The isEncapsulated flag of a SysMLBlock was set to true. Therefore create and persist the ASEM element.
 		val block = change.affectedEObject;
 		
-		System.out.println("[ASEMSysML] A SysML block (" + block.base_Class.name + ") was created and its isEncapsulated flag is true!");
+		logger.info("[ASEMSysML] A SysML block (" + block.base_Class.name + ") was created and its isEncapsulated flag is true!");
 		
 		// Let user select the ASEM component to map the SysML block to.	
 		val java.lang.Class<?> selectedComponentTypeClass = ASEMSysMLUserInteractionHelper.simulateUserInteractionForASEMComponentType(userInteracting);
@@ -105,7 +105,7 @@ reaction ChangeNameOfSysMLBlock {
 		with change.affectedEObject.getAppliedStereotype("SysML::Blocks::Block") != null &&
 			UMLUtil.getStereotypeApplication(change.affectedEObject, Block).isEncapsulated
 	call {
-		System.out.println("[ASEMSysML] Change name of ASEM component ...");
+		logger.info("[ASEMSysML] Change name of ASEM component ...");
 		val block = UMLUtil.getStereotypeApplication(change.affectedEObject, Block);
 		changeNameOfSysMLBlockCorrespondence(block)
 	}
@@ -134,7 +134,7 @@ reaction PortTransformation {
 
 	call {
 		val port = change.affectedEObject
-		System.out.println("[ASEMSysML] Port with name " + change.newValue + " was created.");
+		logger.info("[ASEMSysML] Port with name " + change.newValue + " was created.");
 		createPortCorrespondence(port);
 	}
 }
@@ -255,7 +255,7 @@ routine transformPrimitivePortType(uml::Port port) {
  	call {
  		val partProperty = change.affectedEObject;
  		val blockBaseClass = partProperty.eContainer as Class;
- 		System.out.println("[ASEMSysML] Part " + partProperty.name + " for block " + blockBaseClass.name + " added.");
+ 		logger.info("[ASEMSysML] Part " + partProperty.name + " for block " + blockBaseClass.name + " added.");
  		
  		createPartCorrespondence(partProperty, blockBaseClass);
  	}
@@ -293,11 +293,11 @@ reaction PrimitiveTypeTransformation {
 
 	call {
 		val primitiveType = change.newValue as PrimitiveType
-		System.out.println("[ASEMSysML] Primitive type " + primitiveType.name + " added.");
+		logger.info("[ASEMSysML] Primitive type " + primitiveType.name + " added.");
 		
 		// Add all ASEM primitive types to primitive types model.
 		if(!ASEMSysMLPrimitiveTypeHelper.isPrimitiveTypeModelInitialized(primitiveType)) {
-			System.out.println("[ASEMSysML] Initialize primitive types for " + primitiveType.eResource);
+			logger.info("[ASEMSysML] Initialize primitive types for " + primitiveType.eResource);
 			addASEMPrimitiveTypes(primitiveType);
 		}
 	}
