@@ -59,21 +59,16 @@ reaction SysMLBlockIsEncapsulatedChanged {
 		// Let user select the ASEM component to map the SysML block to.	
 		val java.lang.Class<?> selectedComponentTypeClass = ASEMSysMLUserInteractionHelper.simulateUserInteractionForASEMComponentType(userInteracting);
 		
-		createASEMModelWithRootElement(block, selectedComponentTypeClass.name);
-	}
-}
-
-routine createASEMModelWithRootElement(sysml::Block block, String componentClassName) {
-	action {
-		call {
-			// TODO [BR] Rework this part. Use classes instead of class names?
-			if (componentClassName.equals("edu.kit.ipd.sdq.ASEM.classifiers.Module")) {
-				createASEMModelWithModuleAsRootElement(block);
-			}
-			else if (componentClassName.equals("edu.kit.ipd.sdq.ASEM.classifiers.Class")) {
-				createASEMModelWithClassAsRootElement(block);
-			}
+		if (Module.isAssignableFrom(selectedComponentTypeClass)) {
+			createASEMModelWithModuleAsRootElement(block);
 		}
+		else if (edu.kit.ipd.sdq.ASEM.classifiers.Class.isAssignableFrom(selectedComponentTypeClass)) {
+			createASEMModelWithClassAsRootElement(block);
+		}
+		else {
+			logger.info("[ASEMSysML] Invalid user selection for a ASEM component type.");
+		}
+		
 	}
 }
 routine createASEMModelWithModuleAsRootElement(sysml::Block block) {
