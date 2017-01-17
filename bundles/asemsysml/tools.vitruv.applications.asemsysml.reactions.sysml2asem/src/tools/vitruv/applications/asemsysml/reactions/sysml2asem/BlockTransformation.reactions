@@ -78,7 +78,7 @@ routine changeNameOfSysMLBlockCorrespondence(sysml::Block block) {
 		val asemComponent = retrieve asem::Component corresponding to block	
 	}	
 	action {
-		call {
+		update asemComponent {
 			asemComponent.name = block.base_Class.name
 			persistProjectRelative(block, asemComponent, ASEMSysMLHelper.getASEMProjectModelPath(block.base_Class.name));
 		}

@@ -61,7 +61,7 @@ routine setMessageAccessProperties(uml::Port port) {
 		val asemMessage = retrieve asem::Message corresponding to port
 	}
 	action {
-		call {
+		update asemMessage {
 		
 			// [Requirement 1.d)ii]
 			val flowProperty = ASEMSysMLHelper.getFlowProperty(port);
@@ -104,7 +104,7 @@ routine transformPortType(uml::Port port, sysml::Block block){
 		val asemComponent = retrieve asem::Component corresponding to block
 	}
 	action {
-		call {
+		update asemMessage {
 			
 			// [Requirement 1.d)iii]
 			asemMessage.type = asemComponent;
@@ -118,7 +118,7 @@ routine transformPrimitivePortType(uml::Port port) {
 	}
 	action {
 		
-		call {			
+		update asemMessage {			
 			val messageType = ASEMSysMLPrimitiveTypeHelper.PRIMITIVE_TYPE_MAP.get(port.type);
 			asemMessage.type = ASEMSysMLPrimitiveTypeHelper.getASEMPrimitiveTypeFromRepository(messageType, asemMessage);
 		}
