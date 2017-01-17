@@ -1,0 +1,126 @@
+import org.eclipse.papyrus.sysml14.blocks.Block
+import org.eclipse.uml2.uml.Class
+import org.eclipse.uml2.uml.Port
+import org.eclipse.uml2.uml.PrimitiveType
+import org.eclipse.uml2.uml.util.UMLUtil
+import tools.vitruv.applications.asemsysml.ASEMSysMLHelper
+import tools.vitruv.applications.asemsysml.ASEMSysMLPrimitiveTypeHelper
+
+import "edu.kit.ipd.sdq.asem" as asem
+import "http://www.eclipse.org/papyrus/sysml/1.4/SysML" as sysml
+import "http://www.eclipse.org/uml2/5.0.0/UML" as uml
+
+reactions: sysml2asemPort
+in reaction to changes in uml
+execute actions in asem
+
+
+reaction PortTransformation {
+	
+	after value replaced for uml::Port[name]
+		with change.affectedEObject.owner instanceof Class &&
+			change.affectedEObject.owner.getAppliedStereotype("SysML::Blocks::Block") != null
+
+	call {
+		val port = change.affectedEObject
+		logger.info("[ASEMSysML] Port with name " + change.newValue + " was created.");
+		createPortCorrespondence(port);
+	}
+}
+routine createPortCorrespondence(uml::Port port) {
+	match {
+		val asemModule = retrieve asem::Module corresponding to UMLUtil.getStereotypeApplication(port.owner, Block)
+	}
+	action {
+		val asemMessage = create asem::Message and initialize {
+			
+			// [Requirement 1.d)i]
+			asemMessage.name = port.name;
+			
+		}
+		call {
+			asemModule.typedElements.add(asemMessage)
+		}
+		add correspondence between port and asemMessage
+	}
+}
+
+reaction PortDirectionTransformation {
+	after value replaced for sysml::BindingConnector[base_Connector]
+	call {
+		val bindingConnector = change.affectedEObject;
+		for(connectorEnds: bindingConnector.base_Connector.ends) {
+			if(connectorEnds.role instanceof Port) {
+				setMessageAccessProperties(connectorEnds.role as Port);
+			}
+		}
+	}
+}
+routine setMessageAccessProperties(uml::Port port) {
+	match {
+		val asemMessage = retrieve asem::Message corresponding to port
+	}
+	action {
+		call {
+		
+			// [Requirement 1.d)ii]
+			val flowProperty = ASEMSysMLHelper.getFlowProperty(port);
+			val flowDirection = flowProperty.direction;
+			switch(flowDirection) {
+				case IN: {
+					asemMessage.readable = true;
+					asemMessage.writable = false;
+				}
+				case INOUT: {
+					asemMessage.readable = true;
+					asemMessage.writable = true;
+				}
+				case OUT: {
+					asemMessage.readable = false;
+					asemMessage.writable = true;
+				}
+			}
+			
+		}
+	}
+}
+
+reaction PortTypeTransformation {
+	after value replaced for uml::Port[type]
+	call {
+		val port = change.affectedEObject;
+		val block = UMLUtil.getStereotypeApplication(change.newValue, Block);
+		
+		if(block != null) {
+			transformPortType(port, block);		
+		} else if(change.newValue instanceof PrimitiveType) {
+			transformPrimitivePortType(port);
+		}
+	}
+}
+routine transformPortType(uml::Port port, sysml::Block block){
+	match {
+		val asemMessage = retrieve asem::Message corresponding to port
+		val asemComponent = retrieve asem::Component corresponding to block
+	}
+	action {
+		call {
+			
+			// [Requirement 1.d)iii]
+			asemMessage.type = asemComponent;
+			
+		}
+	}
+}
+routine transformPrimitivePortType(uml::Port port) {
+	match {
+		val asemMessage = retrieve asem::Message corresponding to port
+	}
+	action {
+		
+		call {			
+			val messageType = ASEMSysMLPrimitiveTypeHelper.PRIMITIVE_TYPE_MAP.get(port.type);
+			asemMessage.type = ASEMSysMLPrimitiveTypeHelper.getASEMPrimitiveTypeFromRepository(messageType, asemMessage);
+		}
+	}
+} 

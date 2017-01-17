@@ -1,0 +1,52 @@
+import org.eclipse.uml2.uml.PrimitiveType
+import tools.vitruv.applications.asemsysml.ASEMSysMLPrimitiveTypeHelper
+
+import "edu.kit.ipd.sdq.asem" as asem
+import "http://www.eclipse.org/papyrus/sysml/1.4/SysML" as sysml
+import "http://www.eclipse.org/uml2/5.0.0/UML" as uml
+
+reactions: sysml2asemPrimitiveType
+in reaction to changes in uml
+execute actions in asem
+
+
+reaction PrimitiveTypeTransformation {
+	after list entry created and inserted in uml::Model[packagedElement]
+		with change.newValue instanceof PrimitiveType
+
+	call {
+		val primitiveType = change.newValue as PrimitiveType
+		logger.info("[ASEMSysML] Primitive type " + primitiveType.name + " added.");
+		
+		// Add all ASEM primitive types to primitive types model.
+		if(!ASEMSysMLPrimitiveTypeHelper.isPrimitiveTypeModelInitialized(primitiveType)) {
+			logger.info("[ASEMSysML] Initialize primitive types for " + primitiveType.eResource);
+			addASEMPrimitiveTypes(primitiveType);
+		}
+	}
+}
+routine addASEMPrimitiveTypes(uml::PrimitiveType primitiveType) {
+	action {
+		val pUnsignedDiscrete = create asem::UnsignedDiscreteType and initialize {
+			pUnsignedDiscrete.name = "UnsignedDiscrete";
+		}
+		val pSignedDiscrete = create asem::SignedDiscreteType and initialize {
+			pSignedDiscrete.name = "SignedDiscrete";
+		}
+		val pBoolean = create asem::BooleanType and initialize {
+			pBoolean.name = "Boolean";
+		}
+		val pContinuous = create asem::ContinuousType and initialize {
+			pContinuous.name = "Continuous";
+		}
+		val pRepo = create asem::PrimitiveTypeRepository and initialize {
+			pRepo.name = "PrimitveTypeRepo";
+			pRepo.primitiveTypes.add(pUnsignedDiscrete);
+			pRepo.primitiveTypes.add(pSignedDiscrete);
+			pRepo.primitiveTypes.add(pBoolean);
+			pRepo.primitiveTypes.add(pContinuous);
+			
+			persistProjectRelative(primitiveType, pRepo, ASEMSysMLPrimitiveTypeHelper.primitiveTypeProjectModelPath);
+		}
+	}
+}
