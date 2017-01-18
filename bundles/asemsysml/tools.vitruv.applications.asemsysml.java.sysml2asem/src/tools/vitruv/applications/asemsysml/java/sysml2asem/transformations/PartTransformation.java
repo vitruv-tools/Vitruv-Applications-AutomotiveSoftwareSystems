@@ -11,6 +11,7 @@ import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import edu.kit.ipd.sdq.ASEM.classifiers.Module;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Constant;
 import edu.kit.ipd.sdq.ASEM.dataexchange.DataexchangeFactory;
+import tools.vitruv.applications.asemsysml.ASEMSysMLConstants;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.AbstractTransformationRealization;
 import tools.vitruv.domains.asem.AsemNamespace;
@@ -91,12 +92,12 @@ public class PartTransformation
         if (prop.eContainer() instanceof org.eclipse.uml2.uml.Class) {
             org.eclipse.uml2.uml.Class baseClass = (org.eclipse.uml2.uml.Class) prop.eContainer();
 
-            if (baseClass.getAppliedStereotype("SysML::Blocks::Block") != null) {
+            if (baseClass.getAppliedStereotype(ASEMSysMLConstants.QUALIFIED_BLOCK_NAME) != null) {
                 isContainingElementABlock = true;
             }
         }
 
-        isPropertyTypeABlock = (prop.getType().getAppliedStereotype("SysML::Blocks::Block") != null);
+        isPropertyTypeABlock = (prop.getType().getAppliedStereotype(ASEMSysMLConstants.QUALIFIED_BLOCK_NAME) != null);
 
         isPropertyAPort = (prop instanceof Port);
 

@@ -20,6 +20,7 @@ import edu.kit.ipd.sdq.ASEM.classifiers.Classifier;
 import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import edu.kit.ipd.sdq.ASEM.classifiers.Module;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Message;
+import tools.vitruv.applications.asemsysml.ASEMSysMLConstants;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.ASEMSysMLPrimitiveTypeHelper;
 import tools.vitruv.applications.asemsysml.ASEMSysMLUserInteractionHelper;
@@ -154,7 +155,7 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
         final Type portType = port.getType();
 
         if (portType instanceof org.eclipse.uml2.uml.Class
-                && portType.getAppliedStereotype("SysML::Blocks::Block") != null) {
+                && portType.getAppliedStereotype(ASEMSysMLConstants.QUALIFIED_BLOCK_NAME) != null) {
 
             // [Requirement 1.d)iii]
             assertMessageTypeIsASEMComponent(port);

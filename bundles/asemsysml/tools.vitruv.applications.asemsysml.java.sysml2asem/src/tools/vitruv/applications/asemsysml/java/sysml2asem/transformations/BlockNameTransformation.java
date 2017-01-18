@@ -9,6 +9,7 @@ import org.eclipse.papyrus.sysml14.blocks.Block;
 import org.eclipse.uml2.uml.util.UMLUtil;
 
 import edu.kit.ipd.sdq.ASEM.classifiers.Component;
+import tools.vitruv.applications.asemsysml.ASEMSysMLConstants;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.AbstractTransformationRealization;
 import tools.vitruv.domains.asem.AsemNamespace;
@@ -69,7 +70,7 @@ public class BlockNameTransformation
         if (change.getAffectedEObject() instanceof org.eclipse.uml2.uml.Class) {
             org.eclipse.uml2.uml.Class baseClass = (org.eclipse.uml2.uml.Class) change.getAffectedEObject();
 
-            if (baseClass.getAppliedStereotype("SysML::Blocks::Block") != null) {
+            if (baseClass.getAppliedStereotype(ASEMSysMLConstants.QUALIFIED_BLOCK_NAME) != null) {
                 isBlock = true;
             }
         }
