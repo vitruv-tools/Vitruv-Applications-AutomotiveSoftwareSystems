@@ -3,7 +3,6 @@ package tools.vitruv.applications.asemsysml.java.sysml2asem.transformations;
 import org.apache.log4j.Logger;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.papyrus.sysml14.blocks.Block;
-import org.eclipse.uml2.uml.Connector;
 import org.eclipse.uml2.uml.Port;
 import org.eclipse.uml2.uml.Property;
 import org.eclipse.uml2.uml.util.UMLUtil;
