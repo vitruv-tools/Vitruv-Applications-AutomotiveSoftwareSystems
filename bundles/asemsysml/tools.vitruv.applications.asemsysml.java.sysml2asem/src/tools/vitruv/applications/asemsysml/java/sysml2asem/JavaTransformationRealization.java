@@ -5,7 +5,6 @@ import tools.vitruv.framework.correspondence.CorrespondenceModel;
 import tools.vitruv.framework.util.command.ChangePropagationResult;
 
 /**
- * 
  * Interface which has to be implemented by the java transformation classes.
  * 
  * @author Benjamin Rupp

@@ -20,9 +20,12 @@ import tools.vitruv.framework.util.datatypes.VURI;
  * Abstract class for the java transformation implementations.
  * 
  * @author Benjamin Rupp
+ * 
+ * @param <T>
+ *            Change type the transformation reacts to.
  *
  */
-public abstract class AbstractTransformationRealization implements JavaTransformationRealization {
+public abstract class AbstractTransformationRealization<T extends EChange> implements JavaTransformationRealization {
 
     protected final UserInteracting userInteracting;
     protected TransformationExecutionState executionState;
@@ -49,16 +52,7 @@ public abstract class AbstractTransformationRealization implements JavaTransform
      * @see TransformationExecutionState
      * @see ChangePropagationResult
      */
-    protected abstract void executeTransformation(final EChange change);
-
-    @Override
-    public boolean doesHandleChange(final EChange change) {
-        return (isValidChangeType(change.getClass()) && checkPreconditions(change));
-    }
-
-    private boolean isValidChangeType(final Class<? extends EChange> changeType) {
-        return getExpectedChangeType().isAssignableFrom(changeType);
-    }
+    protected abstract void executeTransformation(final T change);
 
     /**
      * Check if the java transformation fulfills the preconditions for the given change. This method
@@ -69,7 +63,23 @@ public abstract class AbstractTransformationRealization implements JavaTransform
      *            The change for which the preconditions have to be fulfilled.
      * @return <code>True</code> if the preconditions are fulfilled, otherwise <code>false</code>.
      */
-    protected abstract boolean checkPreconditions(final EChange change);
+    protected abstract boolean checkPreconditions(final T change);
+
+    @Override
+    public boolean doesHandleChange(final EChange change) {
+        
+        if (!isValidChangeType(change.getClass())) {
+            return false;
+        }
+        
+        @SuppressWarnings("unchecked")
+        T typedChange = (T) change;
+        return checkPreconditions(typedChange);
+    }
+
+    private boolean isValidChangeType(final Class<? extends EChange> changeType) {
+        return getExpectedChangeType().isAssignableFrom(changeType);
+    }
 
     @Override
     public ChangePropagationResult applyChange(EChange change, CorrespondenceModel correspondenceModel) {
@@ -79,7 +89,9 @@ public abstract class AbstractTransformationRealization implements JavaTransform
 
         if (doesHandleChange(change)) {
             try {
-                executeTransformation(change);
+                @SuppressWarnings("unchecked")
+                T typedChange = (T) change;
+                executeTransformation(typedChange);
             } finally {
                 /*
                  * The transformation was completely executed, so remove all objects registered for

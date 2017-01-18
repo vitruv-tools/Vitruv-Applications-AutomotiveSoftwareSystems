@@ -32,7 +32,8 @@ import tools.vitruv.framework.userinteraction.UserInteracting;
  * @author Benjamin Rupp
  *
  */
-public class PortTransformation extends AbstractTransformationRealization {
+public class PortTransformation
+        extends AbstractTransformationRealization<ReplaceSingleValuedEAttribute<EObject, Object>> {
 
     private static Logger logger = Logger.getLogger(PortTransformation.class);
 
@@ -46,10 +47,7 @@ public class PortTransformation extends AbstractTransformationRealization {
     }
 
     @Override
-    protected void executeTransformation(EChange untypedChange) {
-
-        @SuppressWarnings("unchecked")
-        ReplaceSingleValuedEAttribute<EObject, Object> change = (ReplaceSingleValuedEAttribute<EObject, Object>) untypedChange;
+    protected void executeTransformation(ReplaceSingleValuedEAttribute<EObject, Object> change) {
 
         logger.info("[ASEMSysML][Java] Transforming a SysML port ...");
 
@@ -57,11 +55,7 @@ public class PortTransformation extends AbstractTransformationRealization {
     }
 
     @Override
-    protected boolean checkPreconditions(EChange untypedChange) {
-
-        @SuppressWarnings("unchecked")
-        ReplaceSingleValuedEAttribute<EObject, Object> change = (ReplaceSingleValuedEAttribute<EObject, Object>) untypedChange;
-
+    protected boolean checkPreconditions(ReplaceSingleValuedEAttribute<EObject, Object> change) {
         return (isPortOfABlock(change) && isPortNameSet(change));
     }
 

@@ -40,7 +40,8 @@ import tools.vitruv.framework.userinteraction.UserInteracting;
  * @author Benjamin Rupp
  *
  */
-public class PortDirectionTransformation extends AbstractTransformationRealization {
+public class PortDirectionTransformation
+        extends AbstractTransformationRealization<ReplaceSingleValuedEReference<EObject, EObject>> {
 
     private static Logger logger = Logger.getLogger(PortDirectionTransformation.class);
 
@@ -54,10 +55,7 @@ public class PortDirectionTransformation extends AbstractTransformationRealizati
     }
 
     @Override
-    protected void executeTransformation(EChange untypedChange) {
-
-        @SuppressWarnings("unchecked")
-        ReplaceSingleValuedEReference<EObject, EObject> change = (ReplaceSingleValuedEReference<EObject, EObject>) untypedChange;
+    protected void executeTransformation(ReplaceSingleValuedEReference<EObject, EObject> change) {
 
         logger.info("[ASEMSysML][Java] Transform direction of a SysML port ...");
 
@@ -65,11 +63,7 @@ public class PortDirectionTransformation extends AbstractTransformationRealizati
     }
 
     @Override
-    protected boolean checkPreconditions(EChange untypedChange) {
-
-        @SuppressWarnings("unchecked")
-        ReplaceSingleValuedEReference<EObject, EObject> change = (ReplaceSingleValuedEReference<EObject, EObject>) untypedChange;
-
+    protected boolean checkPreconditions(ReplaceSingleValuedEReference<EObject, EObject> change) {
         return (isBindingConnector(change) && isConnectorReferenceSet(change));
     }
 

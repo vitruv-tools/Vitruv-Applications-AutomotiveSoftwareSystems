@@ -28,10 +28,10 @@ import tools.vitruv.framework.userinteraction.UserInteracting;
  * @author Benjamin Rupp
  *
  */
-public class PrimitiveTypeTransformation extends AbstractTransformationRealization {
+public class PrimitiveTypeTransformation extends AbstractTransformationRealization<InsertEReference<EObject, EObject>> {
 
     private static Logger logger = Logger.getLogger(PrimitiveTypeTransformation.class);
-    
+
     public PrimitiveTypeTransformation(UserInteracting userInteracting) {
         super(userInteracting);
     }
@@ -42,10 +42,7 @@ public class PrimitiveTypeTransformation extends AbstractTransformationRealizati
     }
 
     @Override
-    protected void executeTransformation(EChange untypedChange) {
-
-        @SuppressWarnings("unchecked")
-        InsertEReference<EObject, EObject> change = (InsertEReference<EObject, EObject>) untypedChange;
+    protected void executeTransformation(InsertEReference<EObject, EObject> change) {
 
         if (!ASEMSysMLPrimitiveTypeHelper.isPrimitiveTypeModelInitialized(change.getAffectedEObject())) {
             logger.info("[ASEMSysML][Java] Initialize ASEM primitive types.");
@@ -54,11 +51,7 @@ public class PrimitiveTypeTransformation extends AbstractTransformationRealizati
     }
 
     @Override
-    protected boolean checkPreconditions(EChange untypedChange) {
-
-        @SuppressWarnings("unchecked")
-        InsertEReference<EObject, EObject> change = (InsertEReference<EObject, EObject>) untypedChange;
-
+    protected boolean checkPreconditions(InsertEReference<EObject, EObject> change) {
         return (isUMLModel(change) && isPrimitiveTypeAdded(change));
     }
 

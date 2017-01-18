@@ -34,7 +34,8 @@ import tools.vitruv.framework.userinteraction.UserInteracting;
  * @author Benjamin Rupp
  *
  */
-public class PortTypeTransformation extends AbstractTransformationRealization {
+public class PortTypeTransformation
+        extends AbstractTransformationRealization<ReplaceSingleValuedEReference<EObject, EObject>> {
 
     private static Logger logger = Logger.getLogger(PortTypeTransformation.class);
 
@@ -48,10 +49,7 @@ public class PortTypeTransformation extends AbstractTransformationRealization {
     }
 
     @Override
-    protected void executeTransformation(EChange untypedChange) {
-
-        @SuppressWarnings("unchecked")
-        ReplaceSingleValuedEReference<EObject, EObject> change = (ReplaceSingleValuedEReference<EObject, EObject>) untypedChange;
+    protected void executeTransformation(ReplaceSingleValuedEReference<EObject, EObject> change) {
 
         logger.info("[ASEMSysML][JAVA] Transforming port type ...");
 
@@ -76,11 +74,7 @@ public class PortTypeTransformation extends AbstractTransformationRealization {
     }
 
     @Override
-    protected boolean checkPreconditions(EChange untypedChange) {
-
-        @SuppressWarnings("unchecked")
-        ReplaceSingleValuedEReference<EObject, EObject> change = (ReplaceSingleValuedEReference<EObject, EObject>) untypedChange;
-
+    protected boolean checkPreconditions(ReplaceSingleValuedEReference<EObject, EObject> change) {
         return (isPort(change) && isPortTypeSet(change));
     }
 
@@ -106,7 +100,7 @@ public class PortTypeTransformation extends AbstractTransformationRealization {
         } else if (portType instanceof PrimitiveType) {
 
             final PrimitiveType primitivePortType = (PrimitiveType) portType;
-            
+
             final Class<? extends edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType> primitiveMessageType;
             primitiveMessageType = ASEMSysMLPrimitiveTypeHelper.PRIMITIVE_TYPE_MAP.get(primitivePortType);
 

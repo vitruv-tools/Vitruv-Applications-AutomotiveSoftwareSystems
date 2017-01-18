@@ -28,7 +28,8 @@ import tools.vitruv.framework.userinteraction.UserInteracting;
  * @author Benjamin Rupp
  *
  */
-public class BlockNameTransformation extends AbstractTransformationRealization {
+public class BlockNameTransformation
+        extends AbstractTransformationRealization<ReplaceSingleValuedEAttribute<EObject, Object>> {
 
     public BlockNameTransformation(UserInteracting userInteracting) {
         super(userInteracting);
@@ -40,26 +41,19 @@ public class BlockNameTransformation extends AbstractTransformationRealization {
     }
 
     @Override
-    protected void executeTransformation(EChange change) {
+    protected void executeTransformation(ReplaceSingleValuedEAttribute<EObject, Object> change) {
 
-        @SuppressWarnings("unchecked")
-        ReplaceSingleValuedEAttribute<EObject, Object> typedChange = (ReplaceSingleValuedEAttribute<EObject, Object>) change;
-
-        org.eclipse.uml2.uml.Class baseClass = (org.eclipse.uml2.uml.Class) typedChange.getAffectedEObject();
+        org.eclipse.uml2.uml.Class baseClass = (org.eclipse.uml2.uml.Class) change.getAffectedEObject();
         Block block = UMLUtil.getStereotypeApplication(baseClass, Block.class);
 
-        changeNameOfCorrespondingASEMElement(block, (String) typedChange.getNewValue());
+        changeNameOfCorrespondingASEMElement(block, (String) change.getNewValue());
 
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    protected boolean checkPreconditions(EChange change) {
+    protected boolean checkPreconditions(ReplaceSingleValuedEAttribute<EObject, Object> change) {
 
-        ReplaceSingleValuedEAttribute<EObject, Object> typedChange = (ReplaceSingleValuedEAttribute<EObject, Object>) change;
-
-        boolean preconditionsFulfilled = (isBlockTheAffectedObject(typedChange)
-                && isNameTheAffectedAttribute(typedChange));
+        boolean preconditionsFulfilled = (isBlockTheAffectedObject(change) && isNameTheAffectedAttribute(change));
 
         return preconditionsFulfilled;
     }

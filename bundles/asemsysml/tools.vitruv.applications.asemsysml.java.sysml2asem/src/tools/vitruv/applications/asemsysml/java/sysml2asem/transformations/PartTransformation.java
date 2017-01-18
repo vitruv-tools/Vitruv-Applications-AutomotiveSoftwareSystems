@@ -44,7 +44,8 @@ import tools.vitruv.framework.userinteraction.UserInteracting;
  * @author Benjamin Rupp
  *
  */
-public class PartTransformation extends AbstractTransformationRealization {
+public class PartTransformation
+        extends AbstractTransformationRealization<ReplaceSingleValuedEReference<EObject, EObject>> {
 
     private static Logger logger = Logger.getLogger(PortDirectionTransformation.class);
 
@@ -58,10 +59,7 @@ public class PartTransformation extends AbstractTransformationRealization {
     }
 
     @Override
-    protected void executeTransformation(EChange untypedChange) {
-
-        @SuppressWarnings("unchecked")
-        ReplaceSingleValuedEReference<EObject, EObject> change = (ReplaceSingleValuedEReference<EObject, EObject>) untypedChange;
+    protected void executeTransformation(ReplaceSingleValuedEReference<EObject, EObject> change) {
 
         logger.info("[ASEMSysML][Java] Transform part of a SysML block ...");
 
@@ -73,10 +71,7 @@ public class PartTransformation extends AbstractTransformationRealization {
     }
 
     @Override
-    protected boolean checkPreconditions(EChange untypedChange) {
-
-        @SuppressWarnings("unchecked")
-        ReplaceSingleValuedEReference<EObject, EObject> change = (ReplaceSingleValuedEReference<EObject, EObject>) untypedChange;
+    protected boolean checkPreconditions(ReplaceSingleValuedEReference<EObject, EObject> change) {
 
         return (isProperty(change) && isPartProperty(change));
     }

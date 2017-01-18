@@ -33,7 +33,8 @@ import tools.vitruv.framework.userinteraction.UserInteracting;
  * @author Benjamin Rupp
  *
  */
-public class BlockTransformation extends AbstractTransformationRealization {
+public class BlockTransformation
+        extends AbstractTransformationRealization<ReplaceSingleValuedEAttribute<EObject, Object>> {
 
     private static Logger logger = Logger.getLogger(BlockTransformation.class);
 
@@ -46,24 +47,22 @@ public class BlockTransformation extends AbstractTransformationRealization {
         return ReplaceSingleValuedEAttribute.class;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public boolean checkPreconditions(EChange untypedChange) {
+    public boolean checkPreconditions(ReplaceSingleValuedEAttribute<EObject, Object> change) {
 
         boolean preconditionsFulfilled = false;
 
-        preconditionsFulfilled = isEncapsulatedFlagSet((ReplaceSingleValuedEAttribute<EObject, Object>) untypedChange);
+        preconditionsFulfilled = isEncapsulatedFlagSet(change);
 
         return preconditionsFulfilled;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    protected void executeTransformation(EChange change) {
+    protected void executeTransformation(ReplaceSingleValuedEAttribute<EObject, Object> change) {
 
         logger.info("[ASEMSysML][Java] Transforming a SysML Block ...");
 
-        createASEMComponent((ReplaceSingleValuedEAttribute<EObject, Object>) change);
+        createASEMComponent(change);
 
     }
 

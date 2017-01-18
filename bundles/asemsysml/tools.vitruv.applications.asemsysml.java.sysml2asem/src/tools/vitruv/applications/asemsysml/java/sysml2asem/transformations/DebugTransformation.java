@@ -13,7 +13,7 @@ import tools.vitruv.framework.userinteraction.UserInteracting;
  * @author Benjamin Rupp
  *
  */
-public class DebugTransformation extends AbstractTransformationRealization {
+public class DebugTransformation extends AbstractTransformationRealization<EChange> {
 
     private static Logger logger = Logger.getLogger(DebugTransformation.class);
 
