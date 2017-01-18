@@ -118,7 +118,13 @@ public class PortDirectionTransformation
         }
 
         // Persist message.
-        final Module module = (Module) message.eContainer();
+        EObject messageContainer = message.eContainer();
+
+        if (!(messageContainer instanceof Module)) {
+            throw new IllegalArgumentException("The eContainer of the message object is not an instance of Module!");
+        }
+
+        final Module module = (Module) messageContainer;
         final Block block = ASEMSysMLHelper.getPortsBlock(port);
         final String blockName = block.getBase_Class().getName();
         final String asemModelName = ASEMSysMLHelper.getASEMModelName(blockName);

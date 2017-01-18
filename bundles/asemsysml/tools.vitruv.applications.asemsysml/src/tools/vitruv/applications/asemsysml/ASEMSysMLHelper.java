@@ -164,7 +164,13 @@ public class ASEMSysMLHelper {
         // TODO [BR] A port can have multiple connector ends. If this differentiation is necessary,
         // the following part should be reworked.
         ConnectorEnd portsConnectorEnd = port.getEnds().get(0);
-        Connector connector = (Connector) portsConnectorEnd.eContainer();
+        EObject container = portsConnectorEnd.eContainer();
+        
+        if(!(container instanceof Connector)) {
+            throw new IllegalArgumentException("The eContainer of the connector end is not an instance of Connector!");
+        }
+        
+        Connector connector = (Connector) container;
         EList<ConnectorEnd> connectorEnds = connector.getEnds();
 
         for (ConnectorEnd connectorEnd : connectorEnds) {

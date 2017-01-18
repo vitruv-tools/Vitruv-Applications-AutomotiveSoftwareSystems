@@ -3,6 +3,7 @@ package tools.vitruv.applications.asemsysml.java.sysml2asem.transformations;
 import org.apache.log4j.Logger;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.papyrus.sysml14.blocks.Block;
+import org.eclipse.uml2.uml.Connector;
 import org.eclipse.uml2.uml.Port;
 import org.eclipse.uml2.uml.Property;
 import org.eclipse.uml2.uml.util.UMLUtil;
@@ -64,8 +65,14 @@ public class PartTransformation
 
         logger.info("[ASEMSysML][Java] Transform part of a SysML block ...");
 
-        org.eclipse.uml2.uml.Class blockBaseClass = (org.eclipse.uml2.uml.Class) change.getAffectedEObject()
-                .eContainer();
+        EObject container = change.getAffectedEObject().eContainer();
+
+        if (!(container instanceof org.eclipse.uml2.uml.Class)) {
+            throw new IllegalArgumentException(
+                    "The eContainer of the change object is not an instance of org.eclipse.uml2.uml.Class!");
+        }
+
+        org.eclipse.uml2.uml.Class blockBaseClass = (org.eclipse.uml2.uml.Class) container;
         Property partProperty = (Property) change.getAffectedEObject();
 
         createASEMPartReference(blockBaseClass, partProperty);

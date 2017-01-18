@@ -3,6 +3,7 @@ package tools.vitruv.applications.asemsysml.java.sysml2asem.transformations;
 import org.apache.log4j.Logger;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.papyrus.sysml14.blocks.Block;
+import org.eclipse.uml2.uml.Connector;
 import org.eclipse.uml2.uml.Port;
 import org.eclipse.uml2.uml.PrimitiveType;
 import org.eclipse.uml2.uml.Type;
@@ -63,7 +64,13 @@ public class PortTypeTransformation
         message.setType(messageType);
 
         // Persist message.
-        final Module module = (Module) message.eContainer();
+        EObject messageContainer = message.eContainer();
+
+        if (!(messageContainer instanceof Module)) {
+            throw new IllegalArgumentException("The eContainer of the message object is not an instance of Module!");
+        }
+
+        final Module module = (Module) messageContainer;
         final String blockName = ASEMSysMLHelper.getPortsBlock(port).getBase_Class().getName();
         final String asemModelName = ASEMSysMLHelper.getASEMModelName(blockName);
         final String asemProjectModelPath = ASEMSysMLHelper.getProjectModelPath(asemModelName,
