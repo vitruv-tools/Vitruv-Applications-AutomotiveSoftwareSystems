@@ -16,6 +16,7 @@ import tools.vitruv.domains.asem.AsemNamespace;
 import tools.vitruv.framework.change.echange.EChange;
 import tools.vitruv.framework.change.echange.feature.attribute.ReplaceSingleValuedEAttribute;
 import tools.vitruv.framework.correspondence.Correspondence;
+import tools.vitruv.framework.tuid.TuidManager;
 import tools.vitruv.framework.userinteraction.UserInteracting;
 
 /**
@@ -103,17 +104,21 @@ public class BlockNameTransformation
             for (EObject asemElement : correspondingASEMElements) {
 
                 if (asemElement instanceof Component) {
+
                     Component asemComponent = (Component) asemElement;
+
+                    TuidManager.getInstance().registerObjectUnderModification(asemComponent);
+
                     asemComponent.setName(newName);
 
                     final String asemModelName = ASEMSysMLHelper.getASEMModelName(newName);
                     persistASEMElement(block, asemComponent,
                             ASEMSysMLHelper.getProjectModelPath(asemModelName, AsemNamespace.FILE_EXTENSION));
+
+                    TuidManager.getInstance().updateTuidsOfRegisteredObjects();
+                    TuidManager.getInstance().flushRegisteredObjectsUnderModification();
                 }
-
             }
-
         }
-
     }
 }
