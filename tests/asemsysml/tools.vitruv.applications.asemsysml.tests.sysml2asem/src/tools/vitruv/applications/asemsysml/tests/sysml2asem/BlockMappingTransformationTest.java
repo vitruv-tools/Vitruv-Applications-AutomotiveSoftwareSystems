@@ -1,7 +1,6 @@
 package tools.vitruv.applications.asemsysml.tests.sysml2asem;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.papyrus.sysml14.blocks.Block;
@@ -86,15 +85,39 @@ public class BlockMappingTransformationTest extends SysML2ASEMTest {
     @Test
     public void testIfNamesAreEqual() {
 
-        this.assertSysMLBlockAndASEMModuleNamesAreEqual(sysmlBlock);
+        Block blockToModule;
+        Block blockToClass;
 
-        final String newName = "NewBlockName";
+        Resource sysmlModelResource = this.getModelResource(sysmlProjectModelPath);
 
-        this.sysmlBlock.getBase_Class().setName(newName);
-        this.saveAndSynchronizeChanges(this.sysmlBlock);
+        final int moduleSelection = ASEMSysMLUserInteractionHelper
+                .getNextUserInteractorSelectionForASEMComponent(Module.class);
+        final int classSelection = ASEMSysMLUserInteractionHelper
+                .getNextUserInteractorSelectionForASEMComponent(edu.kit.ipd.sdq.ASEM.classifiers.Class.class);
 
-        // TODO [BR] Use assertSysMLBlockAndASEMModuleNamesAreEqual() method instead?!
-        this.assertASEMComponentNameHasChangedAfterBlockNameChanged(sysmlBlock);
+        // Create two blocks. One which corresponds to an ASEM module and one which corresponds to
+        // an ASEM class.
+        this.testUserInteractor.addNextSelections(moduleSelection);
+        blockToModule = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockToModule", true, this);
+        this.testUserInteractor.addNextSelections(classSelection);
+        blockToClass = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockToClass", true, this);
+
+        // Check if the names of the SysML block an the ASEM component are equal.
+        this.assertSysMLBlockAndASEMComponentNamesAreEqual(blockToModule);
+        this.assertSysMLBlockAndASEMComponentNamesAreEqual(blockToClass);
+
+        final String newNameForModule = "NewBlockToModule";
+        final String newNameForClass = "NewBlockToClass";
+
+        // Change the name of both of the blocks and save the changes.
+        blockToModule.getBase_Class().setName(newNameForModule);
+        this.saveAndSynchronizeChanges(blockToModule);
+        blockToClass.getBase_Class().setName(newNameForClass);
+        this.saveAndSynchronizeChanges(blockToClass);
+
+        // Check the names again.
+        this.assertSysMLBlockAndASEMComponentNamesAreEqual(blockToModule);
+        this.assertSysMLBlockAndASEMComponentNamesAreEqual(blockToClass);
 
     }
 
@@ -106,35 +129,16 @@ public class BlockMappingTransformationTest extends SysML2ASEMTest {
 
     }
 
-    private void assertSysMLBlockAndASEMModuleNamesAreEqual(final Block sysmlBlock) {
+    private void assertSysMLBlockAndASEMComponentNamesAreEqual(final Block sysmlBlock) {
 
-        Resource asemModelResource = this.getASEMModelResource(sysmlBlock.getBase_Class().getName());
+        Component asemRootComponent = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(),
+                sysmlBlock, Component.class);
 
-        ASEMSysMLTestHelper.assertValidModelResource(asemModelResource, Component.class);
+        final String sysmlBlockName = sysmlBlock.getBase_Class().getName();
+        final String asemComponentName = asemRootComponent.getName();
 
-        Component asemRootComponent = (Component) asemModelResource.getContents().get(0);
-
-        assertTrue("Root component of ASEM module is not of the type 'ASEMModule'!",
-                asemRootComponent instanceof Module);
-
-        final String sysmlBlockName = this.sysmlBlock.getBase_Class().getName();
-        final String asemModuleName = asemRootComponent.getName();
-
-        assertEquals("The name of the ASEM module is not equal to the name of the SysML block!", asemModuleName,
+        assertEquals("The name of the ASEM component is not equal to the name of the SysML block!", asemComponentName,
                 sysmlBlockName);
-
-    }
-
-    private void assertASEMComponentNameHasChangedAfterBlockNameChanged(final Block sysmlBlock) {
-
-        Resource asemModelResource = this.getASEMModelResource(sysmlBlock.getBase_Class().getName());
-
-        ASEMSysMLTestHelper.assertValidModelResource(asemModelResource, Component.class);
-
-        Component asemRootComponent = (Component) asemModelResource.getContents().get(0);
-
-        assertEquals("The name of the ASEM component is not equal to its SysML block name!",
-                asemRootComponent.getName(), sysmlBlock.getBase_Class().getName());
 
     }
 
