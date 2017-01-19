@@ -23,7 +23,6 @@ import edu.kit.ipd.sdq.ASEM.dataexchange.Message;
 import tools.vitruv.applications.asemsysml.ASEMSysMLConstants;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.ASEMSysMLPrimitiveTypeHelper;
-import tools.vitruv.applications.asemsysml.ASEMSysMLUserInteractionHelper;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTestHelper;
 import tools.vitruv.framework.correspondence.CorrespondenceModel;
 
@@ -54,10 +53,7 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
         Resource sysmlModelResource = this.getModelResource(sysmlProjectModelPath);
 
         // Add a block which owns all ports for this test.
-        int componentSelection = ASEMSysMLUserInteractionHelper
-                .getNextUserInteractorSelectionForASEMComponent(Module.class);
-        this.testUserInteractor.addNextSelections(componentSelection);
-        Block block = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockWithPort", true, this);
+        Block block = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockWithPort", true, Module.class, this);
 
         // The different port types to test.
         // TODO [BR] String and unlimited natural are ignored at the moment.

@@ -10,7 +10,6 @@ import org.junit.Test;
 import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import edu.kit.ipd.sdq.ASEM.classifiers.Module;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
-import tools.vitruv.applications.asemsysml.ASEMSysMLUserInteractionHelper;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTestHelper;
 
 /**
@@ -31,10 +30,8 @@ public class BlockMappingTransformationTest extends SysML2ASEMTest {
 
         Resource sysmlModelResource = this.getModelResource(sysmlProjectModelPath);
 
-        int selection = ASEMSysMLUserInteractionHelper.getNextUserInteractorSelectionForASEMComponent(Module.class);
-        this.testUserInteractor.addNextSelections(selection);
-
-        this.sysmlBlock = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "SampleBlock", true, this);
+        this.sysmlBlock = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "SampleBlock", true, Module.class,
+                this);
 
     }
 
@@ -70,7 +67,7 @@ public class BlockMappingTransformationTest extends SysML2ASEMTest {
 
         Resource sysmlModelResource = this.getModelResource(this.sysmlProjectModelPath);
         Block blockWhichShouldNotBeTransformed = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource,
-                "BlockWhichShouldNotBeTransformed", isEncapsulated, this);
+                "BlockWhichShouldNotBeTransformed", isEncapsulated, Module.class, this);
         assertASEMModelDoesNotExistForSysMLBlock(blockWhichShouldNotBeTransformed);
 
     }
@@ -90,17 +87,12 @@ public class BlockMappingTransformationTest extends SysML2ASEMTest {
 
         Resource sysmlModelResource = this.getModelResource(sysmlProjectModelPath);
 
-        final int moduleSelection = ASEMSysMLUserInteractionHelper
-                .getNextUserInteractorSelectionForASEMComponent(Module.class);
-        final int classSelection = ASEMSysMLUserInteractionHelper
-                .getNextUserInteractorSelectionForASEMComponent(edu.kit.ipd.sdq.ASEM.classifiers.Class.class);
-
         // Create two blocks. One which corresponds to an ASEM module and one which corresponds to
         // an ASEM class.
-        this.testUserInteractor.addNextSelections(moduleSelection);
-        blockToModule = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockToModule", true, this);
-        this.testUserInteractor.addNextSelections(classSelection);
-        blockToClass = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockToClass", true, this);
+        blockToModule = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockToModule", true, Module.class,
+                this);
+        blockToClass = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockToClass", true,
+                edu.kit.ipd.sdq.ASEM.classifiers.Class.class, this);
 
         // Check if the names of the SysML block an the ASEM component are equal.
         this.assertSysMLBlockAndASEMComponentNamesAreEqual(blockToModule);
@@ -154,11 +146,7 @@ public class BlockMappingTransformationTest extends SysML2ASEMTest {
         final String sysmlBlockName = "BlockTo" + expectedComponentType.getSimpleName();
         Resource sysmlModelResource = this.getModelResource(sysmlProjectModelPath);
 
-        int selection = ASEMSysMLUserInteractionHelper
-                .getNextUserInteractorSelectionForASEMComponent(expectedComponentType);
-
-        this.testUserInteractor.addNextSelections(selection);
-        ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, sysmlBlockName, true, this);
+        ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, sysmlBlockName, true, expectedComponentType, this);
 
         Resource asemModelResource = this.getASEMModelResource(sysmlBlockName);
         ASEMSysMLTestHelper.assertValidModelResource(asemModelResource, expectedComponentType);

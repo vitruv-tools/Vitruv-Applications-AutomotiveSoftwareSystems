@@ -131,6 +131,8 @@ public final class ASEMSysMLTestHelper {
      *            Name of the SysML block to add.
      * @param isEncapsulated
      *            Encapsulated flag, see {@link Block#isEncapsulated()}
+     * @param asemComponentType
+     *            The ASEM component type the SysML block shall be mapped to.
      * @param testCaseClass
      *            Test case class. Needed for accessing synchronization method.
      * @return The created {@link Block SysML Block}.
@@ -138,11 +140,15 @@ public final class ASEMSysMLTestHelper {
      * @see Block#isEncapsulated
      */
     public static Block createSysMLBlock(Resource sysmlModelResource, final String blockName,
-            final Boolean isEncapsulated, final ASEMSysMLTest testCaseClass) {
+            final Boolean isEncapsulated, final java.lang.Class<? extends Component> asemComponentType,
+            final ASEMSysMLTest testCaseClass) {
 
         assertValidModelResource(sysmlModelResource, Model.class);
 
         Model sysmlRootModel = getSysMLRootModelElement(sysmlModelResource);
+
+        // Prepare user selection simulation for ASEM component type.
+        testCaseClass.setNextUserInteractorSelection(asemComponentType);
 
         // Create a SysML block with its base class.
         Class baseClass = sysmlRootModel.createOwnedClass(blockName, false);
@@ -251,7 +257,7 @@ public final class ASEMSysMLTestHelper {
     public static void assertPartReferenceExists(final Component parentComponent, final Component childComponent) {
 
         boolean correctPartReferenceMapping = false;
-        
+
         assertTrue("Component doesn't contain a typed element!", !parentComponent.getTypedElements().isEmpty());
 
         for (TypedElement typedElement : parentComponent.getTypedElements()) {

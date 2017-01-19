@@ -8,7 +8,9 @@ import java.util.List;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 
+import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
+import tools.vitruv.applications.asemsysml.ASEMSysMLUserInteractionHelper;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTestHelper.TransformationType;
 import tools.vitruv.domains.asem.AsemDomain;
 import tools.vitruv.domains.asem.AsemNamespace;
@@ -123,5 +125,19 @@ public abstract class ASEMSysMLTest extends VitruviusChangePropagationTest {
         }
 
         return correspondenceModel;
+    }
+
+    /**
+     * Set the ASEM component type for the next test user interaction.
+     * 
+     * @param asemComponentType
+     *            The ASEM component type which shall be used next.
+     */
+    public void setNextUserInteractorSelection(final Class<? extends Component> asemComponentType) {
+
+        final int componentSelectionClass = ASEMSysMLUserInteractionHelper
+                .getNextUserInteractorSelectionForASEMComponent(asemComponentType);
+
+        this.testUserInteractor.addNextSelections(componentSelectionClass);
     }
 }

@@ -12,7 +12,6 @@ import edu.kit.ipd.sdq.ASEM.base.TypedElement;
 import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import edu.kit.ipd.sdq.ASEM.classifiers.Module;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
-import tools.vitruv.applications.asemsysml.ASEMSysMLUserInteractionHelper;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTestHelper;
 
 /**
@@ -48,13 +47,10 @@ public class PartMappingTransformationTest extends SysML2ASEMTest {
         Resource sysmlModelResource = this.getModelResource(sysmlProjectModelPath);
         Class<? extends Component> asemComponentType = edu.kit.ipd.sdq.ASEM.classifiers.Class.class;
 
-        final int componentSelectionClass = ASEMSysMLUserInteractionHelper
-                .getNextUserInteractorSelectionForASEMComponent(asemComponentType);
-
-        this.testUserInteractor.addNextSelections(componentSelectionClass, componentSelectionClass);
-
-        Block blockA = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockA", true, this);
-        Block blockB1 = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockB1", true, this);
+        Block blockA = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockA", true, asemComponentType,
+                this);
+        Block blockB1 = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockB1", true, asemComponentType,
+                this);
 
         // Add a part property to BlockA. The aggregation kind is needed for the getParts() method.
         Property partPropertyB1 = blockA.getBase_Class().createOwnedAttribute("partReferenceB1",
@@ -94,14 +90,12 @@ public class PartMappingTransformationTest extends SysML2ASEMTest {
         Resource sysmlModelResource = this.getModelResource(sysmlProjectModelPath);
         Class<? extends Component> asemComponentType = edu.kit.ipd.sdq.ASEM.classifiers.Class.class;
 
-        final int componentTypeSelection = ASEMSysMLUserInteractionHelper
-                .getNextUserInteractorSelectionForASEMComponent(asemComponentType);
-
-        this.testUserInteractor.addNextSelections(componentTypeSelection, componentTypeSelection,
-                componentTypeSelection);
-        Block blockN1 = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockN1", true, this);
-        Block blockN2 = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockN2", true, this);
-        Block blockN3 = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockN3", true, this);
+        Block blockN1 = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockN1", true, asemComponentType,
+                this);
+        Block blockN2 = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockN2", true, asemComponentType,
+                this);
+        Block blockN3 = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockN3", true, asemComponentType,
+                this);
 
         Property partPropertyN2 = blockN1.getBase_Class().createOwnedAttribute("partReferenceN2",
                 blockN2.getBase_Class());
@@ -147,13 +141,10 @@ public class PartMappingTransformationTest extends SysML2ASEMTest {
         Resource sysmlModelResource = this.getModelResource(sysmlProjectModelPath);
         Class<? extends Component> asemComponentType = Module.class;
 
-        final int componentTypeSelection = ASEMSysMLUserInteractionHelper
-                .getNextUserInteractorSelectionForASEMComponent(asemComponentType);
-
-        this.testUserInteractor.addNextSelections(componentTypeSelection, componentTypeSelection);
-
-        Block blockA = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockWithModuleAsPart", true, this);
-        Block blockB = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockAsModule", true, this);
+        Block blockA = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockWithModuleAsPart", true,
+                asemComponentType, this);
+        Block blockB = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockAsModule", true,
+                asemComponentType, this);
 
         Property partPropertyB = blockA.getBase_Class().createOwnedAttribute("partReferenceB", blockB.getBase_Class());
         partPropertyB.setAggregation(AggregationKind.COMPOSITE_LITERAL);
