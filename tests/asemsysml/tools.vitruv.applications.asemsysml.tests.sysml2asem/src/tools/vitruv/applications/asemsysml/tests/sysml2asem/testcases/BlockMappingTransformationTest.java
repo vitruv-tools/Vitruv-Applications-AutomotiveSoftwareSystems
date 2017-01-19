@@ -42,17 +42,23 @@ public class BlockMappingTransformationTest extends SysML2ASEMTest {
      * <code>isEncapsulated</code> attribute is set to <code>true</code>.<br>
      * <br>
      * 
-     * [Requirement 1.b)]
+     * [Requirement 1.b)] [Requirement 2.b)]
      */
     @Test
     public void testEncapsulatedRestriction() {
 
+        Block blockWhichShouldNotBeTransformedToAModule;
+        Block blockWhichShouldNotBeTransformedToAClass;
         final Boolean isEncapsulated = false;
 
         Resource sysmlModelResource = this.getModelResource(this.sysmlProjectModelPath);
-        Block blockWhichShouldNotBeTransformed = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource,
+        blockWhichShouldNotBeTransformedToAModule = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource,
                 "BlockWhichShouldNotBeTransformed", isEncapsulated, Module.class, this);
-        assertASEMModelDoesNotExistForSysMLBlock(blockWhichShouldNotBeTransformed);
+        blockWhichShouldNotBeTransformedToAClass = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource,
+                "BlockWhichShouldNotBeTransformed", isEncapsulated, edu.kit.ipd.sdq.ASEM.classifiers.Class.class, this);
+
+        assertASEMModelDoesNotExistForSysMLBlock(blockWhichShouldNotBeTransformedToAModule);
+        assertASEMModelDoesNotExistForSysMLBlock(blockWhichShouldNotBeTransformedToAClass);
 
     }
 
