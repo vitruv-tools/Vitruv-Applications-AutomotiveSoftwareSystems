@@ -63,11 +63,11 @@ public class BlockMappingTransformationTest extends SysML2ASEMTest {
     }
 
     /**
-     * The name of the ASEM module should be equal to the name of the SysML block (the name of its
+     * The name of an ASEM component should be equal to the name of the SysML block (the name of its
      * base class).<br>
      * <br>
      * 
-     * [Requirement 1.c)]
+     * [Requirement 1.c)] [Requirement 2.c)]
      */
     @Test
     public void testIfNamesAreEqual() {
