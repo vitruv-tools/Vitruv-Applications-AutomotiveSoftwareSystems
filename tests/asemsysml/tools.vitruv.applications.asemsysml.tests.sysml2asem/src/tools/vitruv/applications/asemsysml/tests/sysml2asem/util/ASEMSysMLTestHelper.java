@@ -29,6 +29,7 @@ import edu.kit.ipd.sdq.ASEM.base.TypedElement;
 import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.global.SysML2ASEMJavaChangePropagationSpecification;
 import tools.vitruv.applications.asemsysml.reactions.sysml2asem.global.SysML2ASEMChangePropagationSpecification;
+import tools.vitruv.applications.asemsysml.tests.sysml2asem.ASEMSysMLTest;
 import tools.vitruv.framework.change.processing.ChangePropagationSpecification;
 
 /**

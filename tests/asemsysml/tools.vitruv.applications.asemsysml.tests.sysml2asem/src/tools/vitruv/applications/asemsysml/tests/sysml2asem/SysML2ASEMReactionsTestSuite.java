@@ -5,7 +5,10 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTest;
+import tools.vitruv.applications.asemsysml.tests.sysml2asem.testcases.BlockMappingTransformationTest;
+import tools.vitruv.applications.asemsysml.tests.sysml2asem.testcases.ModelInitializationTest;
+import tools.vitruv.applications.asemsysml.tests.sysml2asem.testcases.PartMappingTransformationTest;
+import tools.vitruv.applications.asemsysml.tests.sysml2asem.testcases.PortMappingTransformationTest;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTestHelper.TransformationType;
 
 /**

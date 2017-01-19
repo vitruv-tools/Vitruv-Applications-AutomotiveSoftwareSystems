@@ -1,4 +1,4 @@
-package tools.vitruv.applications.asemsysml.tests.sysml2asem.util;
+package tools.vitruv.applications.asemsysml.tests.sysml2asem;
 
 import static org.junit.Assert.fail;
 
@@ -11,6 +11,7 @@ import org.eclipse.emf.ecore.resource.Resource;
 import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.ASEMSysMLUserInteractionHelper;
+import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTestHelper;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTestHelper.TransformationType;
 import tools.vitruv.domains.asem.AsemDomain;
 import tools.vitruv.domains.asem.AsemNamespace;

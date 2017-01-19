@@ -1,4 +1,4 @@
-package tools.vitruv.applications.asemsysml.tests.sysml2asem;
+package tools.vitruv.applications.asemsysml.tests.sysml2asem.testcases;
 
 import static org.junit.Assert.assertTrue;
 
@@ -12,6 +12,7 @@ import edu.kit.ipd.sdq.ASEM.base.TypedElement;
 import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import edu.kit.ipd.sdq.ASEM.classifiers.Module;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
+import tools.vitruv.applications.asemsysml.tests.sysml2asem.SysML2ASEMTest;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTestHelper;
 
 /**

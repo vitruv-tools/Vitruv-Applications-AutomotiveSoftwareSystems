@@ -1,4 +1,4 @@
-package tools.vitruv.applications.asemsysml.tests.sysml2asem;
+package tools.vitruv.applications.asemsysml.tests.sysml2asem.testcases;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -23,6 +23,7 @@ import edu.kit.ipd.sdq.ASEM.dataexchange.Message;
 import tools.vitruv.applications.asemsysml.ASEMSysMLConstants;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.ASEMSysMLPrimitiveTypeHelper;
+import tools.vitruv.applications.asemsysml.tests.sysml2asem.SysML2ASEMTest;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTestHelper;
 import tools.vitruv.framework.correspondence.CorrespondenceModel;
 

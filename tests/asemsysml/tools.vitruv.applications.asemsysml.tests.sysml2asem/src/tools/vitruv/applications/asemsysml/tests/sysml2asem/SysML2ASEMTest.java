@@ -7,7 +7,6 @@ import org.eclipse.uml2.uml.Model;
 
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.ASEMSysMLPrimitiveTypeHelper;
-import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTest;
 import tools.vitruv.domains.sysml.SysMlNamspace;
 
 /**

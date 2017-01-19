@@ -1,4 +1,4 @@
-package tools.vitruv.applications.asemsysml.tests.sysml2asem;
+package tools.vitruv.applications.asemsysml.tests.sysml2asem.testcases;
 
 import static tools.vitruv.applications.asemsysml.ASEMSysMLConstants.TEST_SYSML_MODEL_NAME;
 
@@ -6,6 +6,7 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.junit.Test;
 
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
+import tools.vitruv.applications.asemsysml.tests.sysml2asem.SysML2ASEMTest;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTestHelper;
 import tools.vitruv.domains.sysml.SysMlNamspace;
 
