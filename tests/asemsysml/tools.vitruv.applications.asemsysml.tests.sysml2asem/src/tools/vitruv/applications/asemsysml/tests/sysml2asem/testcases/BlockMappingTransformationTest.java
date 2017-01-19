@@ -1,10 +1,10 @@
 package tools.vitruv.applications.asemsysml.tests.sysml2asem.testcases;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.papyrus.sysml14.blocks.Block;
-import org.junit.Before;
 import org.junit.Test;
 
 import edu.kit.ipd.sdq.ASEM.classifiers.Component;
@@ -21,21 +21,6 @@ import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTestHe
  */
 public class BlockMappingTransformationTest extends SysML2ASEMTest {
 
-    private Block sysmlBlock;
-
-    /**
-     * Create a SysML block which is needed in all the test cases.
-     */
-    @Before
-    public void setUp() {
-
-        Resource sysmlModelResource = this.getModelResource(sysmlProjectModelPath);
-
-        this.sysmlBlock = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "SampleBlock", true, Module.class,
-                this);
-
-    }
-
     /**
      * After adding a SysML block to a SysML model, a ASEM model should be created with a ASEM
      * component (e.g. a class or module) as root element. The user decides if a SysML block shall
@@ -46,8 +31,6 @@ public class BlockMappingTransformationTest extends SysML2ASEMTest {
      */
     @Test
     public void testIfASysMLBlockIsMappedToAnASEMComponent() {
-
-        this.assertASEMComponentForSysMLBlockExists(sysmlBlock);
 
         this.assertExpectedASEMComponentType(Module.class);
         this.assertExpectedASEMComponentType(edu.kit.ipd.sdq.ASEM.classifiers.Class.class);
@@ -114,14 +97,6 @@ public class BlockMappingTransformationTest extends SysML2ASEMTest {
 
     }
 
-    private void assertASEMComponentForSysMLBlockExists(final Block sysmlBlock) {
-
-        Resource asemModelResource = this.getASEMModelResource(sysmlBlock.getBase_Class().getName());
-
-        ASEMSysMLTestHelper.assertValidModelResource(asemModelResource, Component.class);
-
-    }
-
     private void assertSysMLBlockAndASEMComponentNamesAreEqual(final Block sysmlBlock) {
 
         Component asemRootComponent = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(),
@@ -147,11 +122,21 @@ public class BlockMappingTransformationTest extends SysML2ASEMTest {
         final String sysmlBlockName = "BlockTo" + expectedComponentType.getSimpleName();
         Resource sysmlModelResource = this.getModelResource(sysmlProjectModelPath);
 
-        ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, sysmlBlockName, true, expectedComponentType, this);
+        Block block = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, sysmlBlockName, true,
+                expectedComponentType, this);
 
+        // Check that the ASEM model was created and the root element is of the expected type.
         Resource asemModelResource = this.getASEMModelResource(sysmlBlockName);
         ASEMSysMLTestHelper.assertValidModelResource(asemModelResource, expectedComponentType);
 
+        // Check that the correspondence was created, too.
+        Component asemComponent = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), block,
+                expectedComponentType);
+
+        assertTrue("No correspondence for the SysML block " + block.getBase_Class().getName() + " was created!",
+                asemComponent != null);
+        assertTrue("Corresponding ASEM component of the SysML block " + block.getBase_Class().getName()
+                + " has wrong type!", expectedComponentType.isAssignableFrom(asemComponent.getClass()));
     }
 
 }
