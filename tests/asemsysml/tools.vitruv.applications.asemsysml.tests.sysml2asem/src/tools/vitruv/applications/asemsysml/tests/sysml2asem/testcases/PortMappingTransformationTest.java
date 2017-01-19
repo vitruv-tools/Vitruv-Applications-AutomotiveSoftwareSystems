@@ -20,6 +20,7 @@ import edu.kit.ipd.sdq.ASEM.classifiers.Classifier;
 import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import edu.kit.ipd.sdq.ASEM.classifiers.Module;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Message;
+import edu.kit.ipd.sdq.ASEM.dataexchange.Variable;
 import tools.vitruv.applications.asemsysml.ASEMSysMLConstants;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.ASEMSysMLPrimitiveTypeHelper;
@@ -46,15 +47,38 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
     public void testIfPortsMappedCorrectly() {
 
         this.assertPortMappingForASEMModuleExists();
-        // TODO [BR] Add port mapping check for ASEM class, too.
+        this.assertPortMappingForASEMClassExists();
     }
 
     private void assertPortMappingForASEMModuleExists() {
 
+        Collection<Port> portsToTest = preparePorts(Module.class);
+
+        for (Port port : portsToTest) {
+            this.assertPortExists(port);
+
+            // [Requirement 1.d)] [Requirement 1.d)i]
+            this.assertVariableExistsWithSameName(port);
+
+            // [Requirement 1.d)ii]
+            this.assertPortDirectionIsMappedCorrectly(port);
+
+            // [Requirement 1.d)iii] [Requirement 1.d)iv]
+            this.assertPortTypeIsMappedCorrectly(port);
+        }
+    }
+
+    private void assertPortMappingForASEMClassExists() {
+        // TODO [BR] Implement tests for ASEM class.
+    }
+
+    private Collection<Port> preparePorts(final Class<? extends Component> asemComponentType) {
+
         Resource sysmlModelResource = this.getModelResource(sysmlProjectModelPath);
 
         // Add a block which owns all ports for this test.
-        Block block = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockWithPort", true, Module.class, this);
+        Block block = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockWithPort", true, asemComponentType,
+                this);
 
         // The different port types to test.
         // TODO [BR] String and unlimited natural are ignored at the moment.
@@ -78,27 +102,17 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
         portsToTest.add(
                 ASEMSysMLTestHelper.addPortToBlockAndSync(block, "SampleRealPortIN", FlowDirection.IN, pReal, this));
 
-        for (Port port : portsToTest) {
-            this.assertPortExists(port);
-
-            // [Requirement 1.d)] [Requirement 1.d)i]
-            this.assertMessageExistsWithSameName(port);
-
-            // [Requirement 1.d)ii]
-            this.assertPortDirectionIsMappedCorrectly(port);
-
-            // [Requirement 1.d)iii] [Requirement 1.d)iv]
-            this.assertPortTypeIsMappedCorrectly(port);
-        }
+        return portsToTest;
     }
 
-    private void assertMessageExistsWithSameName(final Port port) {
+    private void assertVariableExistsWithSameName(final Port port) {
 
-        Message asemMessage = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), port,
-                Message.class);
+        Variable asemVariable = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), port,
+                Variable.class);
 
-        assertTrue("The given ASEM module has no message element.", asemMessage != null);
-        assertEquals("The names of port and message are not equal.", port.getName(), asemMessage.getName());
+        assertTrue("The SysML port has no corresponding ASEM variable.", asemVariable != null);
+        assertEquals("The names of the SysML port and the corresponding ASEM variable are not equal.", port.getName(),
+                asemVariable.getName());
     }
 
     private void assertPortDirectionIsMappedCorrectly(final Port port) {
@@ -150,17 +164,19 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
     private void assertPortTypeIsMappedCorrectly(final Port port) {
 
         final Type portType = port.getType();
+        final Classifier asemVariableType = assertVariableTypeExists(port);
 
         if (portType instanceof org.eclipse.uml2.uml.Class
                 && portType.getAppliedStereotype(ASEMSysMLConstants.QUALIFIED_BLOCK_NAME) != null) {
 
             // [Requirement 1.d)iii]
-            assertMessageTypeIsASEMComponent(port);
+            assertVariableTypeIsASEMComponent(port, asemVariableType);
 
         } else if (portType instanceof PrimitiveType) {
 
             // [Requirement 1.d)iv]
-            assertMessageTypeIsPrimitiveType(port);
+            PrimitiveType primitivePortType = (PrimitiveType) port.getType();
+            assertVariableTypeIsPrimitiveType(primitivePortType, asemVariableType);
 
         } else {
             fail("Invalid port type is used.");
@@ -182,47 +198,48 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
                 portExists);
     }
 
-    private void assertMessageTypeIsPrimitiveType(final Port port) {
-
-        final PrimitiveType portType = (PrimitiveType) port.getType();
+    private Classifier assertVariableTypeExists(final Port port) {
 
         CorrespondenceModel correspondenceModel = this.getCorrespondenceModel();
 
-        final Message message = ASEMSysMLHelper.getFirstCorrespondingASEMElement(correspondenceModel, port,
-                Message.class);
-        final Classifier messageType = message.getType();
-        assertTrue("The message typ of message " + message.getName() + " isn't set!", messageType != null);
+        final Variable asemVariable = ASEMSysMLHelper.getFirstCorrespondingASEMElement(correspondenceModel, port,
+                Variable.class);
 
-        final Class<? extends edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType> expectedMessageType;
-        expectedMessageType = ASEMSysMLPrimitiveTypeHelper.PRIMITIVE_TYPE_MAP.get(portType);
+        assertTrue("No corresponding variable for port " + port.getName() + " exists!", asemVariable != null);
 
-        assertTrue(
-                "Message has wrong type! Type is " + messageType.getClass().getSimpleName() + ". Expected type was:"
-                        + expectedMessageType.getSimpleName(),
-                expectedMessageType.isAssignableFrom(messageType.getClass()));
+        final Classifier asemVariableType = asemVariable.getType();
+
+        assertTrue("Variable type is not set.", asemVariableType != null);
+
+        return asemVariableType;
     }
 
-    private void assertMessageTypeIsASEMComponent(final Port port) {
+    private void assertVariableTypeIsPrimitiveType(final PrimitiveType portType, final Classifier variableType) {
+
+        final Class<? extends edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType> expectedVariableType;
+        expectedVariableType = ASEMSysMLPrimitiveTypeHelper.PRIMITIVE_TYPE_MAP.get(portType);
+
+        assertTrue(
+                "ASEM variable has wrong type! Type is " + variableType.getClass().getSimpleName()
+                        + ". Expected type was:" + expectedVariableType.getSimpleName(),
+                expectedVariableType.isAssignableFrom(variableType.getClass()));
+    }
+
+    private void assertVariableTypeIsASEMComponent(final Port port, final Classifier asemVariableType) {
         // The port type is a block, therefore the message type has to be an 1) ASEM module, if the
         // block (which is the type of the port) corresponds to a module, or an 2) ASEM class if the
         // block corresponds to a class.
 
-        CorrespondenceModel correspondenceModel = this.getCorrespondenceModel();
-
-        final Message message = ASEMSysMLHelper.getFirstCorrespondingASEMElement(correspondenceModel, port,
-                Message.class);
-        final Classifier messageType = message.getType();
-
-        assertTrue("Message type is not set.", messageType != null);
-        assertTrue("Message type is not a ASEM component.", messageType instanceof Component);
+        assertTrue("Variable type is not a ASEM component.", asemVariableType instanceof Component);
 
         final Block portsBlock = ASEMSysMLHelper.getPortsBlock(port);
         final Component correspondingASEMComponent = ASEMSysMLHelper
-                .getFirstCorrespondingASEMElement(correspondenceModel, portsBlock, Component.class);
+                .getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), portsBlock, Component.class);
 
         Class<?> componentType = correspondingASEMComponent.getClass();
-        Class<?> msgType = messageType.getClass();
+        Class<?> variableType = asemVariableType.getClass();
 
-        assertEquals("The message which corresponds to the given port has the wrong type.", componentType, msgType);
+        assertEquals("The ASEM variable which corresponds to the given SysML port has the wrong type.", componentType,
+                variableType);
     }
 }
