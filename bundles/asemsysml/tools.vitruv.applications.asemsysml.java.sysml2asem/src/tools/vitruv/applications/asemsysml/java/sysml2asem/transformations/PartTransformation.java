@@ -3,7 +3,7 @@ package tools.vitruv.applications.asemsysml.java.sysml2asem.transformations;
 import org.apache.log4j.Logger;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.papyrus.sysml14.blocks.Block;
-import org.eclipse.uml2.uml.Port;
+import org.eclipse.uml2.uml.AggregationKind;
 import org.eclipse.uml2.uml.Property;
 import org.eclipse.uml2.uml.util.UMLUtil;
 
@@ -16,7 +16,7 @@ import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.AbstractTransformationRealization;
 import tools.vitruv.domains.asem.AsemNamespace;
 import tools.vitruv.framework.change.echange.EChange;
-import tools.vitruv.framework.change.echange.feature.reference.ReplaceSingleValuedEReference;
+import tools.vitruv.framework.change.echange.feature.attribute.ReplaceSingleValuedEAttribute;
 import tools.vitruv.framework.userinteraction.UserInteracting;
 
 /**
@@ -36,8 +36,8 @@ import tools.vitruv.framework.userinteraction.UserInteracting;
  * <li>the property is not a port</li>
  * </ul>
  * 
- * Therefore the transformation reacts on a {@link ReplaceSingleValuedEReference} change which will
- * be triggered if the <code>type</code> of a SysML part property was set. <br>
+ * Therefore the transformation reacts on a {@link ReplaceSingleValuedEAttribute} change which will
+ * be triggered if the <code>aggregation kind</code> of a SysML part property was set. <br>
  * <br>
  * 
  * [Requirement 1.e)]
@@ -46,7 +46,7 @@ import tools.vitruv.framework.userinteraction.UserInteracting;
  *
  */
 public class PartTransformation
-        extends AbstractTransformationRealization<ReplaceSingleValuedEReference<EObject, EObject>> {
+        extends AbstractTransformationRealization<ReplaceSingleValuedEAttribute<EObject, Object>> {
 
     private static Logger logger = Logger.getLogger(PortDirectionTransformation.class);
 
@@ -56,11 +56,11 @@ public class PartTransformation
 
     @Override
     public Class<? extends EChange> getExpectedChangeType() {
-        return ReplaceSingleValuedEReference.class;
+        return ReplaceSingleValuedEAttribute.class;
     }
 
     @Override
-    protected void executeTransformation(ReplaceSingleValuedEReference<EObject, EObject> change) {
+    protected void executeTransformation(ReplaceSingleValuedEAttribute<EObject, Object> change) {
 
         logger.info("[ASEMSysML][Java] Transform part of a SysML block ...");
 
@@ -78,20 +78,25 @@ public class PartTransformation
     }
 
     @Override
-    protected boolean checkPreconditions(ReplaceSingleValuedEReference<EObject, EObject> change) {
+    protected boolean checkPreconditions(ReplaceSingleValuedEAttribute<EObject, Object> change) {
 
-        return (isProperty(change) && isPartProperty(change));
+        return (isProperty(change) && isPropertyTypeSet(change) && isPartProperty(change));
     }
 
-    private boolean isProperty(final ReplaceSingleValuedEReference<EObject, EObject> change) {
+    private boolean isProperty(final ReplaceSingleValuedEAttribute<EObject, Object> change) {
         return (change.getAffectedEObject() instanceof Property);
     }
 
-    private boolean isPartProperty(final ReplaceSingleValuedEReference<EObject, EObject> change) {
+    private boolean isPropertyTypeSet(final ReplaceSingleValuedEAttribute<EObject, Object> change) {
+        final Property property = (Property) change.getAffectedEObject();
+        return (property.getType() != null);
+    }
+
+    private boolean isPartProperty(final ReplaceSingleValuedEAttribute<EObject, Object> change) {
 
         boolean isContainingElementABlock = false;
         boolean isPropertyTypeABlock = false;
-        boolean isPropertyAPort = false;
+        boolean isAggregationKindSetToComposite = false;
 
         final Property prop = (Property) change.getAffectedEObject();
 
@@ -105,9 +110,16 @@ public class PartTransformation
 
         isPropertyTypeABlock = (prop.getType().getAppliedStereotype(ASEMSysMLConstants.QUALIFIED_BLOCK_NAME) != null);
 
-        isPropertyAPort = (prop instanceof Port);
+        /*
+         * Check the aggregation kind of the property because the aggregation kind must be set for
+         * the getParts() method of a SysML block. Furthermore this check prevents the handling of a
+         * port property.
+         */
+        final AggregationKind aggregationKind = prop.getAggregation();
+        isAggregationKindSetToComposite = (aggregationKind != null
+                && aggregationKind.equals(AggregationKind.COMPOSITE_LITERAL));
 
-        return (isContainingElementABlock && isPropertyTypeABlock && !isPropertyAPort);
+        return (isContainingElementABlock && isPropertyTypeABlock && isAggregationKindSetToComposite);
     }
 
     private void createASEMPartReference(final org.eclipse.uml2.uml.Class blockBaseClass, final Property partProperty) {
