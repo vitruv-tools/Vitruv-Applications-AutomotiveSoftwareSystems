@@ -121,9 +121,12 @@ public abstract class AbstractTransformationRealization<T extends EChange> imple
     protected void persistASEMElement(final EObject alreadyPersistedObject, final Named element,
             final String asemProjectModelPath) {
 
+        // The element has to be the root element of the resource. Therefore check if this is true.
+        final EObject rootElement = EcoreUtil.getRootContainer(element);
+        
         VURI oldVURI = null;
-        if (element.eResource() != null) {
-            oldVURI = VURI.getInstance(element.eResource());
+        if (rootElement.eResource() != null) {
+            oldVURI = VURI.getInstance(rootElement.eResource());
         }
 
         String existingElementURI = VURI.getInstance(alreadyPersistedObject.eResource()).getEMFUri()
@@ -133,8 +136,8 @@ public abstract class AbstractTransformationRealization<T extends EChange> imple
         String asemURIString = uriPrefix + asemProjectModelPath;
         VURI asemElementVURI = VURI.getInstance(URI.createPlatformResourceURI(asemURIString, true));
 
-        EcoreUtil.remove(element);
-        executionState.getTransformationResult().addRootEObjectToSave(element, asemElementVURI);
+        EcoreUtil.remove(rootElement);
+        executionState.getTransformationResult().addRootEObjectToSave(rootElement, asemElementVURI);
         executionState.getTransformationResult().addVuriToDeleteIfNotNull(oldVURI);
 
     }
