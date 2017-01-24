@@ -120,7 +120,7 @@ routine mapINPortToClass(uml::Port port, asem::Component correspondingComponent)
 		}
 		
 		val asemMethod = create asem::Method and initialize {
-			val methodName = userInteracting.getTextInput("Please insert a method name which can be used for mapping a SysML port to an ASEM method.")
+			val methodName = userInteracting.getTextInput(ASEMSysMLConstants.MSG_INSERT_METHOD_NAME);
 			asemMethod.name = methodName;
 			asemMethod.parameters.add(asemParameter);
 		}

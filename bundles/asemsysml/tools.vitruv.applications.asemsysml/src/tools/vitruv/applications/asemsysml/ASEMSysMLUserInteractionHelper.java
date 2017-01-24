@@ -66,8 +66,8 @@ public final class ASEMSysMLUserInteractionHelper {
             asemComponentNames.add(asemComponent.getName());
         }
 
-        String selectComponentMsg = "Please select an ASEM component type the SysML block should mapped to.";
-        int selectedComponentType = userInteracting.selectFromMessage(UserInteractionType.MODAL, selectComponentMsg,
+        int selectedComponentType = userInteracting.selectFromMessage(UserInteractionType.MODAL,
+                ASEMSysMLConstants.MSG_SELECT_COMPONENT_TYPE,
                 asemComponentNames.toArray(new String[asemComponentNames.size()]));
         Class<? extends Component> selectedComponentTypeClass = asemComponentTypes.get(selectedComponentType);
 

@@ -20,6 +20,7 @@ import edu.kit.ipd.sdq.ASEM.dataexchange.Message;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Method;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Parameter;
 import edu.kit.ipd.sdq.ASEM.dataexchange.ReturnType;
+import tools.vitruv.applications.asemsysml.ASEMSysMLConstants;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.AbstractTransformationRealization;
 import tools.vitruv.domains.asem.AsemNamespace;
@@ -175,8 +176,7 @@ public class PortDirectionTransformation
     private void createASEMMethodAndSetName(final Port port,
             final edu.kit.ipd.sdq.ASEM.classifiers.Class correspondingASEMClass, final String asemProjectModelPath) {
 
-        String methodName = this.userInteracting.getTextInput(
-                "Please insert a method name which can be used for mapping a SysML port to an ASEM method.");
+        String methodName = this.userInteracting.getTextInput(ASEMSysMLConstants.MSG_INSERT_METHOD_NAME);
 
         if (methodName.isEmpty()) {
             methodName = "SampleMethodName";
@@ -199,32 +199,30 @@ public class PortDirectionTransformation
             method.getParameters().add(parameter);
 
             correspondingASEMClass.getMethods().add(method);
-            
+
             persistASEMElement(port, correspondingASEMClass, asemProjectModelPath);
             addCorrespondence(port, parameter);
             break;
 
         case OUT:
-            
+
             ReturnType returnType = DataexchangeFactory.eINSTANCE.createReturnType();
             returnType.setType(type);
             method.setReturnType(returnType);
-            
+
             correspondingASEMClass.getMethods().add(method);
             persistASEMElement(port, correspondingASEMClass, asemProjectModelPath);
-            
+
             addCorrespondence(port, returnType);
             break;
-        
+
         case INOUT:
-            
+
             logger.warn("INOUT ports are not mapped to ASEM models at the moment!");
-            
+
         default:
             break;
         }
-        
-        
 
     }
 }
