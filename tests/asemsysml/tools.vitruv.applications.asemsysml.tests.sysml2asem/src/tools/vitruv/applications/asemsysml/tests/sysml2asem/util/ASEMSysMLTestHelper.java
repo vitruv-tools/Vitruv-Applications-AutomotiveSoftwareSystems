@@ -27,6 +27,7 @@ import org.eclipse.uml2.uml.util.UMLUtil.StereotypeApplicationHelper;
 
 import edu.kit.ipd.sdq.ASEM.base.TypedElement;
 import edu.kit.ipd.sdq.ASEM.classifiers.Component;
+import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.global.SysML2ASEMJavaChangePropagationSpecification;
 import tools.vitruv.applications.asemsysml.reactions.sysml2asem.global.SysML2ASEMChangePropagationSpecification;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.ASEMSysMLTest;
@@ -121,6 +122,26 @@ public final class ASEMSysMLTestHelper {
 
         return ports;
 
+    }
+
+    /**
+     * Get the direction of the given port which is stored in the flow property of this port.
+     * 
+     * @param port
+     *            The given port which must contain a {@link FlowProperty}.
+     * @return The {@link FlowDirection} of the given Port.
+     */
+    public static FlowDirection getPortDirection(final Port port) {
+
+        FlowProperty flowProperty = ASEMSysMLHelper.getFlowProperty(port);
+        if (flowProperty == null) {
+            fail("There is no flow property available for the current port: " + port);
+        }
+
+        FlowDirection flowDirection = flowProperty.getDirection();
+        assertTrue("No flow direction for given flow was found.", flowDirection != null);
+
+        return flowDirection;
     }
 
     /**
