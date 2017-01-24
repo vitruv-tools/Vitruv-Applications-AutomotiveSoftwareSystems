@@ -1,11 +1,12 @@
 import org.eclipse.papyrus.sysml14.blocks.Block
+import org.eclipse.papyrus.sysml14.portsandflows.FlowDirection
 import org.eclipse.uml2.uml.Class
 import org.eclipse.uml2.uml.Port
 import org.eclipse.uml2.uml.PrimitiveType
 import org.eclipse.uml2.uml.util.UMLUtil
+import tools.vitruv.applications.asemsysml.ASEMSysMLConstants
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper
 import tools.vitruv.applications.asemsysml.ASEMSysMLPrimitiveTypeHelper
-import tools.vitruv.applications.asemsysml.ASEMSysMLConstants
 
 import "edu.kit.ipd.sdq.asem" as asem
 import "http://www.eclipse.org/papyrus/sysml/1.4/SysML" as sysml
@@ -25,10 +26,12 @@ reaction PortTransformation {
 	call {
 		val port = change.affectedEObject
 		logger.info("[ASEMSysML] Port with name " + change.newValue + " was created.");
-		createPortCorrespondence(port);
+		
+		// The mapping to an ASEM class is direction specific. Therefore it will be handled in the PortDirectionTransformation.
+		mapPortToModule(port);
 	}
 }
-routine createPortCorrespondence(uml::Port port) {
+routine mapPortToModule(uml::Port port) {
 	match {
 		val asemModule = retrieve asem::Module corresponding to UMLUtil.getStereotypeApplication(port.owner, Block)
 	}
@@ -52,7 +55,9 @@ reaction PortDirectionTransformation {
 		val bindingConnector = change.affectedEObject;
 		for(connectorEnds: bindingConnector.base_Connector.ends) {
 			if(connectorEnds.role instanceof Port) {
-				setMessageAccessProperties(connectorEnds.role as Port);
+				val port = connectorEnds.role as Port;
+				setMessageAccessProperties(port);
+				mapPortToClass(port);
 			}
 		}
 	}
@@ -60,6 +65,7 @@ reaction PortDirectionTransformation {
 routine setMessageAccessProperties(uml::Port port) {
 	match {
 		val asemMessage = retrieve asem::Message corresponding to port
+		check ASEMSysMLHelper.getFlowProperty(port) != null
 	}
 	action {
 		update asemMessage {
@@ -82,6 +88,90 @@ routine setMessageAccessProperties(uml::Port port) {
 				}
 			}
 			
+		}
+	}
+}
+routine mapPortToClass(uml::Port port) {
+	match {
+		val asemComponent = retrieve asem::Component corresponding to UMLUtil.getStereotypeApplication(port.owner, Block)
+		check asemComponent instanceof edu.kit.ipd.sdq.ASEM.classifiers.Class
+	}
+	action {
+		call mapINPortToClass(port, asemComponent)
+		call mapOUTPortToClass(port, asemComponent)
+		call mapINOUTPortToClass(port, asemComponent)
+		
+	}	
+}
+routine mapINPortToClass(uml::Port port, asem::Component correspondingComponent) {
+	   
+	match {
+		// [Requirement 2.d)ii]
+		check ASEMSysMLHelper.getFlowProperty(port) != null
+		check ASEMSysMLHelper.getFlowProperty(port).direction.equals(FlowDirection.IN)
+	}
+	action {
+		// [Requirement 2.d)iii]
+		val asemParameter = create asem::Parameter and initialize {
+			// [Requirement 2.d)i]
+			asemParameter.name = port.name;
+			// [Requirement 2.d)iv] [Requirement 2.d)v] [Requirement 2.d)vi]
+			asemParameter.type = ASEMSysMLHelper.getClassifierForASEMVariable(port.type, this.correspondenceModel);
+		}
+		
+		val asemMethod = create asem::Method and initialize {
+			val methodName = userInteracting.getTextInput("Please insert a method name which can be used for mapping a SysML port to an ASEM method.")
+			asemMethod.name = methodName;
+			asemMethod.parameters.add(asemParameter);
+		}
+
+		// [Requirement 2.d)]
+		add correspondence between port and asemParameter
+		
+		update correspondingComponent {
+			correspondingComponent.methods.add(asemMethod);
+		}
+		
+	}	
+}
+routine mapOUTPortToClass(uml::Port port, asem::Component correspondingComponent) { 
+	match {
+		// [Requirement 2.e)i]
+		check ASEMSysMLHelper.getFlowProperty(port) != null
+		check ASEMSysMLHelper.getFlowProperty(port).direction.equals(FlowDirection.OUT)
+	}
+	action {
+		// [Requirement 2.e)ii]
+		val asemReturnType = create asem::ReturnType and initialize {
+			// [Requirement 2.e)iii] [Requirement 2.e)iv] [Requirement 2.e)v]
+			asemReturnType.type = ASEMSysMLHelper.getClassifierForASEMVariable(port.type, this.correspondenceModel);
+		}
+		
+		val asemMethod = create asem::Method and initialize {
+			var methodName = userInteracting.getTextInput("Please insert a method name which can be used for mapping a SysML port to an ASEM method.")
+			if(methodName.empty) {
+				methodName = "SampleMethodName";
+			}
+			asemMethod.name = methodName;
+			asemMethod.returnType = asemReturnType;
+		}
+		
+		// [Requirement 2.e)] 
+		add correspondence between port and asemReturnType
+		
+		update correspondingComponent {
+			correspondingComponent.methods.add(asemMethod);
+		}
+	}
+}
+routine mapINOUTPortToClass(uml::Port port, asem::Component correspondingComponent) {
+	match {
+		check ASEMSysMLHelper.getFlowProperty(port) != null
+		check ASEMSysMLHelper.getFlowProperty(port).direction.equals(FlowDirection.INOUT)
+	}
+	action {
+		call {
+			logger.warn("INOUT ports are not mapped to ASEM models at the moment!");
 		}
 	}
 }

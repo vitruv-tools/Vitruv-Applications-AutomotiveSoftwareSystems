@@ -6,6 +6,7 @@ import org.eclipse.papyrus.sysml14.blocks.Block;
 import org.eclipse.uml2.uml.Port;
 import org.eclipse.uml2.uml.UMLPackage;
 
+import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import edu.kit.ipd.sdq.ASEM.classifiers.Module;
 import edu.kit.ipd.sdq.ASEM.dataexchange.DataexchangeFactory;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Message;
@@ -52,7 +53,33 @@ public class PortTransformation
 
         logger.info("[ASEMSysML][Java] Transforming a SysML port ...");
 
-        createASEMMessageAndSetName(change);
+        final Port port = (Port) change.getAffectedEObject();
+        final Block block = ASEMSysMLHelper.getPortsBlock(port);
+        final String blockName = block.getBase_Class().getName();
+        final String asemModelName = ASEMSysMLHelper.getASEMModelName(blockName);
+        final String asemProjectModelPath = ASEMSysMLHelper.getProjectModelPath(asemModelName,
+                AsemNamespace.FILE_EXTENSION);
+
+        Component correspondingASEMComponent = ASEMSysMLHelper
+                .getFirstCorrespondingASEMElement(this.executionState.getCorrespondenceModel(), block, Component.class);
+
+        if (correspondingASEMComponent instanceof Module) {
+
+            Module asemModule = (Module) correspondingASEMComponent;
+            createASEMMessageAndSetName(port, asemModule, asemProjectModelPath);
+
+        } else if (correspondingASEMComponent instanceof edu.kit.ipd.sdq.ASEM.classifiers.Class) {
+
+            // In this case, the mapping of the port is direction specific. Therefore the
+            // transformation will be handled in the PortDirectionTransformation class.
+            return;
+
+        } else {
+            throw new IllegalArgumentException(
+                    "Unhandled ASEM component type of the ASEM element which corresponds to the SysML block "
+                            + block.getBase_Class().getName());
+        }
+
     }
 
     @Override
@@ -81,25 +108,15 @@ public class PortTransformation
         return (change.getAffectedFeature() == UMLPackage.Literals.NAMED_ELEMENT__NAME && change.getNewValue() != null);
     }
 
-    private void createASEMMessageAndSetName(ReplaceSingleValuedEAttribute<EObject, Object> change) {
+    private void createASEMMessageAndSetName(final Port port, final Module correspondingASEMModule,
+            final String asemProjectModelPath) {
 
-        Port port = (Port) change.getAffectedEObject();
         Message message = DataexchangeFactory.eINSTANCE.createMessage();
         message.setName(port.getName());
 
-        // Add ASEM message to ASEM module which corresponds to the block of the given port.
-        Block block = ASEMSysMLHelper.getPortsBlock(port);
-        String blockName = block.getBase_Class().getName();
+        correspondingASEMModule.getTypedElements().add(message);
 
-        Module module = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.executionState.getCorrespondenceModel(),
-                block, Module.class);
-        module.getTypedElements().add(message);
-
-        // Persist module and add correspondence between port and message.
-        String asemModelName = ASEMSysMLHelper.getASEMModelName(blockName);
-        String asemProjectModelPath = ASEMSysMLHelper.getProjectModelPath(asemModelName, AsemNamespace.FILE_EXTENSION);
-
-        persistASEMElement(port, module, asemProjectModelPath);
+        persistASEMElement(port, correspondingASEMModule, asemProjectModelPath);
         addCorrespondence(port, message);
     }
 

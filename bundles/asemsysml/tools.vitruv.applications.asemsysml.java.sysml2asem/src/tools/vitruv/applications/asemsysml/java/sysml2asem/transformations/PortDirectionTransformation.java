@@ -12,8 +12,14 @@ import org.eclipse.uml2.uml.Connector;
 import org.eclipse.uml2.uml.ConnectorEnd;
 import org.eclipse.uml2.uml.Port;
 
+import edu.kit.ipd.sdq.ASEM.classifiers.Classifier;
+import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import edu.kit.ipd.sdq.ASEM.classifiers.Module;
+import edu.kit.ipd.sdq.ASEM.dataexchange.DataexchangeFactory;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Message;
+import edu.kit.ipd.sdq.ASEM.dataexchange.Method;
+import edu.kit.ipd.sdq.ASEM.dataexchange.Parameter;
+import edu.kit.ipd.sdq.ASEM.dataexchange.ReturnType;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.AbstractTransformationRealization;
 import tools.vitruv.domains.asem.AsemNamespace;
@@ -35,7 +41,7 @@ import tools.vitruv.framework.userinteraction.UserInteracting;
  * be triggered if the <code>base connector</code> of a SysML binding connector was set. <br>
  * <br>
  * 
- * [Requirement 1.d)ii]
+ * [Requirement 1.d)ii] [Requirement 2.d)iii] [Requirement 2.e)ii]
  * 
  * @author Benjamin Rupp
  *
@@ -59,7 +65,7 @@ public class PortDirectionTransformation
 
         logger.info("[ASEMSysML][Java] Transform direction of a SysML port ...");
 
-        setMessageAccess(change);
+        transformPortDirection(change);
     }
 
     @Override
@@ -67,7 +73,7 @@ public class PortDirectionTransformation
         return (isBindingConnector(change) && isConnectorReferenceSet(change));
     }
 
-    private void setMessageAccess(ReplaceSingleValuedEReference<EObject, EObject> change) {
+    private void transformPortDirection(ReplaceSingleValuedEReference<EObject, EObject> change) {
 
         final BindingConnector bindingConnector = (BindingConnector) change.getAffectedEObject();
         final Connector connector = bindingConnector.getBase_Connector();
@@ -87,8 +93,45 @@ public class PortDirectionTransformation
             return;
         }
 
+        final Block block = ASEMSysMLHelper.getPortsBlock(port);
+        final String blockName = block.getBase_Class().getName();
+        final String asemModelName = ASEMSysMLHelper.getASEMModelName(blockName);
+        final String asemProjectModelPath = ASEMSysMLHelper.getProjectModelPath(asemModelName,
+                AsemNamespace.FILE_EXTENSION);
+
+        final Component correspondingComponent = ASEMSysMLHelper
+                .getFirstCorrespondingASEMElement(this.executionState.getCorrespondenceModel(), block, Component.class);
+
+        if (correspondingComponent instanceof Module) {
+
+            setMessageAccessParameters(port, asemProjectModelPath);
+
+        } else if (correspondingComponent instanceof edu.kit.ipd.sdq.ASEM.classifiers.Class) {
+
+            edu.kit.ipd.sdq.ASEM.classifiers.Class asemClass = (edu.kit.ipd.sdq.ASEM.classifiers.Class) correspondingComponent;
+            createASEMMethodAndSetName(port, asemClass, asemProjectModelPath);
+
+        }
+
+    }
+
+    private boolean isBindingConnector(final ReplaceSingleValuedEReference<EObject, EObject> change) {
+        return (change.getAffectedEObject() instanceof BindingConnector);
+    }
+
+    private boolean isConnectorReferenceSet(final ReplaceSingleValuedEReference<EObject, EObject> change) {
+        return (change.getAffectedFeature().equals(BlocksPackage.Literals.BINDING_CONNECTOR__BASE_CONNECTOR));
+    }
+
+    private void setMessageAccessParameters(final Port port, final String asemProjectModelPath) {
+
         Message message = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.executionState.getCorrespondenceModel(),
                 port, Message.class);
+
+        if (message == null) {
+            logger.warn("[ASEMSysML][Java] No corresponding ASEM message found for UML port " + port.getName());
+            return;
+        }
 
         // Get ports flow direction.
         final FlowProperty flowProperty = ASEMSysMLHelper.getFlowProperty(port);
@@ -125,21 +168,63 @@ public class PortDirectionTransformation
         }
 
         final Module module = (Module) messageContainer;
-        final Block block = ASEMSysMLHelper.getPortsBlock(port);
-        final String blockName = block.getBase_Class().getName();
-        final String asemModelName = ASEMSysMLHelper.getASEMModelName(blockName);
-        final String asemProjectModelPath = ASEMSysMLHelper.getProjectModelPath(asemModelName,
-                AsemNamespace.FILE_EXTENSION);
 
         persistASEMElement(port, module, asemProjectModelPath);
-
     }
 
-    private boolean isBindingConnector(final ReplaceSingleValuedEReference<EObject, EObject> change) {
-        return (change.getAffectedEObject() instanceof BindingConnector);
-    }
+    private void createASEMMethodAndSetName(final Port port,
+            final edu.kit.ipd.sdq.ASEM.classifiers.Class correspondingASEMClass, final String asemProjectModelPath) {
 
-    private boolean isConnectorReferenceSet(final ReplaceSingleValuedEReference<EObject, EObject> change) {
-        return (change.getAffectedFeature().equals(BlocksPackage.Literals.BINDING_CONNECTOR__BASE_CONNECTOR));
+        String methodName = this.userInteracting.getTextInput(
+                "Please insert a method name which can be used for mapping a SysML port to an ASEM method.");
+
+        if (methodName.isEmpty()) {
+            methodName = "SampleMethodName";
+        }
+
+        FlowProperty flowProp = ASEMSysMLHelper.getFlowProperty(port);
+        FlowDirection direction = flowProp != null ? flowProp.getDirection() : null;
+        Classifier type = ASEMSysMLHelper.getClassifierForASEMVariable(port.getType(),
+                this.executionState.getCorrespondenceModel());
+
+        Method method = DataexchangeFactory.eINSTANCE.createMethod();
+        method.setName(methodName);
+
+        switch (direction) {
+        case IN:
+
+            Parameter parameter = DataexchangeFactory.eINSTANCE.createParameter();
+            parameter.setName(port.getName());
+            parameter.setType(type);
+            method.getParameters().add(parameter);
+
+            correspondingASEMClass.getMethods().add(method);
+            
+            persistASEMElement(port, correspondingASEMClass, asemProjectModelPath);
+            addCorrespondence(port, parameter);
+            break;
+
+        case OUT:
+            
+            ReturnType returnType = DataexchangeFactory.eINSTANCE.createReturnType();
+            returnType.setType(type);
+            method.setReturnType(returnType);
+            
+            correspondingASEMClass.getMethods().add(method);
+            persistASEMElement(port, correspondingASEMClass, asemProjectModelPath);
+            
+            addCorrespondence(port, returnType);
+            break;
+        
+        case INOUT:
+            
+            logger.warn("INOUT ports are not mapped to ASEM models at the moment!");
+            
+        default:
+            break;
+        }
+        
+        
+
     }
 }
