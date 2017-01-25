@@ -1,8 +1,13 @@
 package tools.vitruv.applications.asemsysml.tests.sysml2asem.testcases;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.papyrus.sysml14.blocks.Block;
 import org.eclipse.uml2.uml.AggregationKind;
 import org.eclipse.uml2.uml.Property;
@@ -11,6 +16,7 @@ import org.junit.Test;
 import edu.kit.ipd.sdq.ASEM.base.TypedElement;
 import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import edu.kit.ipd.sdq.ASEM.classifiers.Module;
+import edu.kit.ipd.sdq.ASEM.dataexchange.Constant;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.SysML2ASEMTest;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTestHelper;
@@ -62,17 +68,7 @@ public class PartMappingTransformationTest extends SysML2ASEMTest {
 
         assertTrue("Block A doesn't contain a part!", !blockA.getParts().isEmpty());
 
-        // Check if the corresponding ASEM module of block A contains a reference to the
-        // corresponding ASEM component of block B.
-        Component componentA = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), blockA,
-                asemComponentType);
-        Component componentB1 = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), blockB1,
-                asemComponentType);
-
-        assertTrue("No corresponding element found for " + blockA.getBase_Class().getName(), componentA != null);
-        assertTrue("No corresponding element found for " + blockB1.getBase_Class().getName(), componentB1 != null);
-
-        ASEMSysMLTestHelper.assertPartReferenceExists(componentA, componentB1);
+        assertPartReferenceBetweenBlocksExists(blockA, asemComponentType, blockB1, asemComponentType);
 
     }
 
@@ -113,19 +109,8 @@ public class PartMappingTransformationTest extends SysML2ASEMTest {
         assertTrue("BlockN1 doesn't contain a part!", !blockN1.getParts().isEmpty());
         assertTrue("BlockN2 doesn't contain a part!", !blockN2.getParts().isEmpty());
 
-        Component componentN1 = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), blockN1,
-                asemComponentType);
-        Component componentN2 = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), blockN2,
-                asemComponentType);
-        Component componentN3 = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), blockN3,
-                asemComponentType);
-
-        assertTrue("No corresponding element found for " + blockN1.getBase_Class().getName(), componentN1 != null);
-        assertTrue("No corresponding element found for " + blockN2.getBase_Class().getName(), componentN2 != null);
-        assertTrue("No corresponding element found for " + blockN3.getBase_Class().getName(), componentN3 != null);
-
-        ASEMSysMLTestHelper.assertPartReferenceExists(componentN1, componentN2);
-        ASEMSysMLTestHelper.assertPartReferenceExists(componentN2, componentN3);
+        assertPartReferenceBetweenBlocksExists(blockN1, asemComponentType, blockN2, asemComponentType);
+        assertPartReferenceBetweenBlocksExists(blockN2, asemComponentType, blockN3, asemComponentType);
     }
 
     /**
@@ -171,4 +156,98 @@ public class PartMappingTransformationTest extends SysML2ASEMTest {
         assertTrue("A part reference to an ASEM module exists! ", !partReferenceMappingExists);
 
     }
+
+    /**
+     * If a part reference of a SysML block is deleted the reference mapping on the ASEM model must
+     * be deleted, too. If both SysML blocks are not deleted, the corresponding ASEM components
+     * shall not be deleted, too.
+     */
+    @Test
+    public void testIfPartMappingIsRemovedAfterPartDeletion() {
+
+        // TODO [BR] Remove!
+        Logger.getRootLogger().setLevel(Level.INFO);
+
+        Resource sysmlResource = this.getModelResource(sysmlProjectModelPath);
+        Class<? extends Component> asemComponentType = edu.kit.ipd.sdq.ASEM.classifiers.Class.class;
+
+        Block blockA = ASEMSysMLTestHelper.createSysMLBlock(sysmlResource, "BlockADeletionTest", true,
+                asemComponentType, this);
+        Block blockB = ASEMSysMLTestHelper.createSysMLBlock(sysmlResource, "BlockBDeletionTest", true,
+                asemComponentType, this);
+
+        Property partProperty = blockA.getBase_Class().createOwnedAttribute("partReference", blockB.getBase_Class());
+        partProperty.setAggregation(AggregationKind.COMPOSITE_LITERAL);
+
+        saveAndSynchronizeChanges(blockA);
+        saveAndSynchronizeChanges(blockB);
+
+        assertPartReferenceBetweenBlocksExists(blockA, asemComponentType, blockB, asemComponentType);
+
+        // Remove part reference in blockA.
+        EcoreUtil.delete(partProperty);
+        saveAndSynchronizeChanges(blockA);
+
+        assertTrue("Part property of block " + blockA.getBase_Class().getName() + " was not deleted succesfully!",
+                !blockA.getBase_Class().getAllAttributes().contains(partProperty));
+
+        // Check if part reference was deleted in ASEM model.
+        assertPartReferenceBetweenBlocksDoesNotExist(blockA, asemComponentType, blockB, asemComponentType);
+
+        // Check if correspondence was deleted, too.
+        assertPartCorrespondenceDoesNotExist(partProperty);
+
+    }
+
+    private void assertPartReferenceBetweenBlocksExists(final Block blockA,
+            final Class<? extends Component> componentTypeA, final Block blockB,
+            final Class<? extends Component> componentTypeB) {
+
+        Component componentA = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), blockA,
+                componentTypeA);
+        Component componentB = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), blockB,
+                componentTypeB);
+
+        assertTrue("No corresponding element found for " + blockA.getBase_Class().getName(), componentA != null);
+        assertTrue("No corresponding element found for " + blockB.getBase_Class().getName(), componentB != null);
+        assertTrue("Component " + componentA.getName() + " doesn't contain a typed element!",
+                !componentA.getTypedElements().isEmpty());
+
+        final boolean referenceExists = ASEMSysMLTestHelper.doesPartReferenceExists(componentA, componentB);
+
+        assertTrue("Part reference mapping does not exists in ASEM component " + componentA.getName(), referenceExists);
+    }
+
+    private void assertPartReferenceBetweenBlocksDoesNotExist(final Block blockA,
+            final Class<? extends Component> componentTypeA, final Block blockB,
+            final Class<? extends Component> componentTypeB) {
+
+        Component componentA = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), blockA,
+                componentTypeA);
+        Component componentB = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), blockB,
+                componentTypeB);
+
+        assertTrue("No corresponding element found for " + blockA.getBase_Class().getName(), componentA != null);
+        assertTrue("No corresponding element found for " + blockB.getBase_Class().getName(), componentB != null);
+
+        final boolean referenceExists = ASEMSysMLTestHelper.doesPartReferenceExists(componentA, componentB);
+
+        assertTrue("Part reference mapping exists in ASEM component " + componentA.getName(), !referenceExists);
+    }
+
+    private void assertPartCorrespondenceDoesNotExist(final Property partProperty) {
+
+        final String msg = "Part correspondence for part property " + partProperty.getName() + " was not deleted!";
+        
+        try {
+
+            Constant constant = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(),
+                    partProperty, Constant.class);
+            assertEquals(msg, constant, null);
+
+        } catch (Exception e) {
+            fail(msg);
+        }
+    }
+
 }

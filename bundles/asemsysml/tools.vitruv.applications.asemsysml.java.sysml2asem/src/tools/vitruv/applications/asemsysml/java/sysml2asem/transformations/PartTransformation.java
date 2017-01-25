@@ -80,7 +80,8 @@ public class PartTransformation
     @Override
     protected boolean checkPreconditions(ReplaceSingleValuedEAttribute<EObject, Object> change) {
 
-        return (isProperty(change) && isPropertyTypeSet(change) && isPartProperty(change));
+        return (isProperty(change) && isPropertyTypeSet(change)
+                && isPartProperty((Property) change.getAffectedEObject()));
     }
 
     private boolean isProperty(final ReplaceSingleValuedEAttribute<EObject, Object> change) {
@@ -90,36 +91,6 @@ public class PartTransformation
     private boolean isPropertyTypeSet(final ReplaceSingleValuedEAttribute<EObject, Object> change) {
         final Property property = (Property) change.getAffectedEObject();
         return (property.getType() != null);
-    }
-
-    private boolean isPartProperty(final ReplaceSingleValuedEAttribute<EObject, Object> change) {
-
-        boolean isContainingElementABlock = false;
-        boolean isPropertyTypeABlock = false;
-        boolean isAggregationKindSetToComposite = false;
-
-        final Property prop = (Property) change.getAffectedEObject();
-
-        if (prop.eContainer() instanceof org.eclipse.uml2.uml.Class) {
-            org.eclipse.uml2.uml.Class baseClass = (org.eclipse.uml2.uml.Class) prop.eContainer();
-
-            if (baseClass.getAppliedStereotype(ASEMSysMLConstants.QUALIFIED_BLOCK_NAME) != null) {
-                isContainingElementABlock = true;
-            }
-        }
-
-        isPropertyTypeABlock = (prop.getType().getAppliedStereotype(ASEMSysMLConstants.QUALIFIED_BLOCK_NAME) != null);
-
-        /*
-         * Check the aggregation kind of the property because the aggregation kind must be set for
-         * the getParts() method of a SysML block. Furthermore this check prevents the handling of a
-         * port property.
-         */
-        final AggregationKind aggregationKind = prop.getAggregation();
-        isAggregationKindSetToComposite = (aggregationKind != null
-                && aggregationKind.equals(AggregationKind.COMPOSITE_LITERAL));
-
-        return (isContainingElementABlock && isPropertyTypeABlock && isAggregationKindSetToComposite);
     }
 
     private void createASEMPartReference(final org.eclipse.uml2.uml.Class blockBaseClass, final Property partProperty) {
@@ -152,5 +123,34 @@ public class PartTransformation
         persistASEMElement(blockBaseClass, correspondingASEMBlockComponent, asemProjectModelPath);
         addCorrespondence(partProperty, asemConstant);
 
+    }
+
+    private boolean isPartProperty(final Property property) {
+
+        boolean isContainingElementABlock = false;
+        boolean isPropertyTypeABlock = false;
+        boolean isAggregationKindSetToComposite = false;
+
+        if (property.eContainer() instanceof org.eclipse.uml2.uml.Class) {
+            org.eclipse.uml2.uml.Class baseClass = (org.eclipse.uml2.uml.Class) property.eContainer();
+
+            if (baseClass.getAppliedStereotype(ASEMSysMLConstants.QUALIFIED_BLOCK_NAME) != null) {
+                isContainingElementABlock = true;
+            }
+        }
+
+        isPropertyTypeABlock = (property.getType()
+                .getAppliedStereotype(ASEMSysMLConstants.QUALIFIED_BLOCK_NAME) != null);
+
+        /*
+         * Check the aggregation kind of the property because the aggregation kind must be set for
+         * the getParts() method of a SysML block. Furthermore this check prevents the handling of a
+         * port property.
+         */
+        final AggregationKind aggregationKind = property.getAggregation();
+        isAggregationKindSetToComposite = (aggregationKind != null
+                && aggregationKind.equals(AggregationKind.COMPOSITE_LITERAL));
+
+        return (isContainingElementABlock && isPropertyTypeABlock && isAggregationKindSetToComposite);
     }
 }

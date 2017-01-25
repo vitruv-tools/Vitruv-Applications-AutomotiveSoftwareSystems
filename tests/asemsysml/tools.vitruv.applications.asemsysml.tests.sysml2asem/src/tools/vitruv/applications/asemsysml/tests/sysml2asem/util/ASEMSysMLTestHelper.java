@@ -269,18 +269,19 @@ public final class ASEMSysMLTestHelper {
     }
 
     /**
-     * Check if the given parent component references to the given child component.
+     * Check whether the given parent component references to the given child component or not.
      * 
      * @param parentComponent
      *            ASEM component which contains a reference to another component.
      * @param childComponent
      *            ASEm component which is referenced by another component.
+     * 
+     * @return <code>True</code> if the parent component contains a reference to the child
+     *         component, <code>false</code> otherwise.
      */
-    public static void assertPartReferenceExists(final Component parentComponent, final Component childComponent) {
+    public static boolean doesPartReferenceExists(final Component parentComponent, final Component childComponent) {
 
         boolean correctPartReferenceMapping = false;
-
-        assertTrue("Component doesn't contain a typed element!", !parentComponent.getTypedElements().isEmpty());
 
         for (TypedElement typedElement : parentComponent.getTypedElements()) {
             if (typedElement.getType().equals(childComponent)) {
@@ -288,8 +289,7 @@ public final class ASEMSysMLTestHelper {
             }
         }
 
-        assertTrue("Wrong part reference mapping in ASEM component " + parentComponent.getName(),
-                correctPartReferenceMapping);
+        return correctPartReferenceMapping;
     }
 
     private static Model getSysMLRootModelElement(final Resource sysmlModelResource) {

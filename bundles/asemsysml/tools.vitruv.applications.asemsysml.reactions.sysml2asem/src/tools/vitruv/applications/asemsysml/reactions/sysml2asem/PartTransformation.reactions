@@ -55,3 +55,22 @@ reaction PartTransformation {
  		add correspondence between partProperty and asemConstant
  	}
  }
+ 
+ reaction PartDeletionTransformation {
+ 	after list entry deleted and removed in uml::Class[ownedAttribute]
+ 		with change.affectedEObject.getAppliedStereotype(ASEMSysMLConstants.QUALIFIED_BLOCK_NAME) != null &&
+ 		change.oldValue.type != null && change.oldValue.type.getAppliedStereotype(ASEMSysMLConstants.QUALIFIED_BLOCK_NAME) != null &&
+ 		change.oldValue.aggregation != null && change.oldValue.aggregation.equals(AggregationKind.COMPOSITE_LITERAL)
+ 	call {
+ 		logger.info("Delete part property reference ...");
+ 		deletePartReference(change.oldValue);
+ 	}
+ }
+ routine deletePartReference(uml::Property property) {
+ 	match {
+ 		val asemConstant = retrieve asem::Constant corresponding to property	
+ 	}
+ 	action {
+ 		delete asemConstant
+ 	}
+ }
