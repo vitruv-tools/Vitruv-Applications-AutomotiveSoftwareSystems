@@ -18,6 +18,7 @@ import tools.vitruv.domains.asem.AsemNamespace;
 import tools.vitruv.framework.change.echange.EChange;
 import tools.vitruv.framework.change.echange.feature.attribute.ReplaceSingleValuedEAttribute;
 import tools.vitruv.framework.userinteraction.UserInteracting;
+import tools.vitruv.framework.userinteraction.UserInteractionType;
 
 /**
  * The transformation class for transforming the direction of a SysML part. <br>
@@ -105,7 +106,7 @@ public class PartTransformation
 
         // ASEM modules cannot be used as subcomponents in ASEM components.
         if (correspondingASEMPartComponent instanceof Module) {
-            // TODO [BR] Show user feedback.
+            userInteracting.showMessage(UserInteractionType.MODAL, ASEMSysMLConstants.MSG_WARN_MODULE_AS_SUBCOMPONENT);
             return;
         }
 
