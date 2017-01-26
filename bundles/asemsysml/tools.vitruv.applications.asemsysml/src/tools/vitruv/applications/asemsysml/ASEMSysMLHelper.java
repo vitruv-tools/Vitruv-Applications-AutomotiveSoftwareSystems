@@ -149,7 +149,7 @@ public class ASEMSysMLHelper {
         return (Block) UMLUtil.getStereotypeApplication(baseClass, Block.class);
 
     }
-    
+
     /**
      * Get the classifier for an ASEM variable depending on the given port type.
      * 
@@ -202,16 +202,9 @@ public class ASEMSysMLHelper {
             return null;
         }
 
-        // TODO [BR] A port can have multiple connector ends. If this differentiation is necessary,
-        // the following part should be reworked.
-        ConnectorEnd portsConnectorEnd = port.getEnds().get(0);
-        EObject container = portsConnectorEnd.eContainer();
-        
-        if(!(container instanceof Connector)) {
-            throw new IllegalArgumentException("The eContainer of the connector end is not an instance of Connector!");
-        }
-        
-        Connector connector = (Connector) container;
+        ConnectorEnd portsConnectorEnd = getConnectorEnd(port);
+
+        Connector connector = getConnector(portsConnectorEnd);
         EList<ConnectorEnd> connectorEnds = connector.getEnds();
 
         for (ConnectorEnd connectorEnd : connectorEnds) {
@@ -225,6 +218,29 @@ public class ASEMSysMLHelper {
 
         return flowProperty;
 
+    }
+
+    public static ConnectorEnd getConnectorEnd(final Port port) {
+        // TODO [BR] A port can have multiple connector ends. If this method should be reworked.
+        return port.getEnds().get(0);
+    }
+
+    /**
+     * Get the connector the given connector end belongs to.
+     * 
+     * @param connectorEnd
+     *            The given connector end.
+     * @return The connector the given connector end belongs to.
+     */
+    public static Connector getConnector(final ConnectorEnd connectorEnd) {
+
+        EObject container = connectorEnd.eContainer();
+
+        if (!(container instanceof Connector)) {
+            throw new IllegalArgumentException("The eContainer of the connector end is not an instance of Connector!");
+        }
+
+        return (Connector) container;
     }
 
 }

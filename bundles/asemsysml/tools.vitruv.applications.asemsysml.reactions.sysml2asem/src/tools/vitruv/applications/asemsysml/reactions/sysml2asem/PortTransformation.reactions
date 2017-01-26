@@ -214,4 +214,23 @@ routine transformPrimitivePortType(uml::Port port) {
 			asemMessage.type = ASEMSysMLPrimitiveTypeHelper.getASEMPrimitiveTypeFromRepository(messageType, asemMessage);
 		}
 	}
-} 
+}
+
+reaction PortDeletionTransformation {
+	after list entry deleted and removed in uml::Class[ownedAttribute]
+	with change.oldValue instanceof Port
+	call {
+		
+		logger.info("[ASEMSysML] Delete port reference for port " + change.oldValue.name + " ...");
+		deletePortReference(change.oldValue as Port);
+	
+	}
+}
+routine deletePortReference(uml::Port port) {
+	match {
+		val correspondingElement = retrieve asem::TypedElement corresponding to port
+	}
+	action {
+		delete correspondingElement
+	}
+}

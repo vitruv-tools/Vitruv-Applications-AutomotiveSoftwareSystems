@@ -145,6 +145,29 @@ public final class ASEMSysMLTestHelper {
     }
 
     /**
+     * Get the property which is connected with a port.
+     * 
+     * @param port
+     *            The port which shall be connected to the property.
+     * @return The property which is connected with the given port.
+     */
+    public static Property getPortProperty(final Port port) {
+
+        Property property = null;
+
+        ConnectorEnd connectorEnd = ASEMSysMLHelper.getConnectorEnd(port);
+        Connector connector = ASEMSysMLHelper.getConnector(connectorEnd);
+
+        for (ConnectorEnd end : connector.getEnds()) {
+            if (!end.equals(connectorEnd) && end.getRole() instanceof Property) {
+                property = (Property) end.getRole();
+            }
+        }
+
+        return property;
+    }
+
+    /**
      * Create a SysML block and add it to the SysML model.
      * 
      * @param sysmlModelResource

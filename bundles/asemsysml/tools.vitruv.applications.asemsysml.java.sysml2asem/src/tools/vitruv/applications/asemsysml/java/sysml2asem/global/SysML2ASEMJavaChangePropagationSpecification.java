@@ -13,6 +13,7 @@ import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.Primi
 import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.DebugTransformation;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.PartDeletionTransformation;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.PartTransformation;
+import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.PortDeletionTransformation;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.PortDirectionTransformation;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.JavaTransformationRealization;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.BlockNameTransformation;
@@ -58,6 +59,7 @@ public class SysML2ASEMJavaChangePropagationSpecification extends AbstractEChang
         this.addTransformation(new PortTransformation(this.getUserInteracting()));
         this.addTransformation(new PortDirectionTransformation(this.getUserInteracting()));
         this.addTransformation(new PortTypeTransformation(this.getUserInteracting()));
+        this.addTransformation(new PortDeletionTransformation(this.getUserInteracting()));
         this.addTransformation(new PrimitiveTypeTransformation(this.getUserInteracting()));
         this.addTransformation(new PartTransformation(this.getUserInteracting()));
         this.addTransformation(new PartDeletionTransformation(this.getUserInteracting()));

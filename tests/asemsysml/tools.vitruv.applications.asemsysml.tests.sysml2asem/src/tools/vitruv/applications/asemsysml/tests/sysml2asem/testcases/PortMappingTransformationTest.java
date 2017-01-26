@@ -7,12 +7,21 @@ import static org.junit.Assert.fail;
 import java.util.Collection;
 import java.util.HashSet;
 
+import org.apache.log4j.Logger;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.papyrus.sysml14.blocks.BindingConnector;
 import org.eclipse.papyrus.sysml14.blocks.Block;
 import org.eclipse.papyrus.sysml14.portsandflows.FlowDirection;
+import org.eclipse.papyrus.sysml14.portsandflows.FlowProperty;
+import org.eclipse.uml2.uml.Connector;
+import org.eclipse.uml2.uml.ConnectorEnd;
 import org.eclipse.uml2.uml.Port;
 import org.eclipse.uml2.uml.PrimitiveType;
+import org.eclipse.uml2.uml.Property;
 import org.eclipse.uml2.uml.Type;
+import org.eclipse.uml2.uml.util.UMLUtil;
 import org.junit.Test;
 
 import edu.kit.ipd.sdq.ASEM.base.TypedElement;
@@ -39,6 +48,8 @@ import tools.vitruv.framework.correspondence.CorrespondenceModel;
  */
 public class PortMappingTransformationTest extends SysML2ASEMTest {
 
+    private static Logger logger = Logger.getLogger(PortMappingTransformationTest.class);
+
     /**
      * The owned ports of a SysML block shall be mapped to a ASEM message which is part of a ASEM
      * module or to an argument of a ASEM class method. <br>
@@ -51,6 +62,99 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
 
         this.assertPortMappingForASEMModuleExists();
         this.assertPortMappingForASEMClassExists();
+    }
+
+    /**
+     * If a SysML port is deleted, the corresponding ASEM element must be deleted, too.
+     */
+    @Test
+    public void testIfPortMappingIsRemovedAfterPortDeletion() {
+
+        this.assertPortDeletionForASEMModule();
+        this.assertPortDeletionForASEMClass();
+    }
+
+    private void assertPortDeletionForASEMModule() {
+
+        Collection<Port> portsToDelete = preparePorts(Module.class);
+
+        for (Port port : portsToDelete) {
+            this.doDeletionAndCheck(port);
+        }
+    }
+
+    private void assertPortDeletionForASEMClass() {
+
+        Collection<Port> portsToDelete = preparePorts(edu.kit.ipd.sdq.ASEM.classifiers.Class.class);
+
+        for (Port port : portsToDelete) {
+            this.doDeletionAndCheck(port);
+        }
+    }
+
+    private void assertPortCorrespondenceDoesNotExist(final Port port) {
+
+        final String msg = "Port correspondence for port " + port.getName() + " was not deleted!";
+
+        try {
+
+            TypedElement correspondence = ASEMSysMLHelper
+                    .getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), port, TypedElement.class);
+            assertEquals(msg, correspondence, null);
+
+        } catch (Exception e) {
+            fail(msg);
+        }
+    }
+
+    private void doDeletionAndCheck(final Port port) {
+
+        // Backup data for deletion check.
+        final Block block = ASEMSysMLHelper.getPortsBlock(port);
+        final TypedElement correspondingElement = ASEMSysMLHelper
+                .getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), port, TypedElement.class);
+
+        this.deletePortAndSync(port);
+        this.assertPortMappingIsDeleted(port, block, correspondingElement);
+    }
+
+    private void assertPortMappingIsDeleted(final Port port, final Block block,
+            final TypedElement correspondingElement) {
+
+        // Check if the corresponding element was deleted.
+        final Component component = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(),
+                block, Component.class);
+
+        if (component instanceof Module) {
+
+            Module module = (Module) component;
+            boolean mappingExists = module.getTypedElements().contains(correspondingElement);
+
+            assertTrue("Module " + module.getName() + " contains a port reference which shall be deleted!",
+                    !mappingExists);
+
+        } else if (component instanceof edu.kit.ipd.sdq.ASEM.classifiers.Class) {
+
+            boolean mappingExists = false;
+            edu.kit.ipd.sdq.ASEM.classifiers.Class asemClass = (edu.kit.ipd.sdq.ASEM.classifiers.Class) component;
+
+            for (Method method : asemClass.getMethods()) {
+                if ((method.getReturnType() != null && method.getReturnType().equals(correspondingElement))
+                        || method.getParameters().contains(correspondingElement)) {
+                    mappingExists = true;
+                    break;
+                }
+            }
+
+            assertTrue("Class " + asemClass.getName() + " contains a port reference which shall be deleted!",
+                    !mappingExists);
+
+        } else {
+            logger.warn("Unsupported ASEM component type: " + component);
+        }
+
+        // Check if correspondence was deleted, too.
+        assertPortCorrespondenceDoesNotExist(port);
     }
 
     private void assertPortMappingForASEMModuleExists() {
@@ -135,6 +239,33 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
                 ASEMSysMLTestHelper.addPortToBlockAndSync(block, "SampleRealPortIN", FlowDirection.IN, pReal, this));
 
         return portsToTest;
+    }
+
+    private void deletePortAndSync(final Port port) {
+
+        Resource sysmlModelResource = this.getModelResource(sysmlProjectModelPath);
+        EObject rootElementToSave = EcoreUtil.getRootContainer(port);
+        Block block = ASEMSysMLHelper.getPortsBlock(port);
+
+        ConnectorEnd connectorEnd = ASEMSysMLHelper.getConnectorEnd(port);
+        Connector connector = ASEMSysMLHelper.getConnector(connectorEnd);
+        BindingConnector bindingConnector = UMLUtil.getStereotypeApplication(connector, BindingConnector.class);
+        Property property = ASEMSysMLTestHelper.getPortProperty(port);
+        FlowProperty flowProperty = UMLUtil.getStereotypeApplication(property, FlowProperty.class);
+
+        EcoreUtil.remove(connector);
+        EcoreUtil.remove(bindingConnector);
+        EcoreUtil.remove(property);
+        EcoreUtil.remove(flowProperty);
+        EcoreUtil.remove(port);
+        saveAndSynchronizeChanges(rootElementToSave);
+
+        assertTrue("Port was not deleted successfully!",
+                (!sysmlModelResource.getContents().contains(port)
+                        && !sysmlModelResource.getContents().contains(property)
+                        && !sysmlModelResource.getContents().contains(connector)
+                        && !block.getBase_Class().getOwnedPorts().contains(port)));
+
     }
 
     private void assertVariableExistsWithSameName(final Port port) {
