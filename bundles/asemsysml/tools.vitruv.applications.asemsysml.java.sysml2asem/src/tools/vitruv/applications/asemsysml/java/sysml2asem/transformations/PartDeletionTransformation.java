@@ -49,6 +49,13 @@ public class PartDeletionTransformation extends AbstractTransformationRealizatio
 
         Constant constant = ASEMSysMLHelper.getFirstCorrespondingASEMElement(
                 this.executionState.getCorrespondenceModel(), partProperty, Constant.class);
+
+        if (constant == null) {
+            logger.info("[ASEMSysML][Java] No corresponding element for part property " + partProperty.getName()
+                    + " found.");
+            return;
+        }
+
         EcoreUtil.delete(constant);
 
         this.executionState.getCorrespondenceModel()
