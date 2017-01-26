@@ -2,8 +2,13 @@ package tools.vitruv.applications.asemsysml.tests.sysml2asem.testcases;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.papyrus.sysml14.blocks.Block;
 import org.junit.Test;
 
@@ -101,6 +106,57 @@ public class BlockMappingTransformationTest extends SysML2ASEMTest {
         this.assertSysMLBlockAndASEMComponentNamesAreEqual(blockToModule);
         this.assertSysMLBlockAndASEMComponentNamesAreEqual(blockToClass);
 
+    }
+
+    /**
+     * After the deletion of a SysML block, the corresponding ASEM component must be deleted. Since
+     * the ASEM component is the root element of the ASEM model, the whole ASEM model must be
+     * deleted, too.
+     */
+    @Test
+    public void testIfMappingIsRemovedAfterBlockDeletion() {
+
+        Resource sysmlModelResource = this.getModelResource(sysmlProjectModelPath);
+
+        Block block = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockToDelete", true, Module.class,
+                this);
+        EObject rootElement = EcoreUtil.getRootContainer(block.getBase_Class());
+        org.eclipse.uml2.uml.Class baseClassBckp = block.getBase_Class();
+
+        EcoreUtil.delete(block.getBase_Class());
+        EcoreUtil.delete(block);
+        saveAndSynchronizeChanges(rootElement);
+
+        assertComponentAndASEMModelAreDeleted(baseClassBckp);
+        assertBlockCorrespondenceIsDeleted(block, baseClassBckp);
+    }
+
+    private void assertComponentAndASEMModelAreDeleted(final org.eclipse.uml2.uml.Class baseClass) {
+
+        try {
+
+            final Resource asemModelResource = this.getASEMModelResource(baseClass.getName());
+
+            assertTrue("ASEM model resource for SysML block " + baseClass.getName() + " was not deleted!",
+                    asemModelResource == null);
+
+        } catch (Exception e) {
+        }
+    }
+
+    private void assertBlockCorrespondenceIsDeleted(final Block block, final org.eclipse.uml2.uml.Class baseClass) {
+
+        final String msg = "The correspondence of block " + baseClass.getName() + " was not deleted!";
+
+        try {
+
+            final Component correspondence = ASEMSysMLHelper
+                    .getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), block, Component.class);
+            assertTrue(msg, correspondence == null);
+
+        } catch (Exception e) {
+            fail(msg);
+        }
     }
 
     private void assertSysMLBlockAndASEMComponentNamesAreEqual(final Block sysmlBlock) {

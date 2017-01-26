@@ -85,3 +85,23 @@ routine changeNameOfSysMLBlockCorrespondence(sysml::Block block) {
 		}
 	}
 }
+
+reaction BlockDeletionTransformation {
+	after list entry deleted and removed in uml::Model[packagedElement]
+	with change.oldValue instanceof org.eclipse.uml2.uml.Class && 
+		((change.oldValue as org.eclipse.uml2.uml.Class).getAppliedStereotype(ASEMSysMLConstants.QUALIFIED_BLOCK_NAME) != null)
+	
+	call {
+		val block = UMLUtil.getStereotypeApplication(change.oldValue as org.eclipse.uml2.uml.Class, Block);
+		logger.info("[ASEMSysML] Remove ASEM component which corresponds to the SysML block " + block.base_Class.name);
+		deleteBlockMapping(block);
+	}
+}
+routine deleteBlockMapping(sysml::Block block) {
+	match {
+		val asemComponent = retrieve asem::Component corresponding to block
+	}
+	action {
+		delete asemComponent
+	}
+}
