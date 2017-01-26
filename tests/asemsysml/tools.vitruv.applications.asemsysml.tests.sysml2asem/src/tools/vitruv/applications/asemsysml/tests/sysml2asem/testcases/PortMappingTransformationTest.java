@@ -195,6 +195,7 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
 
             } else if (flowDirection.equals(FlowDirection.INOUT)) {
                 // TODO [BR] INOUT ports are not mapped to ASEM models at the moment.
+                logger.info("INOUT ports are not mapped to ASEM models at the moment.");
                 continue;
             }
 
