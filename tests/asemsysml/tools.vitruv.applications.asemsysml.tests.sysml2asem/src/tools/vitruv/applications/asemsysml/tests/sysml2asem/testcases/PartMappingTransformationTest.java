@@ -27,8 +27,6 @@ import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTestHe
  */
 public class PartMappingTransformationTest extends SysML2ASEMTest {
 
-    // TODO [BR] Check if part reference will be deleted if the part of block was deleted.
-
     /**
      * Part references in SysML are mapped to an ASEM constant which references the element which
      * corresponds with the part block. Therefore a ASEM constant element has to exist in the parent
