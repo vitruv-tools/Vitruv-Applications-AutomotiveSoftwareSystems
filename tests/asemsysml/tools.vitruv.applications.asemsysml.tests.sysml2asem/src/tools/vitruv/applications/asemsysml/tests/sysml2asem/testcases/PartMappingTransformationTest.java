@@ -1,11 +1,9 @@
 package tools.vitruv.applications.asemsysml.tests.sysml2asem.testcases;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.junit.Assert.assertEquals;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.papyrus.sysml14.blocks.Block;
@@ -164,9 +162,6 @@ public class PartMappingTransformationTest extends SysML2ASEMTest {
      */
     @Test
     public void testIfPartMappingIsRemovedAfterPartDeletion() {
-
-        // TODO [BR] Remove!
-        Logger.getRootLogger().setLevel(Level.INFO);
 
         Resource sysmlResource = this.getModelResource(sysmlProjectModelPath);
         Class<? extends Component> asemComponentType = edu.kit.ipd.sdq.ASEM.classifiers.Class.class;
