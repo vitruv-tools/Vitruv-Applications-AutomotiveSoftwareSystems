@@ -19,14 +19,14 @@ execute actions in asem
 
 reaction PortTransformation {
 	
-	after value replaced for uml::Port[name]
-		with change.affectedEObject.owner instanceof Class &&
-			change.affectedEObject.owner.getAppliedStereotype(ASEMSysMLConstants.QUALIFIED_BLOCK_NAME) != null &&
-			change.oldValue == null
+	after attribute replaced at uml::Port[name]
+		with affectedEObject.owner instanceof Class &&
+			affectedEObject.owner.getAppliedStereotype(ASEMSysMLConstants.QUALIFIED_BLOCK_NAME) != null &&
+			oldValue == null
 
 	call {
-		val port = change.affectedEObject
-		logger.info("[ASEMSysML] Port with name " + change.newValue + " was created.");
+		val port = affectedEObject
+		logger.info("[ASEMSysML] Port with name " + newValue + " was created.");
 		
 		// The mapping to an ASEM class is direction specific. Therefore it will be handled in the PortDirectionTransformation.
 		mapPortToModule(port);
@@ -51,9 +51,9 @@ routine mapPortToModule(uml::Port port) {
 }
 
 reaction PortDirectionTransformation {
-	after value replaced for sysml::BindingConnector[base_Connector]
+	after element replaced at sysml::BindingConnector[base_Connector]
 	call {
-		val bindingConnector = change.affectedEObject;
+		val bindingConnector = affectedEObject;
 		for(connectorEnds: bindingConnector.base_Connector.ends) {
 			if(connectorEnds.role instanceof Port) {
 				val port = connectorEnds.role as Port;
@@ -178,14 +178,14 @@ routine mapINOUTPortToClass(uml::Port port, asem::Component correspondingCompone
 }
 
 reaction PortTypeTransformation {
-	after value replaced for uml::Port[type]
+	after element replaced at uml::Port[type]
 	call {
-		val port = change.affectedEObject;
-		val block = UMLUtil.getStereotypeApplication(change.newValue, Block);
+		val port = affectedEObject;
+		val block = UMLUtil.getStereotypeApplication(newValue, Block);
 		
 		if(block != null) {
 			transformPortType(port, block);		
-		} else if(change.newValue instanceof PrimitiveType) {
+		} else if(newValue instanceof PrimitiveType) {
 			transformPrimitivePortType(port);
 		}
 	}
@@ -218,12 +218,12 @@ routine transformPrimitivePortType(uml::Port port) {
 }
 
 reaction PortDeletionTransformation {
-	after list entry deleted and removed in uml::Class[ownedAttribute]
-	with change.oldValue instanceof Port
+	after element uml::Property deleted and removed from uml::Class[ownedAttribute]
+	with oldValue instanceof Port
 	call {
 		
-		logger.info("[ASEMSysML] Delete port reference for port " + change.oldValue.name + " ...");
-		deletePortReference(change.oldValue as Port);
+		logger.info("[ASEMSysML] Delete port reference for port " + oldValue.name + " ...");
+		deletePortReference(oldValue as Port);
 	
 	}
 }

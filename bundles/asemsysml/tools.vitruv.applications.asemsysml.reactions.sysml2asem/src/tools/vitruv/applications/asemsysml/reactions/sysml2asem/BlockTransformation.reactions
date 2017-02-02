@@ -16,12 +16,12 @@ execute actions in asem
 
 reaction SysMLBlockIsEncapsulatedChanged {
 	
-	after value replaced for sysml::Block[isEncapsulated]
-		with change.newValue == true
+	after attribute replaced at sysml::Block[isEncapsulated]
+		with newValue == true
 		
 	call {
 		// The isEncapsulated flag of a SysMLBlock was set to true. Therefore create and persist the ASEM element.
-		val block = change.affectedEObject;
+		val block = affectedEObject;
 		
 		logger.info("[ASEMSysML] A SysML block (" + block.base_Class.name + ") was created and its isEncapsulated flag is true!");
 		
@@ -65,12 +65,12 @@ reaction ChangeNameOfSysMLBlock {
 	// After changing the name, the element will be persisted.
 	// The old resource will be deleted by some magic of the VITRUV framework.
 	 
-	after value replaced for uml::Class[name]
-		with change.affectedEObject.getAppliedStereotype(ASEMSysMLConstants.QUALIFIED_BLOCK_NAME) != null &&
-			UMLUtil.getStereotypeApplication(change.affectedEObject, Block).isEncapsulated
+	after attribute replaced at uml::Class[name]
+		with affectedEObject.getAppliedStereotype(ASEMSysMLConstants.QUALIFIED_BLOCK_NAME) != null &&
+			UMLUtil.getStereotypeApplication(affectedEObject, Block).isEncapsulated
 	call {
 		logger.info("[ASEMSysML] Change name of ASEM component ...");
-		val block = UMLUtil.getStereotypeApplication(change.affectedEObject, Block);
+		val block = UMLUtil.getStereotypeApplication(affectedEObject, Block);
 		changeNameOfSysMLBlockCorrespondence(block)
 	}
 }
@@ -87,12 +87,13 @@ routine changeNameOfSysMLBlockCorrespondence(sysml::Block block) {
 }
 
 reaction BlockDeletionTransformation {
-	after list entry deleted and removed in uml::Model[packagedElement]
-	with change.oldValue instanceof org.eclipse.uml2.uml.Class && 
-		((change.oldValue as org.eclipse.uml2.uml.Class).getAppliedStereotype(ASEMSysMLConstants.QUALIFIED_BLOCK_NAME) != null)
+	after element uml::PackageableElement deleted and removed from uml::Model[packagedElement]
+//	after list entry deleted and removed in uml::Model[packagedElement]
+	with oldValue instanceof org.eclipse.uml2.uml.Class && 
+		((oldValue as org.eclipse.uml2.uml.Class).getAppliedStereotype(ASEMSysMLConstants.QUALIFIED_BLOCK_NAME) != null)
 	
 	call {
-		val block = UMLUtil.getStereotypeApplication(change.oldValue as org.eclipse.uml2.uml.Class, Block);
+		val block = UMLUtil.getStereotypeApplication(oldValue as org.eclipse.uml2.uml.Class, Block);
 		logger.info("[ASEMSysML] Remove ASEM component which corresponds to the SysML block " + block.base_Class.name);
 		deleteBlockMapping(block);
 	}

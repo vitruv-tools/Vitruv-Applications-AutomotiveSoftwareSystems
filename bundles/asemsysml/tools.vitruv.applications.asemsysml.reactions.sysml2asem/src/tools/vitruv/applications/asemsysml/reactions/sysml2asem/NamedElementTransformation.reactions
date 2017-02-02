@@ -10,9 +10,9 @@ execute actions in asem
 
 
 reaction RenameNamedElement {
-	after value replaced for uml::NamedElement[name]
-	with change.oldValue != null
-	call renameNamedElementReference(change.affectedEObject, change.newValue)
+	after attribute replaced at uml::NamedElement[name]
+	with oldValue != null
+	call renameNamedElementReference(affectedEObject, newValue)
 }
 routine renameNamedElementReference(uml::NamedElement namedElement, String newName) {
 	match {

@@ -11,11 +11,11 @@ execute actions in asem
 
 
 reaction PrimitiveTypeTransformation {
-	after list entry created and inserted in uml::Model[packagedElement]
-		with change.newValue instanceof PrimitiveType
+	after element uml::PackageableElement created and inserted in uml::Model[packagedElement]
+		with newValue instanceof PrimitiveType
 
 	call {
-		val primitiveType = change.newValue as PrimitiveType
+		val primitiveType = newValue as PrimitiveType
 		logger.info("[ASEMSysML] Primitive type " + primitiveType.name + " added.");
 		
 		// Add all ASEM primitive types to primitive types model.

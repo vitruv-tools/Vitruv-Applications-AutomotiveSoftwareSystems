@@ -14,6 +14,6 @@ reaction Debug {
 	with false
 	call {
 		logger.level = Level.DEBUG;
-		logger.debug("[ASEMSysML] [Change] " + change);
+		logger.debug("[ASEMSysML] [Change] ");
 	}
 }

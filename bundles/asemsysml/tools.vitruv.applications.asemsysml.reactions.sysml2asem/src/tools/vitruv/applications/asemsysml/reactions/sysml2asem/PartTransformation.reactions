@@ -20,14 +20,14 @@ reaction PartTransformation {
  	// 	- the containing element of the property is a block
  	// 	- the type of the property is a block
  	//	- the aggregation kind of the property must be set to composite
- 	after value replaced for uml::Property[aggregation]
- 		with change.affectedEObject.eContainer instanceof Class &&
- 		(change.affectedEObject.eContainer as Class).getAppliedStereotype(ASEMSysMLConstants.QUALIFIED_BLOCK_NAME) != null &&
- 		change.affectedEObject.type != null && change.affectedEObject.type.getAppliedStereotype(ASEMSysMLConstants.QUALIFIED_BLOCK_NAME) != null &&
- 		change.affectedEObject.aggregation != null && change.affectedEObject.aggregation.equals(AggregationKind.COMPOSITE_LITERAL)
+ 	after attribute replaced at uml::Property[aggregation]
+ 		with affectedEObject.eContainer instanceof Class &&
+ 		(affectedEObject.eContainer as Class).getAppliedStereotype(ASEMSysMLConstants.QUALIFIED_BLOCK_NAME) != null &&
+ 		affectedEObject.type != null && affectedEObject.type.getAppliedStereotype(ASEMSysMLConstants.QUALIFIED_BLOCK_NAME) != null &&
+ 		affectedEObject.aggregation != null && affectedEObject.aggregation.equals(AggregationKind.COMPOSITE_LITERAL)
  		
  	call {
- 		val partProperty = change.affectedEObject;
+ 		val partProperty = affectedEObject;
  		val blockBaseClass = partProperty.eContainer as Class;
  		logger.info("[ASEMSysML] Part " + partProperty.name + " for block " + blockBaseClass.name + " added.");
  		
@@ -71,13 +71,13 @@ reaction PartTransformation {
  }
  
  reaction PartDeletionTransformation {
- 	after list entry deleted and removed in uml::Class[ownedAttribute]
- 		with change.affectedEObject.getAppliedStereotype(ASEMSysMLConstants.QUALIFIED_BLOCK_NAME) != null &&
- 		change.oldValue.type != null && change.oldValue.type.getAppliedStereotype(ASEMSysMLConstants.QUALIFIED_BLOCK_NAME) != null &&
- 		change.oldValue.aggregation != null && change.oldValue.aggregation.equals(AggregationKind.COMPOSITE_LITERAL)
+ 	after element uml::Property deleted and removed from uml::Class[ownedAttribute]
+ 		with affectedEObject.getAppliedStereotype(ASEMSysMLConstants.QUALIFIED_BLOCK_NAME) != null &&
+ 		oldValue.type != null && oldValue.type.getAppliedStereotype(ASEMSysMLConstants.QUALIFIED_BLOCK_NAME) != null &&
+ 		oldValue.aggregation != null && oldValue.aggregation.equals(AggregationKind.COMPOSITE_LITERAL)
  	call {
  		logger.info("Delete part property reference ...");
- 		deletePartReference(change.oldValue);
+ 		deletePartReference(oldValue);
  	}
  }
  routine deletePartReference(uml::Property property) {
