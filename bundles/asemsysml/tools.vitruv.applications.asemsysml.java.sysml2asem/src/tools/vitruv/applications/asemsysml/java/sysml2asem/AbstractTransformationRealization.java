@@ -67,11 +67,11 @@ public abstract class AbstractTransformationRealization<T extends EChange> imple
 
     @Override
     public boolean doesHandleChange(final EChange change) {
-        
+
         if (!isValidChangeType(change.getClass())) {
             return false;
         }
-        
+
         @SuppressWarnings("unchecked")
         T typedChange = (T) change;
         return checkPreconditions(typedChange);
@@ -123,7 +123,7 @@ public abstract class AbstractTransformationRealization<T extends EChange> imple
 
         // The element has to be the root element of the resource. Therefore check if this is true.
         final EObject rootElement = EcoreUtil.getRootContainer(element);
-        
+
         VURI oldVURI = null;
         if (rootElement.eResource() != null) {
             oldVURI = VURI.getInstance(rootElement.eResource());
