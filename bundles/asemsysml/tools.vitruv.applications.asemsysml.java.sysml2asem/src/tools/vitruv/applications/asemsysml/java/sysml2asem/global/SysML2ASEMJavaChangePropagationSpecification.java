@@ -20,7 +20,9 @@ import tools.vitruv.applications.asemsysml.java.sysml2asem.JavaTransformationRea
 import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.BlockDeletionTransformation;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.BlockNameTransformation;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.util.Change2TransformationMap;
+import tools.vitruv.framework.change.echange.AtomicEChange;
 import tools.vitruv.framework.change.echange.EChange;
+import tools.vitruv.framework.change.echange.compound.CompoundEChange;
 import tools.vitruv.framework.change.processing.impl.AbstractEChangePropagationSpecification;
 import tools.vitruv.framework.correspondence.CorrespondenceModel;
 import tools.vitruv.framework.userinteraction.UserInteracting;
@@ -88,6 +90,13 @@ public class SysML2ASEMJavaChangePropagationSpecification extends AbstractEChang
     protected ChangePropagationResult propagateChange(EChange change, CorrespondenceModel correspondenceModel) {
 
         final ChangePropagationResult propagationResult = new ChangePropagationResult();
+
+        if (change instanceof CompoundEChange) {
+            for (AtomicEChange atomicChange : ((CompoundEChange) change).getAtomicChanges()) {
+                propagationResult.integrateResult(propagateChange(atomicChange, correspondenceModel));
+            }
+        }
+
         final Set<JavaTransformationRealization> relevantTransformations = this.getRelevantTransformations(change);
 
         ChangePropagationResult currentResult;
