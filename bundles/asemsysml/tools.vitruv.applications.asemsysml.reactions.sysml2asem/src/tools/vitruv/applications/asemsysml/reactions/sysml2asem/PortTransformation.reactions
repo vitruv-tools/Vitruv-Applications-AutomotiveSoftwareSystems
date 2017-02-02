@@ -21,7 +21,8 @@ reaction PortTransformation {
 	
 	after value replaced for uml::Port[name]
 		with change.affectedEObject.owner instanceof Class &&
-			change.affectedEObject.owner.getAppliedStereotype(ASEMSysMLConstants.QUALIFIED_BLOCK_NAME) != null
+			change.affectedEObject.owner.getAppliedStereotype(ASEMSysMLConstants.QUALIFIED_BLOCK_NAME) != null &&
+			change.oldValue == null
 
 	call {
 		val port = change.affectedEObject

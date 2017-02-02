@@ -105,7 +105,8 @@ public class PortTransformation
     }
 
     private boolean isPortNameSet(ReplaceSingleValuedEAttribute<EObject, Object> change) {
-        return (change.getAffectedFeature() == UMLPackage.Literals.NAMED_ELEMENT__NAME && change.getNewValue() != null);
+        return (change.getAffectedFeature() == UMLPackage.Literals.NAMED_ELEMENT__NAME && change.getNewValue() != null
+                && change.getOldValue() == null);
     }
 
     private void createASEMMessageAndSetName(final Port port, final Module correspondingASEMModule,
