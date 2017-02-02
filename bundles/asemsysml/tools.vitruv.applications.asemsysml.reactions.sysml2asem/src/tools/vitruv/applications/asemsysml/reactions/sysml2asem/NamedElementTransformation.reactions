@@ -1,0 +1,33 @@
+import edu.kit.ipd.sdq.ASEM.classifiers.Component
+
+import "edu.kit.ipd.sdq.asem" as asem
+import "http://www.eclipse.org/papyrus/sysml/1.4/SysML" as sysml
+import "http://www.eclipse.org/uml2/5.0.0/UML" as uml
+
+reactions: sysml2asemNamedElement
+in reaction to changes in uml
+execute actions in asem
+
+
+reaction RenameNamedElement {
+	after value replaced for uml::NamedElement[name]
+	with change.oldValue != null
+	call renameNamedElementReference(change.affectedEObject, change.newValue)
+}
+routine renameNamedElementReference(uml::NamedElement namedElement, String newName) {
+	match {
+		val correspondingElement = retrieve asem::Named corresponding to namedElement
+		// Component renaming must be handled specifically because their names are used as the
+        // name of the ASEM models and therefore the models must be persisted with the new name.
+        // See BlockTransformation reaction which handles this kind of transformation.
+		check !(correspondingElement instanceof Component)
+	}
+	action {
+		call {
+			logger.info("[ASEMSysML] Rename corresponding element of NamedElement " + namedElement.name + " ...");
+		}
+		update correspondingElement {
+			correspondingElement.name = newName;
+		}
+	}
+}
