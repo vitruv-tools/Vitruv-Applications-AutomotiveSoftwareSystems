@@ -3,6 +3,7 @@ package tools.vitruv.applications.asemsysml.java.sysml2asem.transformations;
 import java.util.Collections;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.papyrus.sysml14.blocks.Block;
@@ -33,6 +34,8 @@ import tools.vitruv.framework.userinteraction.UserInteracting;
 public class BlockNameTransformation
         extends AbstractTransformationRealization<ReplaceSingleValuedEAttribute<EObject, Object>> {
 
+    private static Logger logger = Logger.getLogger(BlockNameTransformation.class);
+
     public BlockNameTransformation(UserInteracting userInteracting) {
         super(userInteracting);
     }
@@ -47,6 +50,9 @@ public class BlockNameTransformation
 
         org.eclipse.uml2.uml.Class baseClass = (org.eclipse.uml2.uml.Class) change.getAffectedEObject();
         Block block = UMLUtil.getStereotypeApplication(baseClass, Block.class);
+
+        logger.info(
+                "[ASEMSysML][Java] Transform a block name change of block " + block.getBase_Class().getName() + " ...");
 
         changeNameOfCorrespondingASEMElement(block, (String) change.getNewValue());
 
