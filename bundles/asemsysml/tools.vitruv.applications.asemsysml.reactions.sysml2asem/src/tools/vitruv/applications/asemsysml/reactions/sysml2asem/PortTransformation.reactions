@@ -7,6 +7,8 @@ import org.eclipse.uml2.uml.util.UMLUtil
 import tools.vitruv.applications.asemsysml.ASEMSysMLConstants
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper
 import tools.vitruv.applications.asemsysml.ASEMSysMLPrimitiveTypeHelper
+import tools.vitruv.applications.asemsysml.ASEMSysMLUserInteractionHelper.ASEMParameterMode
+import tools.vitruv.applications.asemsysml.ASEMSysMLUserInteractionHelper
 
 import "edu.kit.ipd.sdq.asem" as asem
 import "http://www.eclipse.org/papyrus/sysml/1.4/SysML" as sysml
@@ -120,20 +122,57 @@ routine mapINPortToClass(uml::Port port, asem::Component correspondingComponent)
 			asemParameter.type = ASEMSysMLHelper.getClassifierForASEMVariable(port.type, this.correspondenceModel);
 		}
 		
-		val asemMethod = create asem::Method and initialize {
-			val methodName = userInteracting.getTextInput(ASEMSysMLConstants.MSG_INSERT_METHOD_NAME);
-			asemMethod.name = methodName;
+		call {
+			val asemProjectModelPath = ASEMSysMLHelper.getASEMProjectModelPath(correspondingComponent.name);
+			val asemResource = ASEMSysMLHelper.getModelResource(this.correspondenceModel, port, asemProjectModelPath);
+			var mode = ASEMParameterMode.CREATE_NEW;
+			
+			if(ASEMSysMLHelper.areMethodsAvailable(asemResource)) {
+				mode = ASEMSysMLUserInteractionHelper.selectASEMParameterMode(this.userInteracting);
+			}
+			
+			switch (mode) {
+				case CREATE_NEW: {
+					createNewMethod(port, asemParameter, correspondingComponent);
+				}
+				case USE_EXISTING: {
+					var method = ASEMSysMLUserInteractionHelper.selectASEMMethod(this.userInteracting, asemResource);
+					addParameter(port, method, asemParameter, correspondingComponent);
+				}
+		    }
+			
+		}		
+	}	
+}
+routine addParameter(uml::Port port, asem::Method asemMethod, asem::Parameter asemParameter, asem::Component correspondingComponent) {
+	action {
+		update asemMethod {
 			asemMethod.parameters.add(asemParameter);
 		}
-
+		
 		// [Requirement 2.d)]
 		add correspondence between port and asemParameter
 		
 		update correspondingComponent {
 			correspondingComponent.methods.add(asemMethod);
 		}
+	}
+}
+routine createNewMethod(uml::Port port, asem::Parameter asemParameter, asem::Component correspondingComponent) {
+	action {
+		val asemMethod = create asem::Method and initialize {
+			val methodName = userInteracting.getTextInput(ASEMSysMLConstants.MSG_INSERT_METHOD_NAME);
+			asemMethod.name = methodName;
+			asemMethod.parameters.add(asemParameter);
+		}
 		
-	}	
+		// [Requirement 2.d)]
+		add correspondence between port and asemParameter
+		
+		update correspondingComponent {
+			correspondingComponent.methods.add(asemMethod);
+		}
+	}
 }
 routine mapOUTPortToClass(uml::Port port, asem::Component correspondingComponent) { 
 	match {

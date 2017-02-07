@@ -51,4 +51,6 @@ public final class ASEMSysMLConstants {
     public static final String MSG_WARN_MODULE_AS_SUBCOMPONENT = "The corresponding ASEM component of the part of the SysML block is a ASEM Module.\n"
             + "An ASEM module cannot be used as a subcomponent in other ASEM components.\n"
             + "Therefore this part reference will NOT be transformed to the ASEM model!";
+    public static final String MSG_SELECT_PARAMTER_MODE = "Please select which mode shall be used to add the ASEM parameter to the ASEM model.";
+    public static final String MSG_SELECT_METHOD = "Please select a method the parameter shall be added to.";
 }

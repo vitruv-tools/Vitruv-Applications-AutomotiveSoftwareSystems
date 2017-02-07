@@ -3,6 +3,7 @@ package tools.vitruv.applications.asemsysml.java.sysml2asem.transformations;
 import org.apache.log4j.Logger;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.papyrus.sysml14.blocks.BindingConnector;
 import org.eclipse.papyrus.sysml14.blocks.Block;
 import org.eclipse.papyrus.sysml14.blocks.BlocksPackage;
@@ -22,6 +23,8 @@ import edu.kit.ipd.sdq.ASEM.dataexchange.Parameter;
 import edu.kit.ipd.sdq.ASEM.dataexchange.ReturnType;
 import tools.vitruv.applications.asemsysml.ASEMSysMLConstants;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
+import tools.vitruv.applications.asemsysml.ASEMSysMLUserInteractionHelper;
+import tools.vitruv.applications.asemsysml.ASEMSysMLUserInteractionHelper.ASEMParameterMode;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.AbstractTransformationRealization;
 import tools.vitruv.domains.asem.AsemNamespace;
 import tools.vitruv.framework.change.echange.EChange;
@@ -176,19 +179,25 @@ public class PortDirectionTransformation
     private void createASEMMethodAndSetName(final Port port,
             final edu.kit.ipd.sdq.ASEM.classifiers.Class correspondingASEMClass, final String asemProjectModelPath) {
 
-        String methodName = this.userInteracting.getTextInput(ASEMSysMLConstants.MSG_INSERT_METHOD_NAME);
+        Method method;
+        ASEMParameterMode mode = ASEMParameterMode.CREATE_NEW;
+        Resource asemResource = ASEMSysMLHelper.getModelResource(this.executionState.getCorrespondenceModel(), port,
+                asemProjectModelPath);
 
-        if (methodName.isEmpty()) {
-            methodName = "SampleMethodName";
+        if (ASEMSysMLHelper.areMethodsAvailable(asemResource)) {
+
+            mode = ASEMSysMLUserInteractionHelper.selectASEMParameterMode(this.userInteracting);
+
         }
+
+        logger.info("[ASEMSysML][Java] Selected ASEM parameter mode: " + mode);
+
+        method = this.getMethodDependingOnParamterMode(mode, port, asemProjectModelPath);
 
         FlowProperty flowProp = ASEMSysMLHelper.getFlowProperty(port);
         FlowDirection direction = flowProp != null ? flowProp.getDirection() : null;
         Classifier type = ASEMSysMLHelper.getClassifierForASEMVariable(port.getType(),
                 this.executionState.getCorrespondenceModel());
-
-        Method method = DataexchangeFactory.eINSTANCE.createMethod();
-        method.setName(methodName);
 
         switch (direction) {
         case IN:
@@ -225,4 +234,43 @@ public class PortDirectionTransformation
         }
 
     }
+
+    private Method getMethodDependingOnParamterMode(final ASEMParameterMode mode, final Port port,
+            final String asemProjectModelPath) {
+        switch (mode) {
+
+        case CREATE_NEW:
+            return this.createNewMethod();
+
+        case USE_EXISTING:
+            return this.selectMethod(port, asemProjectModelPath);
+
+        default:
+            return null;
+        }
+    }
+
+    private Method selectMethod(final EObject alreadyPersistedObject, final String asemProjectModelPath) {
+
+        Resource asemResource = ASEMSysMLHelper.getModelResource(this.executionState.getCorrespondenceModel(),
+                alreadyPersistedObject, asemProjectModelPath);
+        Method selectedMethod = ASEMSysMLUserInteractionHelper.selectASEMMethod(this.userInteracting, asemResource);
+
+        return selectedMethod;
+    }
+
+    private Method createNewMethod() {
+
+        String methodName = this.userInteracting.getTextInput(ASEMSysMLConstants.MSG_INSERT_METHOD_NAME);
+
+        if (methodName.isEmpty()) {
+            methodName = "SampleMethodName";
+        }
+
+        Method method = DataexchangeFactory.eINSTANCE.createMethod();
+        method.setName(methodName);
+
+        return method;
+    }
+
 }

@@ -2,12 +2,12 @@ package tools.vitruv.applications.asemsysml.java.sysml2asem;
 
 import java.util.Collections;
 
-import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 import edu.kit.ipd.sdq.ASEM.base.Named;
 import tools.vitruv.applications.asemsysml.ASEMSysMLConstants;
+import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.util.TransformationExecutionState;
 import tools.vitruv.framework.change.echange.EChange;
 import tools.vitruv.framework.correspondence.CorrespondenceModel;
@@ -129,12 +129,7 @@ public abstract class AbstractTransformationRealization<T extends EChange> imple
             oldVURI = VURI.getInstance(rootElement.eResource());
         }
 
-        String existingElementURI = VURI.getInstance(alreadyPersistedObject.eResource()).getEMFUri()
-                .toPlatformString(false);
-        String uriPrefix = existingElementURI.substring(0,
-                existingElementURI.lastIndexOf(ASEMSysMLConstants.MODEL_DIR_NAME + "/"));
-        String asemURIString = uriPrefix + asemProjectModelPath;
-        VURI asemElementVURI = VURI.getInstance(URI.createPlatformResourceURI(asemURIString, true));
+        VURI asemElementVURI = ASEMSysMLHelper.getModelVURI(alreadyPersistedObject, asemProjectModelPath);
 
         EcoreUtil.remove(rootElement);
         executionState.getTransformationResult().addRootEObjectToSave(rootElement, asemElementVURI);

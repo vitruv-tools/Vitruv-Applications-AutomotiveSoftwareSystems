@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import org.apache.log4j.Logger;
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -24,6 +25,7 @@ import org.eclipse.uml2.uml.Type;
 import org.eclipse.uml2.uml.util.UMLUtil;
 import org.junit.Test;
 
+import edu.kit.ipd.sdq.ASEM.base.Named;
 import edu.kit.ipd.sdq.ASEM.base.TypedElement;
 import edu.kit.ipd.sdq.ASEM.classifiers.Classifier;
 import edu.kit.ipd.sdq.ASEM.classifiers.Component;
@@ -36,6 +38,8 @@ import edu.kit.ipd.sdq.ASEM.dataexchange.Variable;
 import tools.vitruv.applications.asemsysml.ASEMSysMLConstants;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.ASEMSysMLPrimitiveTypeHelper;
+import tools.vitruv.applications.asemsysml.ASEMSysMLUserInteractionHelper;
+import tools.vitruv.applications.asemsysml.ASEMSysMLUserInteractionHelper.ASEMParameterMode;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.SysML2ASEMTest;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTestHelper;
 import tools.vitruv.framework.correspondence.CorrespondenceModel;
@@ -72,6 +76,95 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
 
         this.assertPortDeletionForASEMModule();
         this.assertPortDeletionForASEMClass();
+    }
+
+    /**
+     * If a SysML port has direction 'in' the port will be mapped to an ASEM method parameter.
+     * Therefore a user interaction dialog must be appear. In this dialog the user can decide
+     * whether to create a new method (and enter a method name) or to add the parameter to an
+     * existing method (and select this method from the list of available methods). This test case
+     * checks, whether the adding to a existing method will be handled correctly.
+     */
+    @Test
+    public void testIfASEMMethodArgumentWasAddedToExistingMethod() {
+
+        Resource sysmlModelResource = this.getModelResource(sysmlProjectModelPath);
+        final Class<? extends Component> asemComponentType = edu.kit.ipd.sdq.ASEM.classifiers.Class.class;
+        final PrimitiveType pInteger = ASEMSysMLPrimitiveTypeHelper.PRIMITIVE_TYPE_INTEGER;
+        final String methodName = "MethodWithSecondParameter";
+
+        // Add a block will be contain all the ports.
+        Block blockA = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockA", true, asemComponentType,
+                this);
+
+        // Add a port PortX to the block, to test if the correct method is selected by the user
+        // interacting.
+        final int parameterModeSelection = this.getNextUserInteractorSelection(ASEMParameterMode.CREATE_NEW);
+        this.testUserInteractor.addNextSelections(parameterModeSelection);
+        this.testUserInteractor.addNextSelections("MethodWithoutSecondParameter");
+        ASEMSysMLTestHelper.addPortToBlockAndSync(blockA, "PortX", FlowDirection.IN, pInteger, this);
+
+        // Add a port PortA which will be mapped to an ASEM parameter in a new ASEM method.
+        final int parameterModeSelectionA = this.getNextUserInteractorSelection(ASEMParameterMode.CREATE_NEW);
+        this.testUserInteractor.addNextSelections(parameterModeSelectionA);
+        this.testUserInteractor.addNextSelections(methodName);
+        final Port portA = ASEMSysMLTestHelper.addPortToBlockAndSync(blockA, "PortA", FlowDirection.IN, pInteger, this);
+
+        // Add a port PortB which will be mapped to an ASEM parameter of the ASEM method of PortA.
+        final int parameterModeSelectionB = this.getNextUserInteractorSelection(ASEMParameterMode.USE_EXISTING);
+        final int methodSelection = this.getNextUserInteractorSelection(this.getMethodOfPortCorrespondence(portA));
+        this.testUserInteractor.addNextSelections(parameterModeSelectionB, methodSelection);
+        final Port portB = ASEMSysMLTestHelper.addPortToBlockAndSync(blockA, "PortB", FlowDirection.IN, pInteger, this);
+
+        // Check transformation results.
+        this.assertMethodsWereAddedCorrectly(blockA, portA, methodName, 2);
+        this.assertParameterWasAddedCorrectly(portA, portB);
+
+    }
+
+    private void assertMethodsWereAddedCorrectly(final Block block, final Port port, final String methodName,
+            final int numberOfMethods) {
+
+        Component correspondingComponent = ASEMSysMLHelper
+                .getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), block, Component.class);
+
+        assertTrue("Invalid corresponding element for SysML block " + block.getBase_Class().getName() + ".",
+                correspondingComponent != null
+                        && correspondingComponent instanceof edu.kit.ipd.sdq.ASEM.classifiers.Class);
+
+        EList<Method> methods = correspondingComponent.getMethods();
+        Method method = this.getMethodOfPortCorrespondence(port);
+
+        assertEquals("Invalid number of methods in ASEM component " + correspondingComponent.getName(), numberOfMethods,
+                methods.size());
+
+        assertTrue("Invalid method.", method != null);
+        assertTrue("Method is not contained in method list of " + correspondingComponent.getName(),
+                methods.contains(method));
+        assertEquals("Invalid method name in ASEM component " + correspondingComponent.getName(), methodName,
+                method.getName());
+
+    }
+
+    private void assertParameterWasAddedCorrectly(final Port portA, final Port portB) {
+
+        Method methodWithParameter = this.getMethodOfPortCorrespondence(portA);
+
+        Named portACorrespondence = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(),
+                portA, Named.class);
+        Named portBCorrespondence = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(),
+                portB, Named.class);
+
+        assertTrue("Invalid port correspondences!", portACorrespondence != null && portBCorrespondence != null);
+
+        assertTrue(
+                "Corresponding ASEM parameter for port " + portA.getName() + " was not added to method "
+                        + methodWithParameter.getName(),
+                methodWithParameter.getParameters().contains(portACorrespondence));
+        assertTrue(
+                "Corresponding ASEM parameter for port " + portB.getName() + " was not added to method "
+                        + methodWithParameter.getName(),
+                methodWithParameter.getParameters().contains(portBCorrespondence));
     }
 
     private void assertPortDeletionForASEMModule() {
@@ -451,5 +544,35 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
 
         assertEquals("The ASEM variable which corresponds to the given SysML port has the wrong type.", componentType,
                 variableType);
+    }
+
+    private Method getMethodOfPortCorrespondence(final Port port) {
+
+        Named portCorrespondence = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), port,
+                Named.class);
+
+        assertTrue("Invalid port correspondence! Parent element of port correspondence is not a method.",
+                portCorrespondence.eContainer() instanceof Method);
+
+        return (Method) portCorrespondence.eContainer();
+    }
+
+    private int getNextUserInteractorSelection(final ASEMParameterMode mode) {
+
+        return mode.ordinal();
+    }
+
+    private int getNextUserInteractorSelection(final Method method) {
+
+        if (!(EcoreUtil.getRootContainer(method) instanceof Component)) {
+            throw new IllegalArgumentException("Invalid root element of ASEM method " + method.getName());
+        }
+
+        final Component rootComponent = (Component) EcoreUtil.getRootContainer(method);
+        final String asemProjectModelPath = ASEMSysMLHelper.getASEMProjectModelPath(rootComponent.getName());
+        final Resource asemResource = this.getModelResource(asemProjectModelPath);
+
+        return ASEMSysMLUserInteractionHelper.getNextUserInteractorSelectionForASEMMethodSelection(method,
+                asemResource);
     }
 }

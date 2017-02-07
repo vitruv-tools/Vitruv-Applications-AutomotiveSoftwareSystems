@@ -1,11 +1,16 @@
 package tools.vitruv.applications.asemsysml;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.papyrus.sysml14.blocks.Block;
 import org.eclipse.papyrus.sysml14.portsandflows.FlowProperty;
 import org.eclipse.uml2.uml.Connector;
@@ -18,9 +23,11 @@ import org.eclipse.uml2.uml.util.UMLUtil;
 
 import edu.kit.ipd.sdq.ASEM.classifiers.Classifier;
 import edu.kit.ipd.sdq.ASEM.classifiers.Component;
+import edu.kit.ipd.sdq.ASEM.dataexchange.Method;
 import tools.vitruv.domains.asem.AsemNamespace;
 import tools.vitruv.framework.correspondence.Correspondence;
 import tools.vitruv.framework.correspondence.CorrespondenceModel;
+import tools.vitruv.framework.util.datatypes.VURI;
 
 /**
  * Global helper class which can be used in the reflections and in the test cases.
@@ -70,6 +77,52 @@ public class ASEMSysMLHelper {
 
         return projectModelPath;
 
+    }
+
+    /**
+     * Get the VURI of a model with the given project model path.
+     * 
+     * @param alreadyPersistedObject
+     *            An object that already exists. This is needed to get the correct URI (test project
+     *            name, etc.).
+     * @param projectModelPath
+     *            The project model path which starts with
+     *            {@link ASEMSysMLConstants#MODEL_DIR_NAME}.
+     * @return The VURI of the model.
+     */
+    public static VURI getModelVURI(final EObject alreadyPersistedObject, final String projectModelPath) {
+
+        String existingElementURI = VURI.getInstance(alreadyPersistedObject.eResource()).getEMFUri()
+                .toPlatformString(false);
+        String uriPrefix = existingElementURI.substring(0,
+                existingElementURI.lastIndexOf(ASEMSysMLConstants.MODEL_DIR_NAME + "/"));
+        String uriString = uriPrefix + projectModelPath;
+        VURI modelVURI = VURI.getInstance(URI.createPlatformResourceURI(uriString, true));
+
+        return modelVURI;
+    }
+
+    /**
+     * Get the model resource of the given project model path. The resource must be contained in the
+     * same resource set as the correspondence model!
+     * 
+     * @param correspondenceModel
+     *            The correspondence model to get the resource set.
+     * @param alreadyPersistedObject
+     *            An object that already exists. This is needed to get the correct URI (test project
+     *            name, etc.).
+     * @param projectModelPath
+     *            The project model path which starts with
+     *            {@link ASEMSysMLConstants#MODEL_DIR_NAME}.
+     * @return The model resource.
+     */
+    public static Resource getModelResource(final CorrespondenceModel correspondenceModel,
+            final EObject alreadyPersistedObject, final String projectModelPath) {
+
+        ResourceSet rs = correspondenceModel.getResource().getResourceSet();
+        VURI modelVURI = ASEMSysMLHelper.getModelVURI(alreadyPersistedObject, projectModelPath);
+
+        return rs.getResource(modelVURI.getEMFUri(), false);
     }
 
     /**
@@ -243,4 +296,36 @@ public class ASEMSysMLHelper {
         return (Connector) container;
     }
 
+    /**
+     * Get all available ASEM methods in the given ASEM model resource.
+     * 
+     * @param asemResource
+     *            The ASEM model resource.
+     * @return All available ASEM methods in this model resource.
+     */
+    public static List<Method> getAllASEMMethods(final Resource asemResource) {
+
+        List<Method> methods = new ArrayList<Method>();
+
+        for (EObject object : asemResource.getContents()) {
+            if (object instanceof Component) {
+                Component component = (Component) object;
+                methods.addAll(component.getMethods());
+            }
+        }
+
+        return methods;
+    }
+
+    /**
+     * Returns whether the given ASEM resource contains at least one ASEM method or not.
+     * 
+     * @param asemResource
+     *            The ASEM model resource.
+     * @return <code>True</code> if the ASEM model resource contains at least one ASEM method
+     *         element, otherwise <code>false</code>.
+     */
+    public static boolean areMethodsAvailable(final Resource asemResource) {
+        return !(getAllASEMMethods(asemResource).isEmpty());
+    }
 }
