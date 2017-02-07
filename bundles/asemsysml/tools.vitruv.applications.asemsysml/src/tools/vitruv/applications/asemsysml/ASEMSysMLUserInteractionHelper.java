@@ -22,6 +22,14 @@ import tools.vitruv.framework.userinteraction.UserInteractionType;
 
 public final class ASEMSysMLUserInteractionHelper {
 
+    public static final String MSG_SELECT_COMPONENT_TYPE = "Please select an ASEM component type the SysML block should mapped to.";
+    public static final String MSG_INSERT_METHOD_NAME = "Please insert a method name which can be used for mapping a SysML port to an ASEM method.";
+    public static final String MSG_WARN_MODULE_AS_SUBCOMPONENT = "The corresponding ASEM component of the part of the SysML block is a ASEM Module.\n"
+            + "An ASEM module cannot be used as a subcomponent in other ASEM components.\n"
+            + "Therefore this part reference will NOT be transformed to the ASEM model!";
+    public static final String MSG_SELECT_PARAMTER_MODE = "Please select which mode shall be used to add the ASEM parameter to the ASEM model.";
+    public static final String MSG_SELECT_METHOD = "Please select a method the parameter shall be added to.";
+
     /**
      * Available modes for adding an ASEM parameter to an ASEM method.
      * 
@@ -117,7 +125,7 @@ public final class ASEMSysMLUserInteractionHelper {
         }
 
         int selectedComponentType = userInteracting.selectFromMessage(UserInteractionType.MODAL,
-                ASEMSysMLConstants.MSG_SELECT_COMPONENT_TYPE,
+                ASEMSysMLUserInteractionHelper.MSG_SELECT_COMPONENT_TYPE,
                 asemComponentNames.toArray(new String[asemComponentNames.size()]));
         Class<? extends Component> selectedComponentTypeClass = asemComponentTypes.get(selectedComponentType);
 
@@ -144,7 +152,8 @@ public final class ASEMSysMLUserInteractionHelper {
         }
 
         int selectedModeType = userInteracting.selectFromMessage(UserInteractionType.MODAL,
-                ASEMSysMLConstants.MSG_SELECT_PARAMTER_MODE, modeNames.toArray(new String[modeNames.size()]));
+                ASEMSysMLUserInteractionHelper.MSG_SELECT_PARAMTER_MODE,
+                modeNames.toArray(new String[modeNames.size()]));
 
         mode = modeTypes[selectedModeType];
 
@@ -172,7 +181,7 @@ public final class ASEMSysMLUserInteractionHelper {
         }
 
         int selectedMethodSignature = userInteracting.selectFromMessage(UserInteractionType.MODAL,
-                ASEMSysMLConstants.MSG_SELECT_METHOD, methodNames.toArray(new String[methodNames.size()]));
+                ASEMSysMLUserInteractionHelper.MSG_SELECT_METHOD, methodNames.toArray(new String[methodNames.size()]));
 
         selectedMethod = (Method) methods.toArray()[selectedMethodSignature];
 

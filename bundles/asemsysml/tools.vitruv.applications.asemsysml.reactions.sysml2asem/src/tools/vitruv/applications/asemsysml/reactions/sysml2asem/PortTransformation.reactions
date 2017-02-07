@@ -161,7 +161,7 @@ routine addParameter(uml::Port port, asem::Method asemMethod, asem::Parameter as
 routine createNewMethod(uml::Port port, asem::Parameter asemParameter, asem::Component correspondingComponent) {
 	action {
 		val asemMethod = create asem::Method and initialize {
-			val methodName = userInteracting.getTextInput(ASEMSysMLConstants.MSG_INSERT_METHOD_NAME);
+			val methodName = userInteracting.getTextInput(ASEMSysMLUserInteractionHelper.MSG_INSERT_METHOD_NAME);
 			asemMethod.name = methodName;
 			asemMethod.parameters.add(asemParameter);
 		}

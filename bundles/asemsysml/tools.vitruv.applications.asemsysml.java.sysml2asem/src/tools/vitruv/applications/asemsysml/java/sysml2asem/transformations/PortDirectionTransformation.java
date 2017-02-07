@@ -21,7 +21,6 @@ import edu.kit.ipd.sdq.ASEM.dataexchange.Message;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Method;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Parameter;
 import edu.kit.ipd.sdq.ASEM.dataexchange.ReturnType;
-import tools.vitruv.applications.asemsysml.ASEMSysMLConstants;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.ASEMSysMLUserInteractionHelper;
 import tools.vitruv.applications.asemsysml.ASEMSysMLUserInteractionHelper.ASEMParameterMode;
@@ -261,7 +260,7 @@ public class PortDirectionTransformation
 
     private Method createNewMethod() {
 
-        String methodName = this.userInteracting.getTextInput(ASEMSysMLConstants.MSG_INSERT_METHOD_NAME);
+        String methodName = this.userInteracting.getTextInput(ASEMSysMLUserInteractionHelper.MSG_INSERT_METHOD_NAME);
 
         if (methodName.isEmpty()) {
             methodName = "SampleMethodName";

@@ -5,6 +5,7 @@ import org.eclipse.uml2.uml.Class
 import org.eclipse.uml2.uml.util.UMLUtil
 import tools.vitruv.applications.asemsysml.ASEMSysMLConstants
 import tools.vitruv.framework.userinteraction.UserInteractionType
+import tools.vitruv.applications.asemsysml.ASEMSysMLUserInteractionHelper
 
 import "edu.kit.ipd.sdq.asem" as asem
 import "http://www.eclipse.org/papyrus/sysml/1.4/SysML" as sysml
@@ -65,7 +66,7 @@ reaction PartTransformation {
  	action {
  		call {
  			logger.warn("ASEM modules cannot be used as subcomponents in other components. Therefore this part reference will NOT be mapped to the ASEM model.");
- 			userInteracting.showMessage(UserInteractionType.MODAL, ASEMSysMLConstants.MSG_WARN_MODULE_AS_SUBCOMPONENT);
+ 			userInteracting.showMessage(UserInteractionType.MODAL, ASEMSysMLUserInteractionHelper.MSG_WARN_MODULE_AS_SUBCOMPONENT);
  		}
  	}
  }

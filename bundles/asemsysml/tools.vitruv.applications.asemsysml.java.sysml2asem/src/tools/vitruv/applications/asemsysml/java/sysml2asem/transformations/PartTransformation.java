@@ -13,6 +13,7 @@ import edu.kit.ipd.sdq.ASEM.dataexchange.Constant;
 import edu.kit.ipd.sdq.ASEM.dataexchange.DataexchangeFactory;
 import tools.vitruv.applications.asemsysml.ASEMSysMLConstants;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
+import tools.vitruv.applications.asemsysml.ASEMSysMLUserInteractionHelper;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.AbstractTransformationRealization;
 import tools.vitruv.domains.asem.AsemNamespace;
 import tools.vitruv.framework.change.echange.EChange;
@@ -106,7 +107,8 @@ public class PartTransformation
 
         // ASEM modules cannot be used as subcomponents in ASEM components.
         if (correspondingASEMPartComponent instanceof Module) {
-            userInteracting.showMessage(UserInteractionType.MODAL, ASEMSysMLConstants.MSG_WARN_MODULE_AS_SUBCOMPONENT);
+            userInteracting.showMessage(UserInteractionType.MODAL,
+                    ASEMSysMLUserInteractionHelper.MSG_WARN_MODULE_AS_SUBCOMPONENT);
             return;
         }
 
