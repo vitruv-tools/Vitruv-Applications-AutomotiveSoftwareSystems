@@ -77,7 +77,7 @@ public class BlockTransformation
         Block block = (Block) change.getAffectedEObject();
 
         Class<?> asemComponentType = ASEMSysMLUserInteractionHelper
-                .simulateUserInteractionForASEMComponentType(this.userInteracting);
+                .selectASEMComponentType(this.userInteracting);
 
         Component asemComponent;
 

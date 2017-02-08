@@ -26,7 +26,7 @@ reaction SysMLBlockIsEncapsulatedChanged {
 		logger.info("[ASEMSysML] A SysML block (" + block.base_Class.name + ") was created and its isEncapsulated flag is true!");
 		
 		// Let user select the ASEM component to map the SysML block to.	
-		val Class<?> selectedComponentTypeClass = ASEMSysMLUserInteractionHelper.simulateUserInteractionForASEMComponentType(userInteracting);
+		val Class<?> selectedComponentTypeClass = ASEMSysMLUserInteractionHelper.selectASEMComponentType(userInteracting);
 		
 		if (Module.isAssignableFrom(selectedComponentTypeClass)) {
 			createASEMModelWithModuleAsRootElement(block);

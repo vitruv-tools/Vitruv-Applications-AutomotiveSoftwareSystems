@@ -137,7 +137,7 @@ public abstract class ASEMSysMLTest extends VitruviusChangePropagationTest {
     public void setNextUserInteractorSelection(final Class<? extends Component> asemComponentType) {
 
         final int componentSelectionClass = ASEMSysMLUserInteractionHelper
-                .getNextUserInteractorSelectionForASEMComponent(asemComponentType);
+                .getNextUserInteractionSelectionForASEMComponent(asemComponentType);
 
         this.testUserInteractor.addNextSelections(componentSelectionClass);
     }

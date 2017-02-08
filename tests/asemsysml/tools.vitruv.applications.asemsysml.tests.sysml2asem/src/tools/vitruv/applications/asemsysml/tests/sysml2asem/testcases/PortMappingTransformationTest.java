@@ -678,10 +678,10 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
 
         if (directionOfPortToAdd.equals(FlowDirection.OUT)) {
             return ASEMSysMLUserInteractionHelper
-                    .getNextUserInteractorSelectionForASEMMethodSelectionForReturnTypes(method, asemResource);
+                    .getNextUserInteractionSelectionForASEMMethodSelectionForReturnTypes(method, asemResource);
         } else {
             return ASEMSysMLUserInteractionHelper
-                    .getNextUserInteractorSelectionForASEMMethodSelectionForParameter(method, asemResource);
+                    .getNextUserInteractionSelectionForASEMMethodSelectionForParameter(method, asemResource);
         }
 
     }

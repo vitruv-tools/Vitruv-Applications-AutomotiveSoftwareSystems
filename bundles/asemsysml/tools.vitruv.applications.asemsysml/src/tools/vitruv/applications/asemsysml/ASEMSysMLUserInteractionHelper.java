@@ -62,7 +62,7 @@ public final class ASEMSysMLUserInteractionHelper {
      * @return The magic number for the {@link TestUserInteractor}
      * @see TestUserInteractor#addNextSelections(Integer...)
      */
-    public static int getNextUserInteractorSelectionForASEMComponent(
+    public static int getNextUserInteractionSelectionForASEMComponent(
             final java.lang.Class<? extends Component> expectedComponentType) {
         // FIXME [BR] Remove magic numbers!
         // The order must be the same as in the transformation!
@@ -83,7 +83,7 @@ public final class ASEMSysMLUserInteractionHelper {
      * <b>Important:</b> This method must be used if <i>all methods</i> were allowed to select (with
      * and without return types). If only methods <i>without</i> return types were shown in the user
      * interaction dialog, the
-     * {@link #getNextUserInteractorSelectionForASEMMethodSelectionForReturnTypes(Method, Resource)}
+     * {@link #getNextUserInteractionSelectionForASEMMethodSelectionForReturnTypes(Method, Resource)}
      * method must be used instead.
      * 
      * @param method
@@ -94,7 +94,7 @@ public final class ASEMSysMLUserInteractionHelper {
      * 
      * @see #selectASEMMethodForParameter(UserInteracting, Resource)
      */
-    public static int getNextUserInteractorSelectionForASEMMethodSelectionForParameter(final Method method,
+    public static int getNextUserInteractionSelectionForASEMMethodSelectionForParameter(final Method method,
             final Resource asemResource) {
 
         List<Method> methods = ASEMSysMLHelper.getAllASEMMethods(asemResource);
@@ -119,7 +119,7 @@ public final class ASEMSysMLUserInteractionHelper {
      * <b>Important:</b> This method must be used if <i>only methods without return types</i> were
      * allowed to select. If all methods (with and without return types) were shown in the user
      * interaction dialog, the
-     * {@link #getNextUserInteractorSelectionForASEMMethodSelectionForParameter(Method, Resource)}
+     * {@link #getNextUserInteractionSelectionForASEMMethodSelectionForParameter(Method, Resource)}
      * method must be used instead.
      * 
      * @param method
@@ -130,7 +130,7 @@ public final class ASEMSysMLUserInteractionHelper {
      * 
      * @see #selectASEMMethodForReturnType(UserInteracting, Resource)
      */
-    public static int getNextUserInteractorSelectionForASEMMethodSelectionForReturnTypes(final Method method,
+    public static int getNextUserInteractionSelectionForASEMMethodSelectionForReturnTypes(final Method method,
             final Resource asemResource) {
 
         List<Method> methods = ASEMSysMLHelper.getAllASEMMethodsWithoutReturnType(asemResource);
@@ -151,13 +151,13 @@ public final class ASEMSysMLUserInteractionHelper {
     }
 
     /**
-     * Simulate the user interaction for selecting a ASEM component type.
+     * Do user interaction for selecting a ASEM component type.
      * 
      * @param userInteracting
      *            User interacting of the current transformation.
      * @return An ASEM component class.
      */
-    public static Class<? extends Component> simulateUserInteractionForASEMComponentType(
+    public static Class<? extends Component> selectASEMComponentType(
             final UserInteracting userInteracting) {
 
         List<Class<? extends Component>> asemComponentTypes = new ArrayList<java.lang.Class<? extends Component>>();
@@ -178,7 +178,7 @@ public final class ASEMSysMLUserInteractionHelper {
     }
 
     /**
-     * Do user interacting for determine the mode for adding an ASEM parameter. The user can select
+     * Do user interaction for determine the mode for adding an ASEM parameter. The user can select
      * whether a new ASEM method shall be created or an existing method shall be used.
      * 
      * @param userInteracting
@@ -206,7 +206,7 @@ public final class ASEMSysMLUserInteractionHelper {
     }
 
     /**
-     * Do user interacting for selecting an ASEM method from all available methods in the given ASEM
+     * Do user interaction for selecting an ASEM method from all available methods in the given ASEM
      * model resource where the return value is not set yet.
      * 
      * @param userInteracting
@@ -227,7 +227,7 @@ public final class ASEMSysMLUserInteractionHelper {
     }
 
     /**
-     * Do user interacting for selecting an ASEM method from all available methods in the given ASEM
+     * Do user interaction for selecting an ASEM method from all available methods in the given ASEM
      * model resource.
      * 
      * @param userInteracting
