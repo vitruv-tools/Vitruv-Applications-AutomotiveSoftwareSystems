@@ -1,5 +1,5 @@
 /**
- * Package for the reactions.
+ * Package for the reactions transformations from <b>SysML to ASEM</b>.
  * 
  * @author Benjamin Rupp
  */
