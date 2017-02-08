@@ -88,7 +88,6 @@ routine changeNameOfSysMLBlockCorrespondence(sysml::Block block) {
 
 reaction BlockDeletionTransformation {
 	after element uml::PackageableElement deleted and removed from uml::Model[packagedElement]
-//	after list entry deleted and removed in uml::Model[packagedElement]
 	with oldValue instanceof org.eclipse.uml2.uml.Class && 
 		((oldValue as org.eclipse.uml2.uml.Class).getAppliedStereotype(ASEMSysMLConstants.QUALIFIED_BLOCK_NAME) != null)
 	
