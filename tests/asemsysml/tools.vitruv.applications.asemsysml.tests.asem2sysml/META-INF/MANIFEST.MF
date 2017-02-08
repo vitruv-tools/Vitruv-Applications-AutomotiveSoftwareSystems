@@ -4,3 +4,10 @@ Bundle-Name: Asem2sysml
 Bundle-SymbolicName: tools.vitruv.applications.asemsysml.tests.asem2sysml
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Require-Bundle: tools.vitruv.applications.asemsysml.tests;bundle-version="0.1.0",
+ tools.vitruv.framework.util;bundle-version="0.2.0",
+ tools.vitruv.framework.tests.util;bundle-version="0.2.0",
+ tools.vitruv.framework.change;bundle-version="0.2.0",
+ tools.vitruv.framework.change.processing;bundle-version="0.2.0",
+ tools.vitruv.framework.metamodel;bundle-version="0.2.0",
+ org.junit;bundle-version="4.12.0"
