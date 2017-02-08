@@ -1,6 +1,7 @@
 package tools.vitruv.applications.asemsysml.tests.sysml2asem.testcases;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -83,7 +84,7 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
      * Therefore a user interaction dialog must be appear. In this dialog the user can decide
      * whether to create a new method (and enter a method name) or to add the parameter to an
      * existing method (and select this method from the list of available methods). This test case
-     * checks, whether the adding to a existing method will be handled correctly.
+     * checks, whether the adding to an existing method will be handled correctly.
      */
     @Test
     public void testIfASEMMethodArgumentWasAddedToExistingMethod() {
@@ -93,7 +94,7 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
         final PrimitiveType pInteger = ASEMSysMLPrimitiveTypeHelper.PRIMITIVE_TYPE_INTEGER;
         final String methodName = "MethodWithSecondParameter";
 
-        // Add a block will be contain all the ports.
+        // Add a block which will be contain all the ports.
         Block blockA = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockA", true, asemComponentType,
                 this);
 
@@ -112,18 +113,121 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
 
         // Add a port PortB which will be mapped to an ASEM parameter of the ASEM method of PortA.
         final int parameterModeSelectionB = this.getNextUserInteractorSelection(ASEMParameterMode.USE_EXISTING);
-        final int methodSelection = this.getNextUserInteractorSelection(this.getMethodOfPortCorrespondence(portA));
+        final int methodSelection = this.getNextUserInteractorSelection(this.getMethodOfPortCorrespondence(portA),
+                FlowDirection.IN);
         this.testUserInteractor.addNextSelections(parameterModeSelectionB, methodSelection);
         final Port portB = ASEMSysMLTestHelper.addPortToBlockAndSync(blockA, "PortB", FlowDirection.IN, pInteger, this);
 
         // Check transformation results.
-        this.assertMethodsWereAddedCorrectly(blockA, portA, methodName, 2);
+        this.assertMethodsForParameterCheckWereAddedCorrectly(blockA, portA, methodName, 2);
         this.assertParameterWasAddedCorrectly(portA, portB);
 
     }
 
-    private void assertMethodsWereAddedCorrectly(final Block block, final Port port, final String methodName,
-            final int numberOfMethods) {
+    /**
+     * If a SysML port has direction 'out' the port will be mapped to an ASEM return value.
+     * Therefore a user interaction dialog must be appear. In this dialog the user can decide
+     * whether to create a new method (and enter a method name) or to add the return value to an
+     * existing method (and select this method from the list of available methods) if this method
+     * doesn't have a return value so far. This test case checks, whether the adding to an existing
+     * method will be handled correctly.
+     */
+    @Test
+    public void testIfASEMReturnValueWasAddedToExistingMethod() {
+
+        Resource sysmlModelResource = this.getModelResource(this.sysmlProjectModelPath);
+        final Class<? extends Component> asemComponentType = edu.kit.ipd.sdq.ASEM.classifiers.Class.class;
+        final PrimitiveType pInteger = ASEMSysMLPrimitiveTypeHelper.PRIMITIVE_TYPE_INTEGER;
+
+        // Add a block which will be contain all the ports.
+        Block block = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "SampleBlock", true, asemComponentType,
+                this);
+
+        // Add a port PortA with direction 'in' which will be mapped to an ASEM parameter in a new
+        // ASEM method. The created method will NOT have a return type.
+        final int parameterModeSelectionA = this.getNextUserInteractorSelection(ASEMParameterMode.CREATE_NEW);
+        this.testUserInteractor.addNextSelections(parameterModeSelectionA);
+        this.testUserInteractor.addNextSelections("MethodWithoutReturnValue");
+        Port portA = ASEMSysMLTestHelper.addPortToBlockAndSync(block, "PortA", FlowDirection.IN, pInteger, this);
+
+        // Add a port PortB with direction 'out' which will be mapped to an ASEM return type in a
+        // new ASEM method. The created method will have a return type.
+        final int parameterModeSelectionB = this.getNextUserInteractorSelection(ASEMParameterMode.CREATE_NEW);
+        this.testUserInteractor.addNextSelections(parameterModeSelectionB);
+        this.testUserInteractor.addNextSelections("MethodWithReturnValue");
+        Port portB = ASEMSysMLTestHelper.addPortToBlockAndSync(block, "PortB", FlowDirection.OUT, pInteger, this);
+
+        // Add a port PortC with direction 'out' which shall be mapped to an ASEM return type which
+        // will be added to the existing method of PortA.
+        final int parameterModeSelectionC = this.getNextUserInteractorSelection(ASEMParameterMode.USE_EXISTING);
+        final int methodSelectionC = this.getNextUserInteractorSelection(this.getMethodOfPortCorrespondence(portA),
+                FlowDirection.OUT);
+        this.testUserInteractor.addNextSelections(parameterModeSelectionC, methodSelectionC);
+        Port portC = ASEMSysMLTestHelper.addPortToBlockAndSync(block, "PortC", FlowDirection.OUT, pInteger, this);
+
+        // Add a port PortD with direction 'out' and try to add its return type to the existing
+        // method of PortB. This attempt must be fail and a new method for the return type of PortD
+        // must be created.
+        final int parameterModeSelectionD = this.getNextUserInteractorSelection(ASEMParameterMode.USE_EXISTING);
+
+        try {
+            // Check user interacting.
+            // The message of PortB must NOT be part of the list of available methods in the user
+            // interacting dialog.
+            Method methodB = this.getMethodOfPortCorrespondence(portB);
+            this.getNextUserInteractorSelection(methodB, FlowDirection.OUT);
+
+            fail("The method " + methodB.getName()
+                    + " must not be part of the allowed methods because it already has a return type!");
+
+        } catch (IllegalArgumentException iae) {
+        }
+
+        this.testUserInteractor.addNextSelections(parameterModeSelectionD);
+        Port portD = ASEMSysMLTestHelper.addPortToBlockAndSync(block, "PortD", FlowDirection.OUT, pInteger, this);
+
+        // Check transformation result.
+        this.assertMethodsForReturnTypeCheckWereAddedCorrectly(block, portA, portB);
+        this.assertReturnTypeWasAddedCorrectly(portA, portB, portC, portD);
+
+    }
+
+    private void assertMethodsForReturnTypeCheckWereAddedCorrectly(final Block block, final Port portA,
+            final Port portB) {
+
+        final Component correspondingComponent = ASEMSysMLHelper
+                .getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), block, Component.class);
+
+        EList<Method> methods = correspondingComponent.getMethods();
+        Method methodA = this.getMethodOfPortCorrespondence(portA);
+        Method methodB = this.getMethodOfPortCorrespondence(portB);
+
+        assertTrue(
+                "Corresponding ASEM component of block " + block.getBase_Class().getName()
+                        + " does not contain all relevant methods.",
+                methods.contains(methodA) && methods.contains(methodB));
+    }
+
+    private void assertReturnTypeWasAddedCorrectly(final Port portA, final Port portB, final Port portC,
+            final Port portD) {
+
+        Method methodA = this.getMethodOfPortCorrespondence(portA);
+        Method methodB = this.getMethodOfPortCorrespondence(portB);
+        Method methodC = this.getMethodOfPortCorrespondence(portC);
+        Method methodD = this.getMethodOfPortCorrespondence(portD);
+
+        assertEquals("Return type corresponding to port " + portC.getName() + " was not added to the method "
+                + methodA.getName(), methodA, methodC);
+
+        assertTrue("No method for the corresponding return value of port " + portD.getName() + " was created.",
+                methodD != null);
+        assertNotEquals("The return type corresponding to port " + portD.getName() + " was added to method "
+                + methodB.getName() + ". This method already had a return type.", methodB, methodD);
+
+    }
+
+    private void assertMethodsForParameterCheckWereAddedCorrectly(final Block block, final Port port,
+            final String methodName, final int numberOfMethods) {
 
         Component correspondingComponent = ASEMSysMLHelper
                 .getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), block, Component.class);
@@ -562,7 +666,7 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
         return mode.ordinal();
     }
 
-    private int getNextUserInteractorSelection(final Method method) {
+    private int getNextUserInteractorSelection(final Method method, final FlowDirection directionOfPortToAdd) {
 
         if (!(EcoreUtil.getRootContainer(method) instanceof Component)) {
             throw new IllegalArgumentException("Invalid root element of ASEM method " + method.getName());
@@ -572,7 +676,13 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
         final String asemProjectModelPath = ASEMSysMLHelper.getASEMProjectModelPath(rootComponent.getName());
         final Resource asemResource = this.getModelResource(asemProjectModelPath);
 
-        return ASEMSysMLUserInteractionHelper.getNextUserInteractorSelectionForASEMMethodSelection(method,
-                asemResource);
+        if (directionOfPortToAdd.equals(FlowDirection.OUT)) {
+            return ASEMSysMLUserInteractionHelper
+                    .getNextUserInteractorSelectionForASEMMethodSelectionForReturnTypes(method, asemResource);
+        } else {
+            return ASEMSysMLUserInteractionHelper
+                    .getNextUserInteractorSelectionForASEMMethodSelectionForParameter(method, asemResource);
+        }
+
     }
 }

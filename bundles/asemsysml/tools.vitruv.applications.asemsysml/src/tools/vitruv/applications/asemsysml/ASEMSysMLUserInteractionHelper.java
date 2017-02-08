@@ -28,7 +28,8 @@ public final class ASEMSysMLUserInteractionHelper {
             + "An ASEM module cannot be used as a subcomponent in other ASEM components.\n"
             + "Therefore this part reference will NOT be transformed to the ASEM model!";
     public static final String MSG_SELECT_PARAMTER_MODE = "Please select which mode shall be used to add the ASEM parameter to the ASEM model.";
-    public static final String MSG_SELECT_METHOD = "Please select a method the parameter shall be added to.";
+    public static final String MSG_SELECT_METHOD_FOR_PARAMETER = "Please select a method the parameter shall be added to.";
+    public static final String MSG_SELECT_METHOD_FOR_RETURN_TYPE = "Please select a method the return type shall be added to.";
 
     /**
      * Available modes for adding an ASEM parameter to an ASEM method.
@@ -77,16 +78,23 @@ public final class ASEMSysMLUserInteractionHelper {
     }
 
     /**
-     * Get the number of the given ASEM method in the given ASEM model resource. This number can be
-     * used for the next selection of the {@link TestUserInteractor}.
+     * Get the position of the given ASEM method in the given ASEM model resource. This magic number
+     * can be used for the next selection of the {@link TestUserInteractor}. <br>
+     * <b>Important:</b> This method must be used if <i>all methods</i> were allowed to select (with
+     * and without return types). If only methods <i>without</i> return types were shown in the user
+     * interaction dialog, the
+     * {@link #getNextUserInteractorSelectionForASEMMethodSelectionForReturnTypes(Method, Resource)}
+     * method must be used instead.
      * 
      * @param method
      *            The method which shall be selected next.
      * @param asemResource
      *            The ASEM model resource which must contain the method.
      * @return The magic number for the {@link TestUserInteractor}
+     * 
+     * @see #selectASEMMethodForParameter(UserInteracting, Resource)
      */
-    public static int getNextUserInteractorSelectionForASEMMethodSelection(final Method method,
+    public static int getNextUserInteractorSelectionForASEMMethodSelectionForParameter(final Method method,
             final Resource asemResource) {
 
         List<Method> methods = ASEMSysMLHelper.getAllASEMMethods(asemResource);
@@ -103,6 +111,43 @@ public final class ASEMSysMLUserInteractionHelper {
 
         throw new IllegalArgumentException(
                 "The method " + method.getName() + " is not contained in the ASEM model resource " + asemResource);
+    }
+
+    /**
+     * Get the position of the given ASEM method in the given ASEM model resource. This magic number
+     * can be used for the next selection of the {@link TestUserInteractor}. <br>
+     * <b>Important:</b> This method must be used if <i>only methods without return types</i> were
+     * allowed to select. If all methods (with and without return types) were shown in the user
+     * interaction dialog, the
+     * {@link #getNextUserInteractorSelectionForASEMMethodSelectionForParameter(Method, Resource)}
+     * method must be used instead.
+     * 
+     * @param method
+     *            The method which shall be selected next.
+     * @param asemResource
+     *            The ASEM model resource which must contain the method.
+     * @return The magic number for the {@link TestUserInteractor}
+     * 
+     * @see #selectASEMMethodForReturnType(UserInteracting, Resource)
+     */
+    public static int getNextUserInteractorSelectionForASEMMethodSelectionForReturnTypes(final Method method,
+            final Resource asemResource) {
+
+        List<Method> methods = ASEMSysMLHelper.getAllASEMMethodsWithoutReturnType(asemResource);
+
+        for (int i = 0; i < methods.size(); i++) {
+
+            if (methods.get(i).getId().equals(method.getId())) {
+                // FIXME [BR] Remove magic numbers!
+                // TODO [BR] Hopefully the order of the methods is the same as in the user
+                // interaction.
+                return i;
+            }
+        }
+
+        throw new IllegalArgumentException(
+                "The method " + method.getName() + " is not contained in the ASEM model resource " + asemResource);
+
     }
 
     /**
@@ -162,30 +207,57 @@ public final class ASEMSysMLUserInteractionHelper {
 
     /**
      * Do user interacting for selecting an ASEM method from all available methods in the given ASEM
+     * model resource where the return value is not set yet.
+     * 
+     * @param userInteracting
+     *            User interacting of the current transformation.
+     * @param asemResource
+     *            The ASEM model resource.
+     * @return The selected method.
+     */
+    public static Method selectASEMMethodForReturnType(final UserInteracting userInteracting,
+            final Resource asemResource) {
+
+        Method selectedMethod = null;
+        List<Method> methods = ASEMSysMLHelper.getAllASEMMethodsWithoutReturnType(asemResource);
+
+        selectedMethod = selectMethodFromList(methods, MSG_SELECT_METHOD_FOR_RETURN_TYPE, userInteracting);
+
+        return selectedMethod;
+    }
+
+    /**
+     * Do user interacting for selecting an ASEM method from all available methods in the given ASEM
      * model resource.
      * 
      * @param userInteracting
      *            User interacting of the current transformation.
      * @param asemResource
      *            The ASEM model resource.
-     * @return The selected Method.
+     * @return The selected method.
      */
-    public static Method selectASEMMethod(final UserInteracting userInteracting, final Resource asemResource) {
+    public static Method selectASEMMethodForParameter(UserInteracting userInteracting, Resource asemResource) {
 
         Method selectedMethod = null;
         List<Method> methods = ASEMSysMLHelper.getAllASEMMethods(asemResource);
+
+        selectedMethod = selectMethodFromList(methods, MSG_SELECT_METHOD_FOR_PARAMETER, userInteracting);
+
+        return selectedMethod;
+    }
+
+    private static Method selectMethodFromList(final List<Method> methods, final String msg,
+            final UserInteracting userInteracting) {
 
         List<String> methodNames = new ArrayList<String>();
         for (Method method : methods) {
             methodNames.add(getMethodSignature(method));
         }
 
-        int selectedMethodSignature = userInteracting.selectFromMessage(UserInteractionType.MODAL,
-                ASEMSysMLUserInteractionHelper.MSG_SELECT_METHOD, methodNames.toArray(new String[methodNames.size()]));
+        int selectedMethodSignature = userInteracting.selectFromMessage(UserInteractionType.MODAL, msg,
+                methodNames.toArray(new String[methodNames.size()]));
 
-        selectedMethod = (Method) methods.toArray()[selectedMethodSignature];
-
-        return selectedMethod;
+        return methods.toArray(new Method[methods.size()])[selectedMethodSignature];
     }
 
     private static String getMethodSignature(Method method) {

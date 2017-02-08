@@ -182,9 +182,21 @@ public class PortDirectionTransformation
         ASEMParameterMode mode = ASEMParameterMode.CREATE_NEW;
         Resource asemResource = ASEMSysMLHelper.getModelResource(this.executionState.getCorrespondenceModel(), port,
                 asemProjectModelPath);
+        FlowProperty flowProp = ASEMSysMLHelper.getFlowProperty(port);
+        FlowDirection direction = flowProp != null ? flowProp.getDirection() : null;
+        Classifier type = ASEMSysMLHelper.getClassifierForASEMVariable(port.getType(),
+                this.executionState.getCorrespondenceModel());
 
-        if (ASEMSysMLHelper.areMethodsAvailable(asemResource)) {
+        if (direction.equals(FlowDirection.OUT) && ASEMSysMLHelper.areMethodsWithoutReturnTypeAvailable(asemResource)) {
 
+            // There exists at least one method without a return value which can be used for the
+            // mapping of the ports corresponding return type.
+            mode = ASEMSysMLUserInteractionHelper.selectASEMParameterMode(this.userInteracting);
+
+        } else if (!direction.equals(FlowDirection.OUT) && ASEMSysMLHelper.areMethodsAvailable(asemResource)) {
+
+            // There exists at least one method which can be used for the mapping of the ports
+            // corresponding parameter.
             mode = ASEMSysMLUserInteractionHelper.selectASEMParameterMode(this.userInteracting);
 
         }
@@ -192,11 +204,6 @@ public class PortDirectionTransformation
         logger.info("[ASEMSysML][Java] Selected ASEM parameter mode: " + mode);
 
         method = this.getMethodDependingOnParamterMode(mode, port, asemProjectModelPath);
-
-        FlowProperty flowProp = ASEMSysMLHelper.getFlowProperty(port);
-        FlowDirection direction = flowProp != null ? flowProp.getDirection() : null;
-        Classifier type = ASEMSysMLHelper.getClassifierForASEMVariable(port.getType(),
-                this.executionState.getCorrespondenceModel());
 
         switch (direction) {
         case IN:
@@ -216,6 +223,7 @@ public class PortDirectionTransformation
 
             ReturnType returnType = DataexchangeFactory.eINSTANCE.createReturnType();
             returnType.setType(type);
+            returnType.setName(port.getName());
             method.setReturnType(returnType);
 
             correspondingASEMClass.getMethods().add(method);
@@ -249,11 +257,23 @@ public class PortDirectionTransformation
         }
     }
 
-    private Method selectMethod(final EObject alreadyPersistedObject, final String asemProjectModelPath) {
+    private Method selectMethod(final Port port, final String asemProjectModelPath) {
 
-        Resource asemResource = ASEMSysMLHelper.getModelResource(this.executionState.getCorrespondenceModel(),
-                alreadyPersistedObject, asemProjectModelPath);
-        Method selectedMethod = ASEMSysMLUserInteractionHelper.selectASEMMethod(this.userInteracting, asemResource);
+        Resource asemResource = ASEMSysMLHelper.getModelResource(this.executionState.getCorrespondenceModel(), port,
+                asemProjectModelPath);
+        final FlowDirection portDirection = ASEMSysMLHelper.getFlowProperty(port).getDirection();
+
+        Method selectedMethod;
+        
+        if (portDirection.equals(FlowDirection.OUT)) {
+            
+            selectedMethod = ASEMSysMLUserInteractionHelper.selectASEMMethodForReturnType(this.userInteracting, asemResource);
+            
+        } else {
+            
+            selectedMethod = ASEMSysMLUserInteractionHelper.selectASEMMethodForParameter(this.userInteracting, asemResource);
+            
+        }
 
         return selectedMethod;
     }

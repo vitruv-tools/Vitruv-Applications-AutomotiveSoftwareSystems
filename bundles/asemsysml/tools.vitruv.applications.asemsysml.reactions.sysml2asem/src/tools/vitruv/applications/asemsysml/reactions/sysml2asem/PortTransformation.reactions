@@ -133,10 +133,10 @@ routine mapINPortToClass(uml::Port port, asem::Component correspondingComponent)
 			
 			switch (mode) {
 				case CREATE_NEW: {
-					createNewMethod(port, asemParameter, correspondingComponent);
+					createNewMethodWithParameter(port, asemParameter, correspondingComponent);
 				}
 				case USE_EXISTING: {
-					var method = ASEMSysMLUserInteractionHelper.selectASEMMethod(this.userInteracting, asemResource);
+					var method = ASEMSysMLUserInteractionHelper.selectASEMMethodForParameter(this.userInteracting, asemResource);
 					addParameter(port, method, asemParameter, correspondingComponent);
 				}
 		    }
@@ -158,7 +158,7 @@ routine addParameter(uml::Port port, asem::Method asemMethod, asem::Parameter as
 		}
 	}
 }
-routine createNewMethod(uml::Port port, asem::Parameter asemParameter, asem::Component correspondingComponent) {
+routine createNewMethodWithParameter(uml::Port port, asem::Parameter asemParameter, asem::Component correspondingComponent) {
 	action {
 		val asemMethod = create asem::Method and initialize {
 			val methodName = userInteracting.getTextInput(ASEMSysMLUserInteractionHelper.MSG_INSERT_METHOD_NAME);
@@ -185,8 +185,33 @@ routine mapOUTPortToClass(uml::Port port, asem::Component correspondingComponent
 		val asemReturnType = create asem::ReturnType and initialize {
 			// [Requirement 2.e)iii] [Requirement 2.e)iv] [Requirement 2.e)v]
 			asemReturnType.type = ASEMSysMLHelper.getClassifierForASEMVariable(port.type, this.correspondenceModel);
+			asemReturnType.name = port.name;
 		}
 		
+		call {
+			val asemProjectModelPath = ASEMSysMLHelper.getASEMProjectModelPath(correspondingComponent.name);
+			val asemResource = ASEMSysMLHelper.getModelResource(this.correspondenceModel, port, asemProjectModelPath);
+			var mode = ASEMParameterMode.CREATE_NEW;
+			
+			if(ASEMSysMLHelper.areMethodsWithoutReturnTypeAvailable(asemResource)) {
+				mode = ASEMSysMLUserInteractionHelper.selectASEMParameterMode(this.userInteracting);
+			}
+			
+			switch (mode) {
+				case CREATE_NEW: {
+					createNewMethodWithReturnType(port, asemReturnType, correspondingComponent);
+				}
+				case USE_EXISTING: {
+					var method = ASEMSysMLUserInteractionHelper.selectASEMMethodForReturnType(this.userInteracting, asemResource);
+					addReturnType(port, method, asemReturnType, correspondingComponent);
+				}
+		    }
+			
+		}	
+	}
+}
+routine createNewMethodWithReturnType(uml::Port port, asem::ReturnType asemReturnType, asem::Component correspondingComponent) {
+	action {
 		val asemMethod = create asem::Method and initialize {
 			var methodName = userInteracting.getTextInput("Please insert a method name which can be used for mapping a SysML port to an ASEM method.")
 			if(methodName.empty) {
@@ -197,6 +222,20 @@ routine mapOUTPortToClass(uml::Port port, asem::Component correspondingComponent
 		}
 		
 		// [Requirement 2.e)] 
+		add correspondence between port and asemReturnType
+		
+		update correspondingComponent {
+			correspondingComponent.methods.add(asemMethod);
+		}
+	}
+}
+routine addReturnType(uml::Port port, asem::Method asemMethod, asem::ReturnType asemReturnType, asem::Component correspondingComponent) {
+	action {
+		update asemMethod {
+			asemMethod.returnType = asemReturnType;
+		}
+		
+		// [Requirement 2.d)]
 		add correspondence between port and asemReturnType
 		
 		update correspondingComponent {

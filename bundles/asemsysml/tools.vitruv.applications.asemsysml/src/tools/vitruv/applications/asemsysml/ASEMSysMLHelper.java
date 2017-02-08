@@ -3,6 +3,7 @@ package tools.vitruv.applications.asemsysml;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -318,6 +319,29 @@ public class ASEMSysMLHelper {
     }
 
     /**
+     * Get all available ASEM methods in the given ASEM model resource which have no return type.
+     * 
+     * @param asemResource
+     *            The ASEM model resource.
+     * @return All available ASEM methods in this model resource which have no return type.
+     */
+    public static List<Method> getAllASEMMethodsWithoutReturnType(final Resource asemResource) {
+
+        List<Method> methods = getAllASEMMethods(asemResource);
+        Collection<Method> methodsToRemove = new HashSet<>();
+
+        for (Method method : methods) {
+            if (method.getReturnType() != null) {
+                methodsToRemove.add(method);
+            }
+        }
+
+        methods.removeAll(methodsToRemove);
+
+        return methods;
+    }
+
+    /**
      * Returns whether the given ASEM resource contains at least one ASEM method or not.
      * 
      * @param asemResource
@@ -327,5 +351,18 @@ public class ASEMSysMLHelper {
      */
     public static boolean areMethodsAvailable(final Resource asemResource) {
         return !(getAllASEMMethods(asemResource).isEmpty());
+    }
+
+    /**
+     * Returns whether the given ASEM resource contains at least one ASEM method which has no return
+     * type or not.
+     * 
+     * @param asemResource
+     *            The ASEM model resource.
+     * @return <code>True</code> if the ASEM model resource contains at least one ASEM method
+     *         element which has no return type, otherwise <code>false</code>.
+     */
+    public static boolean areMethodsWithoutReturnTypeAvailable(final Resource asemResource) {
+        return !(getAllASEMMethodsWithoutReturnType(asemResource).isEmpty());
     }
 }
