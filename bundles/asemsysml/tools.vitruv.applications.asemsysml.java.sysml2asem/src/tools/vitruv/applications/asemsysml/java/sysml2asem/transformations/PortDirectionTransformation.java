@@ -23,7 +23,7 @@ import edu.kit.ipd.sdq.ASEM.dataexchange.Parameter;
 import edu.kit.ipd.sdq.ASEM.dataexchange.ReturnType;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.ASEMSysMLUserInteractionHelper;
-import tools.vitruv.applications.asemsysml.ASEMSysMLUserInteractionHelper.ASEMParameterMode;
+import tools.vitruv.applications.asemsysml.ASEMSysMLUserInteractionHelper.ASEMMethodMode;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.AbstractTransformationRealization;
 import tools.vitruv.domains.asem.AsemNamespace;
 import tools.vitruv.framework.change.echange.EChange;
@@ -179,7 +179,7 @@ public class PortDirectionTransformation
             final edu.kit.ipd.sdq.ASEM.classifiers.Class correspondingASEMClass, final String asemProjectModelPath) {
 
         Method method;
-        ASEMParameterMode mode = ASEMParameterMode.CREATE_NEW;
+        ASEMMethodMode mode = ASEMMethodMode.CREATE_NEW;
         Resource asemResource = ASEMSysMLHelper.getModelResource(this.executionState.getCorrespondenceModel(), port,
                 asemProjectModelPath);
         FlowProperty flowProp = ASEMSysMLHelper.getFlowProperty(port);
@@ -242,7 +242,7 @@ public class PortDirectionTransformation
 
     }
 
-    private Method getMethodDependingOnParamterMode(final ASEMParameterMode mode, final Port port,
+    private Method getMethodDependingOnParamterMode(final ASEMMethodMode mode, final Port port,
             final String asemProjectModelPath) {
         switch (mode) {
 

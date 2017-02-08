@@ -32,18 +32,18 @@ public final class ASEMSysMLUserInteractionHelper {
     public static final String MSG_SELECT_METHOD_FOR_RETURN_TYPE = "Please select a method the return type shall be added to.";
 
     /**
-     * Available modes for adding an ASEM parameter to an ASEM method.
+     * Available modes for adding an ASEM parameter or an ASEM return type to an ASEM method.
      * 
      * @author Benjamin Rupp
      *
      */
-    public static enum ASEMParameterMode {
+    public static enum ASEMMethodMode {
         /**
-         * Mode for adding an ASEM parameter to a <i>new</i> ASEM Method.
+         * Mode for adding an ASEM parameter or return type to a <i>new</i> ASEM Method.
          */
         CREATE_NEW,
         /**
-         * Mode for adding an ASEM parameter to an <i>existing</i> ASEM Method.
+         * Mode for adding an ASEM parameter or return type to an <i>existing</i> ASEM Method.
          */
         USE_EXISTING
     }
@@ -183,16 +183,16 @@ public final class ASEMSysMLUserInteractionHelper {
      * 
      * @param userInteracting
      *            User interacting of the current transformation.
-     * @return The {@link ASEMParameterMode} the user has selected.
+     * @return The {@link ASEMMethodMode} the user has selected.
      */
-    public static ASEMParameterMode selectASEMParameterMode(final UserInteracting userInteracting) {
+    public static ASEMMethodMode selectASEMParameterMode(final UserInteracting userInteracting) {
 
-        ASEMParameterMode mode = ASEMParameterMode.CREATE_NEW;
+        ASEMMethodMode mode = ASEMMethodMode.CREATE_NEW;
 
-        ASEMParameterMode[] modeTypes = ASEMParameterMode.values();
+        ASEMMethodMode[] modeTypes = ASEMMethodMode.values();
         List<String> modeNames = new ArrayList<>();
 
-        for (ASEMParameterMode asemParameterMode : modeTypes) {
+        for (ASEMMethodMode asemParameterMode : modeTypes) {
             modeNames.add(asemParameterMode.toString());
         }
 
