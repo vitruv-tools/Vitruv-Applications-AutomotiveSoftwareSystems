@@ -22,3 +22,4 @@ Require-Bundle: org.eclipse.uml2.uml;bundle-version="5.2.1",
  org.eclipse.xtend.lib,
  org.eclipse.xtend.lib.macro
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Export-Package: tools.vitruv.applications.asemsysml.reactions.asem2sysml.global
