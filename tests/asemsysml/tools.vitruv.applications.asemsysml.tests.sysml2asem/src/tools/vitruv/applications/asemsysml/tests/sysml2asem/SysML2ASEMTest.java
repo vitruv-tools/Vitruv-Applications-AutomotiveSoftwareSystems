@@ -2,13 +2,19 @@ package tools.vitruv.applications.asemsysml.tests.sysml2asem;
 
 import static tools.vitruv.applications.asemsysml.ASEMSysMLConstants.TEST_SYSML_MODEL_NAME;
 
+import java.util.Collections;
+
 import org.eclipse.papyrus.sysml14.util.SysMLResource;
 import org.eclipse.uml2.uml.Model;
 
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.ASEMSysMLPrimitiveTypeHelper;
+import tools.vitruv.applications.asemsysml.java.sysml2asem.global.SysML2ASEMJavaChangePropagationSpecification;
+import tools.vitruv.applications.asemsysml.reactions.sysml2asem.global.SysML2ASEMChangePropagationSpecification;
 import tools.vitruv.applications.asemsysml.tests.ASEMSysMLTest;
+import tools.vitruv.applications.asemsysml.tests.util.ASEMSysMLTestHelper.TransformationType;
 import tools.vitruv.domains.sysml.SysMlNamspace;
+import tools.vitruv.framework.change.processing.ChangePropagationSpecification;
 
 /**
  * Test case class for transforming a SysML model to ASEM models.
@@ -42,4 +48,19 @@ public class SysML2ASEMTest extends ASEMSysMLTest {
 
     }
 
+    @Override
+    protected Iterable<ChangePropagationSpecification> createDirectionSpecificChangePropagationSpecifications(
+            TransformationType transformationType) {
+        
+        switch (transformationType) {
+        case REACTIONS:
+            return Collections.singletonList(new SysML2ASEMChangePropagationSpecification());
+
+        case JAVA:
+            return Collections.singletonList(new SysML2ASEMJavaChangePropagationSpecification());
+
+        default:
+            return null;
+        }
+    }
 }

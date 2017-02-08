@@ -11,7 +11,6 @@ import org.eclipse.emf.ecore.resource.Resource;
 import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.ASEMSysMLUserInteractionHelper;
-import tools.vitruv.applications.asemsysml.tests.util.ASEMSysMLTestHelper;
 import tools.vitruv.applications.asemsysml.tests.util.ASEMSysMLTestHelper.TransformationType;
 import tools.vitruv.domains.asem.AsemDomain;
 import tools.vitruv.domains.asem.AsemNamespace;
@@ -50,9 +49,22 @@ public abstract class ASEMSysMLTest extends VitruviusChangePropagationTest {
 
     }
 
+    /**
+     * Create the change propagation specifications for the given transformation type. This method has
+     * to be implemented in the direction specific transformation test class.
+     * 
+     * @param transformationType
+     *            The {@link TransformationType type of the transformation} which should be used.
+     * @return The change propagation specifications for the given transformation type. If no change
+     *         propagation specification is available <code>null</code> is returned.
+     * @see ChangePropagationSpecification
+     */
+    protected abstract Iterable<ChangePropagationSpecification> createDirectionSpecificChangePropagationSpecifications(
+            TransformationType transformationType);
+
     @Override
     protected Iterable<ChangePropagationSpecification> createChangePropagationSpecifications() {
-        return ASEMSysMLTestHelper.getChangePropagationSpecificationsByTransformationType(transformationType);
+        return this.createDirectionSpecificChangePropagationSpecifications(transformationType);
     }
 
     /**

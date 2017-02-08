@@ -5,7 +5,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 
 import org.eclipse.emf.common.util.EList;
@@ -28,10 +27,7 @@ import org.eclipse.uml2.uml.util.UMLUtil.StereotypeApplicationHelper;
 import edu.kit.ipd.sdq.ASEM.base.TypedElement;
 import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
-import tools.vitruv.applications.asemsysml.java.sysml2asem.global.SysML2ASEMJavaChangePropagationSpecification;
-import tools.vitruv.applications.asemsysml.reactions.sysml2asem.global.SysML2ASEMChangePropagationSpecification;
 import tools.vitruv.applications.asemsysml.tests.ASEMSysMLTest;
-import tools.vitruv.framework.change.processing.ChangePropagationSpecification;
 
 /**
  * A helper class which contains useful methods for the ASEMSysML test cases.
@@ -60,32 +56,6 @@ public final class ASEMSysMLTestHelper {
     public static enum TransformationType {
         REACTIONS, JAVA
     };
-
-    /**
-     * Get the change propagation specifications of the transformation type which should be used for
-     * the transformations.
-     * 
-     * @param transformationType
-     *            The {@link TransformationType type of the transformation} which should be used.
-     * @return The change propagation specifications for the given transformation type. If no change
-     *         propagation specification is available <code>null</code> is returned.
-     * @see ChangePropagationSpecification
-     */
-    public static Iterable<ChangePropagationSpecification> getChangePropagationSpecificationsByTransformationType(
-            final TransformationType transformationType) {
-
-        switch (transformationType) {
-        case REACTIONS:
-            return Collections.singletonList(new SysML2ASEMChangePropagationSpecification());
-
-        case JAVA:
-            return Collections.singletonList(new SysML2ASEMJavaChangePropagationSpecification());
-
-        default:
-            return null;
-        }
-
-    }
 
     /**
      * Get all available ports of the given SysML model resource.
