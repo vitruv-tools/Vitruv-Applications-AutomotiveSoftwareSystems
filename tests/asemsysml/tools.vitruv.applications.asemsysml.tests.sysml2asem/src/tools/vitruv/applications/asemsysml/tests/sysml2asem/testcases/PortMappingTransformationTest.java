@@ -42,7 +42,7 @@ import tools.vitruv.applications.asemsysml.ASEMSysMLPrimitiveTypeHelper;
 import tools.vitruv.applications.asemsysml.ASEMSysMLUserInteractionHelper;
 import tools.vitruv.applications.asemsysml.ASEMSysMLUserInteractionHelper.ASEMMethodMode;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.SysML2ASEMTest;
-import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTestHelper;
+import tools.vitruv.applications.asemsysml.tests.util.ASEMSysMLTestHelper;
 import tools.vitruv.framework.correspondence.CorrespondenceModel;
 
 /**

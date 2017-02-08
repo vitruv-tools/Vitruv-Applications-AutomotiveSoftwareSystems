@@ -1,4 +1,4 @@
-package tools.vitruv.applications.asemsysml.tests.sysml2asem.util;
+package tools.vitruv.applications.asemsysml.tests.util;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -30,7 +30,7 @@ import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.global.SysML2ASEMJavaChangePropagationSpecification;
 import tools.vitruv.applications.asemsysml.reactions.sysml2asem.global.SysML2ASEMChangePropagationSpecification;
-import tools.vitruv.applications.asemsysml.tests.sysml2asem.ASEMSysMLTest;
+import tools.vitruv.applications.asemsysml.tests.ASEMSysMLTest;
 import tools.vitruv.framework.change.processing.ChangePropagationSpecification;
 
 /**

@@ -3,4 +3,4 @@
  * 
  * @author Benjamin Rupp
  */
-package tools.vitruv.applications.asemsysml.tests.sysml2asem.util;
+package tools.vitruv.applications.asemsysml.tests.util;

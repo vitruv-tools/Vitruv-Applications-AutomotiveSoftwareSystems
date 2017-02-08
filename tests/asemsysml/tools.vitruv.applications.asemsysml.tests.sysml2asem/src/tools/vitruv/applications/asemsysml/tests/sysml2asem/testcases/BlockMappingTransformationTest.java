@@ -14,7 +14,7 @@ import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import edu.kit.ipd.sdq.ASEM.classifiers.Module;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.SysML2ASEMTest;
-import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTestHelper;
+import tools.vitruv.applications.asemsysml.tests.util.ASEMSysMLTestHelper;
 
 /**
  * Class for all SysML block mapping tests. A SysML block will be mapped to an ASEM model containing

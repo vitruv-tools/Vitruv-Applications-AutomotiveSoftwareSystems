@@ -17,7 +17,7 @@ import edu.kit.ipd.sdq.ASEM.classifiers.Module;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Constant;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.SysML2ASEMTest;
-import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTestHelper;
+import tools.vitruv.applications.asemsysml.tests.util.ASEMSysMLTestHelper;
 
 /**
  * Class for all test cases checking the part mapping of a SysML block to an ASEM component.
@@ -231,7 +231,7 @@ public class PartMappingTransformationTest extends SysML2ASEMTest {
     private void assertPartCorrespondenceDoesNotExist(final Property partProperty) {
 
         final String msg = "Part correspondence for part property " + partProperty.getName() + " was not deleted!";
-        
+
         try {
 
             Constant constant = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(),

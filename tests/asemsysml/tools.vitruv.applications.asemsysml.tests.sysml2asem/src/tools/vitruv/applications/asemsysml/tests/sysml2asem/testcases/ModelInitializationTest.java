@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.SysML2ASEMTest;
-import tools.vitruv.applications.asemsysml.tests.sysml2asem.util.ASEMSysMLTestHelper;
+import tools.vitruv.applications.asemsysml.tests.util.ASEMSysMLTestHelper;
 import tools.vitruv.domains.sysml.SysMlNamspace;
 
 /**
