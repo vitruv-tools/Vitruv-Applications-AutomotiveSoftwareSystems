@@ -152,14 +152,16 @@ public class ASEMSysMLHelper {
     }
 
     /**
-     * Get the first corresponding ASEM element for a SysML element. If there are multiple ASEM
-     * elements corresponding to the given SysML element, the first of them will be returned.
+     * Get the first corresponding ASEM element of the given type for a SysML element. If there are
+     * multiple ASEM elements corresponding to the given SysML element, the first of them will be
+     * returned.
      * 
      * @param sysmlElement
      *            The SysML element which corresponds with a ASEM element.
      * @param asemElementType
      *            The type of the corresponding ASEM element.
-     * @return The first element of the corresponding ASEM elements.
+     * @return The first element of the corresponding ASEM elements or <code>null</code> if no
+     *         corresponding element of the given type was found.
      */
     @SuppressWarnings("unchecked")
     public static <T> T getFirstCorrespondingASEMElement(final CorrespondenceModel correspondenceModel,
@@ -172,9 +174,6 @@ public class ASEMSysMLHelper {
 
             if (asemElementType.isAssignableFrom(correspondingASEMElement.getClass())) {
 
-                // To get only one message element, return the first element which is part of
-                // the corresponding elements. If there is a case where a port can have multiple
-                // corresponding messages, this section must be reworked.
                 return (T) correspondingASEMElement;
 
             }
