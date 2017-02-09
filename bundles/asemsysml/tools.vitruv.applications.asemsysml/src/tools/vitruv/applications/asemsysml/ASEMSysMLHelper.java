@@ -26,6 +26,7 @@ import edu.kit.ipd.sdq.ASEM.classifiers.Classifier;
 import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Method;
 import tools.vitruv.domains.asem.AsemNamespace;
+import tools.vitruv.domains.sysml.SysMlNamspace;
 import tools.vitruv.framework.correspondence.Correspondence;
 import tools.vitruv.framework.correspondence.CorrespondenceModel;
 import tools.vitruv.framework.util.datatypes.VURI;
@@ -150,6 +151,31 @@ public class ASEMSysMLHelper {
 
         return correspondingASEMElements;
     }
+    
+    /**
+     * Get all SysML elements which correspond to the given ASEM element.
+     * 
+     * @param correspondenceModel
+     *            The correspondence model.
+     * @param asemElement
+     *            The ASEM element.
+     * @return Corresponding SysML elements or an empty collection if no corresponding elements
+     *         exist.
+     */
+    public static Collection<EObject> getCorrespondingSysMLElements(final CorrespondenceModel correspondenceModel,
+            final EObject asemElement) {
+
+        Collection<EObject> correspondingSysMLElements = Collections.emptyList();
+        Set<Correspondence> correspondences = Collections.emptySet();
+
+        correspondences = correspondenceModel.getCorrespondences(Collections.singletonList(asemElement));
+
+        for (Correspondence correspondence : correspondences) {
+            correspondingSysMLElements = correspondence.getElementsForMetamodel(SysMlNamspace.METAMODEL_NAMESPACE);
+        }
+
+        return correspondingSysMLElements;
+    }
 
     /**
      * Get the first corresponding ASEM element of the given type for a SysML element. If there are
@@ -163,22 +189,48 @@ public class ASEMSysMLHelper {
      * @return The first element of the corresponding ASEM elements or <code>null</code> if no
      *         corresponding element of the given type was found.
      */
-    @SuppressWarnings("unchecked")
     public static <T> T getFirstCorrespondingASEMElement(final CorrespondenceModel correspondenceModel,
             final EObject sysmlElement, final Class<T> asemElementType) {
 
         Collection<EObject> correspondingASEMElements = ASEMSysMLHelper
                 .getCorrespondingASEMElements(correspondenceModel, sysmlElement);
+        
+        return getFirstCorrespondingElement(correspondingASEMElements, asemElementType);
+    }
+    
+    /**
+     * Get the first corresponding SysML element of the given type for a ASEM element. If there are
+     * multiple SysML elements corresponding to the given ASEM element, the first of them will be
+     * returned.
+     * 
+     * @param asemElement
+     *            The SysML element which corresponds with a ASEM element.
+     * @param sysmlElementType
+     *            The type of the corresponding ASEM element.
+     * @return The first element of the corresponding ASEM elements or <code>null</code> if no
+     *         corresponding element of the given type was found.
+     */
+    public static <T> T getFirstCorrespondingSysMLElement(final CorrespondenceModel correspondenceModel,
+            final EObject asemElement, final Class<T> sysmlElementType) {
 
-        for (EObject correspondingASEMElement : correspondingASEMElements) {
+        Collection<EObject> correspondingASEMElements = ASEMSysMLHelper
+                .getCorrespondingSysMLElements(correspondenceModel, asemElement);
+        
+        return getFirstCorrespondingElement(correspondingASEMElements, sysmlElementType);
+    }
+    
+    @SuppressWarnings("unchecked")
+    private static <T> T getFirstCorrespondingElement(final Collection<EObject> correspondingElements, final Class<T> correspondingElementType) {
+        
+        for (EObject correspondingElement : correspondingElements) {
 
-            if (asemElementType.isAssignableFrom(correspondingASEMElement.getClass())) {
+            if (correspondingElementType.isAssignableFrom(correspondingElement.getClass())) {
 
-                return (T) correspondingASEMElement;
+                return (T) correspondingElement;
 
             }
         }
-
+        
         return null;
     }
 

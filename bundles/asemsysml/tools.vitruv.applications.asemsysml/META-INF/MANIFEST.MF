@@ -9,6 +9,7 @@ Require-Bundle: org.eclipse.uml2.uml,
  org.eclipse.papyrus.sysml14,
  tools.vitruv.framework.correspondence;bundle-version="0.1.0",
  tools.vitruv.domains.asem;bundle-version="0.1.0",
+ tools.vitruv.domains.sysml;bundle-version="0.2.0",
  edu.kit.ipd.sdq.asem;bundle-version="0.1.0",
  tools.vitruv.framework.util,
  tools.vitruv.framework.tests.util;bundle-version="0.1.0"
