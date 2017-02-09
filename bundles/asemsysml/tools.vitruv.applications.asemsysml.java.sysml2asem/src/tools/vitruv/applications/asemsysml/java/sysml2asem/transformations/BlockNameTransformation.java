@@ -1,10 +1,6 @@
 package tools.vitruv.applications.asemsysml.java.sysml2asem.transformations;
 
-import java.util.Collections;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.papyrus.sysml14.blocks.Block;
 import org.eclipse.uml2.uml.util.UMLUtil;
@@ -16,7 +12,6 @@ import tools.vitruv.applications.asemsysml.java.sysml2asem.AbstractTransformatio
 import tools.vitruv.domains.asem.AsemNamespace;
 import tools.vitruv.framework.change.echange.EChange;
 import tools.vitruv.framework.change.echange.feature.attribute.ReplaceSingleValuedEAttribute;
-import tools.vitruv.framework.correspondence.Correspondence;
 import tools.vitruv.framework.tuid.TuidManager;
 import tools.vitruv.framework.userinteraction.UserInteracting;
 
@@ -99,32 +94,19 @@ public class BlockNameTransformation
 
     private void changeNameOfCorrespondingASEMElement(final Block block, final String newName) {
 
-        Set<Correspondence> correspondences = this.executionState.getCorrespondenceModel()
-                .getCorrespondences(Collections.singletonList(block));
+        Component asemComponent = ASEMSysMLHelper
+                .getFirstCorrespondingASEMElement(this.executionState.getCorrespondenceModel(), block, Component.class);
 
-        for (Correspondence correspondence : correspondences) {
+        TuidManager.getInstance().registerObjectUnderModification(asemComponent);
 
-            EList<EObject> correspondingASEMElements = correspondence
-                    .getElementsForMetamodel(AsemNamespace.METAMODEL_NAMESPACE);
+        asemComponent.setName(newName);
 
-            for (EObject asemElement : correspondingASEMElements) {
+        final String asemModelName = ASEMSysMLHelper.getASEMModelName(newName);
+        persistASEMElement(block, asemComponent,
+                ASEMSysMLHelper.getProjectModelPath(asemModelName, AsemNamespace.FILE_EXTENSION));
 
-                if (asemElement instanceof Component) {
+        TuidManager.getInstance().updateTuidsOfRegisteredObjects();
+        TuidManager.getInstance().flushRegisteredObjectsUnderModification();
 
-                    Component asemComponent = (Component) asemElement;
-
-                    TuidManager.getInstance().registerObjectUnderModification(asemComponent);
-
-                    asemComponent.setName(newName);
-
-                    final String asemModelName = ASEMSysMLHelper.getASEMModelName(newName);
-                    persistASEMElement(block, asemComponent,
-                            ASEMSysMLHelper.getProjectModelPath(asemModelName, AsemNamespace.FILE_EXTENSION));
-
-                    TuidManager.getInstance().updateTuidsOfRegisteredObjects();
-                    TuidManager.getInstance().flushRegisteredObjectsUnderModification();
-                }
-            }
-        }
     }
 }
