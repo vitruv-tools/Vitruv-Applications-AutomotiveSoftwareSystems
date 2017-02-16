@@ -24,9 +24,6 @@ import tools.vitruv.framework.change.processing.ChangePropagationSpecification;
  */
 public class SysML2ASEMTest extends ASEMSysMLTest {
 
-    protected final String sysmlProjectModelPath = ASEMSysMLHelper.getProjectModelPath(TEST_SYSML_MODEL_NAME,
-            SysMlNamspace.FILE_EXTENSION);
-
     @Override
     protected void initializeTestModel() {
 
@@ -51,7 +48,7 @@ public class SysML2ASEMTest extends ASEMSysMLTest {
     @Override
     protected Iterable<ChangePropagationSpecification> createDirectionSpecificChangePropagationSpecifications(
             TransformationType transformationType) {
-        
+
         switch (transformationType) {
         case REACTIONS:
             return Collections.singletonList(new SysML2ASEMChangePropagationSpecification());

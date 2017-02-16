@@ -1,5 +1,7 @@
 package tools.vitruv.applications.asemsysml.tests;
 
+import static tools.vitruv.applications.asemsysml.ASEMSysMLConstants.TEST_SYSML_MODEL_NAME;
+
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
@@ -15,6 +17,7 @@ import tools.vitruv.applications.asemsysml.tests.util.ASEMSysMLTestHelper.Transf
 import tools.vitruv.domains.asem.AsemDomain;
 import tools.vitruv.domains.asem.AsemNamespace;
 import tools.vitruv.domains.sysml.SysMlDomain;
+import tools.vitruv.domains.sysml.SysMlNamspace;
 import tools.vitruv.framework.change.processing.ChangePropagationSpecification;
 import tools.vitruv.framework.correspondence.CorrespondenceModel;
 import tools.vitruv.framework.metamodel.Metamodel;
@@ -31,6 +34,9 @@ import tools.vitruv.framework.tests.VitruviusChangePropagationTest;
 public abstract class ASEMSysMLTest extends VitruviusChangePropagationTest {
 
     private static TransformationType transformationType = TransformationType.REACTIONS;
+
+    protected final String sysmlProjectModelPath = ASEMSysMLHelper.getProjectModelPath(TEST_SYSML_MODEL_NAME,
+            SysMlNamspace.FILE_EXTENSION);
 
     /*
      * TEST CASE methods. -------------------------------------------------------------------------
@@ -50,8 +56,8 @@ public abstract class ASEMSysMLTest extends VitruviusChangePropagationTest {
     }
 
     /**
-     * Create the change propagation specifications for the given transformation type. This method has
-     * to be implemented in the direction specific transformation test class.
+     * Create the change propagation specifications for the given transformation type. This method
+     * has to be implemented in the direction specific transformation test class.
      * 
      * @param transformationType
      *            The {@link TransformationType type of the transformation} which should be used.
