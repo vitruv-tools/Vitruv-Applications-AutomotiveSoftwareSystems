@@ -17,6 +17,7 @@ import org.eclipse.papyrus.sysml14.portsandflows.FlowProperty;
 import org.eclipse.uml2.uml.Connector;
 import org.eclipse.uml2.uml.ConnectorEnd;
 import org.eclipse.uml2.uml.Element;
+import org.eclipse.uml2.uml.Model;
 import org.eclipse.uml2.uml.Port;
 import org.eclipse.uml2.uml.PrimitiveType;
 import org.eclipse.uml2.uml.Type;
@@ -29,6 +30,7 @@ import tools.vitruv.domains.asem.AsemNamespace;
 import tools.vitruv.domains.sysml.SysMlNamspace;
 import tools.vitruv.framework.correspondence.Correspondence;
 import tools.vitruv.framework.correspondence.CorrespondenceModel;
+import tools.vitruv.framework.util.bridges.EcoreResourceBridge;
 import tools.vitruv.framework.util.datatypes.VURI;
 
 /**
@@ -128,6 +130,35 @@ public class ASEMSysMLHelper {
     }
 
     /**
+     * Get the SysML model which is the root element of the SysML model resource.
+     * 
+     * @param correspondenceModel
+     *            The correspondence model to get the resource set.
+     * @param alreadyPersistedObject
+     *            An object that already exists. This is needed to get the correct URI (test project
+     *            name, etc.).
+     * @return The SysML model element or <code>null</code> if no or multiple SysML model element(s)
+     *         exists as root element(s).
+     */
+    public static Model getSysMLModel(final CorrespondenceModel correspondenceModel,
+            final EObject alreadyPersistedObject) {
+
+        final String sysmlProjectModelPath = getProjectModelPath(ASEMSysMLConstants.TEST_SYSML_MODEL_NAME,
+                SysMlNamspace.FILE_EXTENSION);
+        final Resource sysmlResource = getModelResource(correspondenceModel, alreadyPersistedObject,
+                sysmlProjectModelPath);
+
+        try {
+
+            return EcoreResourceBridge.getUniqueTypedRootEObject(sysmlResource,
+                    ASEMSysMLConstants.TEST_SYSML_MODEL_NAME, Model.class);
+
+        } catch (RuntimeException re) {
+            return null;
+        }
+    }
+
+    /**
      * Get all ASEM elements which correspond to the given SysML element.
      * 
      * @param correspondenceModel
@@ -151,7 +182,7 @@ public class ASEMSysMLHelper {
 
         return correspondingASEMElements;
     }
-    
+
     /**
      * Get all SysML elements which correspond to the given ASEM element.
      * 
@@ -194,10 +225,10 @@ public class ASEMSysMLHelper {
 
         Collection<EObject> correspondingASEMElements = ASEMSysMLHelper
                 .getCorrespondingASEMElements(correspondenceModel, sysmlElement);
-        
+
         return getFirstCorrespondingElement(correspondingASEMElements, asemElementType);
     }
-    
+
     /**
      * Get the first corresponding SysML element of the given type for a ASEM element. If there are
      * multiple SysML elements corresponding to the given ASEM element, the first of them will be
@@ -210,18 +241,37 @@ public class ASEMSysMLHelper {
      * @return The first element of the corresponding ASEM elements or <code>null</code> if no
      *         corresponding element of the given type was found.
      */
+    @SuppressWarnings("unchecked")
     public static <T> T getFirstCorrespondingSysMLElement(final CorrespondenceModel correspondenceModel,
             final EObject asemElement, final Class<T> sysmlElementType) {
 
-        Collection<EObject> correspondingASEMElements = ASEMSysMLHelper
+        Collection<EObject> correspondingSysMLElements = ASEMSysMLHelper
                 .getCorrespondingSysMLElements(correspondenceModel, asemElement);
-        
-        return getFirstCorrespondingElement(correspondingASEMElements, sysmlElementType);
+
+        if (sysmlElementType.isAssignableFrom(Block.class)) {
+
+            org.eclipse.uml2.uml.Class baseClass = getFirstCorrespondingElement(correspondingSysMLElements,
+                    org.eclipse.uml2.uml.Class.class);
+
+            if (baseClass == null) {
+                return null;
+            }
+
+            Block block = UMLUtil.getStereotypeApplication(baseClass, Block.class);
+            return (T) block;
+
+        } else {
+
+            return getFirstCorrespondingElement(correspondingSysMLElements, sysmlElementType);
+
+        }
+
     }
-    
+
     @SuppressWarnings("unchecked")
-    private static <T> T getFirstCorrespondingElement(final Collection<EObject> correspondingElements, final Class<T> correspondingElementType) {
-        
+    private static <T> T getFirstCorrespondingElement(final Collection<EObject> correspondingElements,
+            final Class<T> correspondingElementType) {
+
         for (EObject correspondingElement : correspondingElements) {
 
             if (correspondingElementType.isAssignableFrom(correspondingElement.getClass())) {
@@ -230,7 +280,7 @@ public class ASEMSysMLHelper {
 
             }
         }
-        
+
         return null;
     }
 
