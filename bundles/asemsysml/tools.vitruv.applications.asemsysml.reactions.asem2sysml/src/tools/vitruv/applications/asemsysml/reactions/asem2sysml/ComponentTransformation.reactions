@@ -1,0 +1,41 @@
+import tools.vitruv.applications.asemsysml.ASEMSysMLConstants
+import tools.vitruv.applications.asemsysml.ASEMSysMLHelper
+import tools.vitruv.domains.sysml.SysMlNamspace
+
+import "edu.kit.ipd.sdq.asem" as asem
+import "http://www.eclipse.org/papyrus/sysml/1.4/SysML" as sysml
+import "http://www.eclipse.org/uml2/5.0.0/UML" as uml
+
+reactions: asem2sysmlComponent
+in reaction to changes in asem
+execute actions in uml
+
+reaction ComponentTransformation {
+	after element asem::Component created and inserted as root
+	call {
+		logger.info("[ASEMSysML] Create block for component " + newValue.name);
+		mapComponentToBlock(newValue)
+	} 
+}
+routine mapComponentToBlock(asem::Component component) {
+	action {
+
+		val baseClass = create uml::Class and initialize {
+		
+			baseClass.name = component.name;	
+			
+			val sysmlModel = ASEMSysMLHelper.getSysMLModel(this.correspondenceModel, component);
+			sysmlModel.packagedElements.add(baseClass);
+		}
+		
+		val block = create sysml::Block and initialize {
+			block.base_Class = baseClass;
+			block.isEncapsulated = true;
+		
+			persistProjectRelative(component, block, ASEMSysMLHelper.getProjectModelPath(ASEMSysMLConstants.TEST_SYSML_MODEL_NAME, SysMlNamspace.FILE_EXTENSION))
+		}
+		
+		add correspondence between component and block
+		
+	}
+}

@@ -1,0 +1,88 @@
+import tools.vitruv.applications.asemsysml.ASEMSysMLHelper
+import tools.vitruv.applications.asemsysml.ASEMSysMLConstants
+import tools.vitruv.domains.sysml.SysMlNamspace
+import org.eclipse.emf.ecore.util.EcoreUtil
+import org.eclipse.emf.common.util.URI
+import org.eclipse.uml2.uml.resource.UMLResource
+import org.eclipse.uml2.uml.UMLPackage
+import org.eclipse.uml2.uml.Profile
+import org.eclipse.papyrus.sysml14.util.SysMLResource
+import org.eclipse.uml2.types.TypesPackage
+
+import "edu.kit.ipd.sdq.asem" as asem
+import "http://www.eclipse.org/papyrus/sysml/1.4/SysML" as sysml
+import "http://www.eclipse.org/uml2/5.0.0/UML" as uml
+
+reactions: asem2sysmlInit
+in reaction to changes in asem
+execute actions in uml
+
+
+reaction Initialization{
+	after element asem::PrimitiveTypeRepository created and inserted as root
+	call {
+		logger.info("[ASEMSysML] Initialize ...");
+		doInitialization(newValue);	
+	}
+}
+routine doInitialization(asem::PrimitiveTypeRepository repo) {
+	
+	//	TODO [BR] This routine shall be split up into two different reactions.
+	//	On for the primitive types and one for the SysML model itself. But this is not possible at the moment,
+	//	because the order of the reactions can not be influenced. So it is not possible to initialize the SysML
+	//	model before the primitive types.
+	
+	action {
+		
+		// Initialize SysML model.
+		val sysmlModel = create uml::Model and initialize {
+
+			logger.info("[ASEMSysML] Initialize SysML model ... ");
+			sysmlModel.name = ASEMSysMLConstants.TEST_SYSML_MODEL_NAME;
+
+			// Apply UML and SysML profile.
+			var resourceSet = this.correspondenceModel.resource.resourceSet;
+			
+			val umlStdProfileResource = resourceSet.getResource(URI.createURI(UMLResource.STANDARD_PROFILE_URI), true)
+			val umlStdProfile = EcoreUtil.getObjectByType(umlStdProfileResource.contents, UMLPackage.Literals.PACKAGE) as Profile;
+			sysmlModel.applyProfile(umlStdProfile);
+			
+			val sysmlProfileResource = resourceSet.getResource(URI.createURI(SysMLResource.PROFILE_PATH), true);
+			val sysmlProfile = EcoreUtil.getObjectByType(sysmlProfileResource.contents, UMLPackage.Literals.PACKAGE) as Profile;
+			sysmlModel.applyProfile(sysmlProfile);
+			
+			persistProjectRelative(repo, sysmlModel, ASEMSysMLHelper.getProjectModelPath(ASEMSysMLConstants.TEST_SYSML_MODEL_NAME, SysMlNamspace.FILE_EXTENSION))
+		}
+		
+		// Initialize primitive types.
+		val pBoolean = create uml::PrimitiveType and initialize {
+			pBoolean.setName(TypesPackage.eINSTANCE.boolean.name);
+		}
+		val pInteger = create uml::PrimitiveType and initialize {
+			pInteger.setName(TypesPackage.eINSTANCE.integer.name);
+		}
+		val pReal = create uml::PrimitiveType and initialize {
+			pReal.setName(TypesPackage.eINSTANCE.real.name);
+		}
+		val pUnlimitedNatural = create uml::PrimitiveType and initialize {
+			pUnlimitedNatural.setName(TypesPackage.eINSTANCE.unlimitedNatural.name);
+		}
+		val pString = create uml::PrimitiveType and initialize {
+			pString.setName(TypesPackage.eINSTANCE.string.name);
+		}
+			
+		call {
+				
+			if(sysmlModel == null) {
+				logger.error("[ASEMSysML] Could not initialize primitive types! SysML model was not initialized yet.");
+				return
+			}
+			
+			sysmlModel.packagedElements.add(pBoolean);
+			sysmlModel.packagedElements.add(pInteger);
+			sysmlModel.packagedElements.add(pReal);
+			sysmlModel.packagedElements.add(pUnlimitedNatural);
+			sysmlModel.packagedElements.add(pString);
+		}
+	}
+}
