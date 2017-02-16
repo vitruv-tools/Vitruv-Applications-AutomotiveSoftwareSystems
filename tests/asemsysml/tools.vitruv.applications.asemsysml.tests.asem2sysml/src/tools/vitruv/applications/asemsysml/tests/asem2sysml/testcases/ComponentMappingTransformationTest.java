@@ -3,15 +3,14 @@ package tools.vitruv.applications.asemsysml.tests.asem2sysml.testcases;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.eclipse.papyrus.sysml14.blocks.Block;
 import org.junit.Test;
 
 import edu.kit.ipd.sdq.ASEM.classifiers.Class;
-import edu.kit.ipd.sdq.ASEM.classifiers.ClassifiersFactory;
+import edu.kit.ipd.sdq.ASEM.classifiers.Module;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.tests.asem2sysml.ASEM2SysMLTest;
+import tools.vitruv.applications.asemsysml.tests.util.ASEMSysMLTestHelper;
 
 /**
  * Class for all ASEM component mapping tests. An ASEM component must be transformed to a SysML
@@ -23,31 +22,32 @@ import tools.vitruv.applications.asemsysml.tests.asem2sysml.ASEM2SysMLTest;
 public class ComponentMappingTransformationTest extends ASEM2SysMLTest {
 
     /**
-     * After adding a ASEM Component to an ASEM model, a SysML block must be added to the SysML
-     * model.
+     * After adding a ASEM Component to an ASEM model, a SysML block with the same name must be
+     * added to the SysML model.
+     * 
+     * [Requirement 1.][Requirement 1.c)][Requirement 2.][Requirement 2.c)]
      */
     @Test
     public void testIfAComponentIsMappedToASysMLBlock() {
 
-        Logger.getRootLogger().setLevel(Level.INFO);
-
-        // Create ASEM class.
-        // TODO Move to helper method.
-        final String asemClassName = "SampleClass";
-        Class asemClass = ClassifiersFactory.eINSTANCE.createClass();
-        asemClass.setName(asemClassName);
-
-        // Create new ASEM model and add component as root element.
-        final String asemProjectModelPath = ASEMSysMLHelper.getASEMProjectModelPath(asemClassName);
-        this.createAndSynchronizeModel(asemProjectModelPath, asemClass);
+        Class asemClass = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("SampleClass", Class.class, this);
+        Module asemModule = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("SampleModule", Module.class,
+                this);
 
         // Check correspondence.
-        Block block = ASEMSysMLHelper.getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(), asemClass,
-                Block.class);
+        Block blockForClass = ASEMSysMLHelper.getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(),
+                asemClass, Block.class);
+        Block blockForModule = ASEMSysMLHelper.getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(),
+                asemModule, Block.class);
 
-        assertTrue("No corresponding element for ASEM class " + asemClass.getName() + " exists.", block != null);
+        assertTrue("No corresponding element for ASEM class " + asemClass.getName() + " exists.",
+                blockForClass != null);
+        assertTrue("No corresponding element for ASEM module " + asemModule.getName() + " exists.",
+                blockForModule != null);
         assertEquals("The names of the ASEM component and the SysML block must be equal!", asemClass.getName(),
-                block.getBase_Class().getName());
+                blockForClass.getBase_Class().getName());
+        assertEquals("The names of the ASEM component and the SysML block must be equal!", asemModule.getName(),
+                blockForModule.getBase_Class().getName());
 
     }
 }
