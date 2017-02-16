@@ -50,4 +50,49 @@ public class ComponentMappingTransformationTest extends ASEM2SysMLTest {
                 blockForModule.getBase_Class().getName());
 
     }
+
+    /**
+     * After changing the name of an ASEM component, the name of the corresponding SysML block must
+     * be changed, too.
+     */
+    @Test
+    public void testIfASysMLBlockIsRenamed() {
+
+        final String componentNameBefore = "Sample";
+        final String componentNameAfter = "RenamedSample";
+
+        Class asemClass = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync(
+                componentNameBefore + Class.class.getSimpleName(), Class.class, this);
+        Module asemModule = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync(
+                componentNameBefore + Module.class.getSimpleName(), Module.class, this);
+
+        // Check names before renaming.
+        Block blockForClass = ASEMSysMLHelper.getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(),
+                asemClass, Block.class);
+        Block blockForModule = ASEMSysMLHelper.getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(),
+                asemModule, Block.class);
+
+        assertEquals("Invalid block name!", componentNameBefore + Class.class.getSimpleName(),
+                blockForClass.getBase_Class().getName());
+        assertEquals("Invalid block name!", componentNameBefore + Module.class.getSimpleName(),
+                blockForModule.getBase_Class().getName());
+
+        // Rename components.
+        asemClass.setName(componentNameAfter + Class.class.getSimpleName());
+        this.saveAndSynchronizeChanges(asemClass);
+        asemModule.setName(componentNameAfter + Module.class.getSimpleName());
+        this.saveAndSynchronizeChanges(asemModule);
+
+        // Check names after renaming.
+        Block blockForClassRenamed = ASEMSysMLHelper.getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(),
+                asemClass, Block.class);
+        Block blockForModuleRenamed = ASEMSysMLHelper.getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(),
+                asemModule, Block.class);
+
+        assertEquals("Renaming of SysML block " + blockForClassRenamed.getBase_Class().getName() + " failed!",
+                componentNameAfter + Class.class.getSimpleName(), blockForClassRenamed.getBase_Class().getName());
+        assertEquals("Renaming of SysML block " + blockForModuleRenamed.getBase_Class().getName() + " failed!",
+                componentNameAfter + Module.class.getSimpleName(), blockForModuleRenamed.getBase_Class().getName());
+
+    }
 }
