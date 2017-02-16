@@ -1,3 +1,5 @@
+import org.eclipse.papyrus.sysml14.blocks.Block
+import org.eclipse.uml2.uml.util.UMLUtil
 import tools.vitruv.applications.asemsysml.ASEMSysMLConstants
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper
 import tools.vitruv.domains.sysml.SysMlNamspace
@@ -37,5 +39,32 @@ routine mapComponentToBlock(asem::Component component) {
 		
 		add correspondence between component and block
 		
+	}
+}
+
+reaction ComponentDeletionTransformation {
+	after element asem::Component deleted and removed as root
+	call {
+		logger.info("[ASEMSysML] Delete the block and its base class corresponding to component " + oldValue.name + "...");
+		deleteBaseClass(oldValue);
+	}
+}
+routine deleteBaseClass(asem::Component component) {
+	match {
+		val baseClass = retrieve uml::Class corresponding to component
+	}
+	action {
+		
+		delete baseClass
+		
+		call {
+			val block = UMLUtil.getStereotypeApplication(baseClass, Block);
+			deleteTest(block);
+		}
+	}
+}
+routine deleteTest(sysml::Block block) {
+	action {
+		delete block
 	}
 }

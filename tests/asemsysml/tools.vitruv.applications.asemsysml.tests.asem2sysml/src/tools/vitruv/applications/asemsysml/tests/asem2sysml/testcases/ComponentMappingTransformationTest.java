@@ -3,7 +3,12 @@ package tools.vitruv.applications.asemsysml.tests.asem2sysml.testcases;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.papyrus.sysml14.blocks.Block;
+import org.eclipse.papyrus.sysml14.blocks.BlocksPackage;
 import org.junit.Test;
 
 import edu.kit.ipd.sdq.ASEM.classifiers.Class;
@@ -95,4 +100,57 @@ public class ComponentMappingTransformationTest extends ASEM2SysMLTest {
                 componentNameAfter + Module.class.getSimpleName(), blockForModuleRenamed.getBase_Class().getName());
 
     }
+
+    /**
+     * After a ASEM component was deleted, the corresponding SysML block and the correspondence
+     * between both must be deleted, too.
+     */
+    @Test
+    public void testIfASysMLBlockIsDeleted() {
+
+        Logger.getRootLogger().setLevel(Level.INFO);
+
+        Class asemClass = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("SampleClassToDelete", Class.class,
+                this);
+        Module asemModule = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("SampleModuleToDelete",
+                Module.class, this);
+
+        // Check that corresponding SysML blocks exist.
+        Block blockForClass = ASEMSysMLHelper.getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(),
+                asemClass, Block.class);
+        Block blockForModule = ASEMSysMLHelper.getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(),
+                asemModule, Block.class);
+
+        assertTrue("No corresponding SysML block for ASEM class " + asemClass.getName() + " was created!",
+                blockForClass != null);
+        assertTrue("No corresponding SysML block for ASEM module " + asemModule.getName() + " was created!",
+                blockForModule != null);
+
+        // Delete ASEM components.
+        final String classProjectModelPath = ASEMSysMLHelper.getASEMProjectModelPath(asemClass.getName());
+        this.deleteAndSynchronizeModel(classProjectModelPath);
+        final String moduleProjectModelPath = ASEMSysMLHelper.getASEMProjectModelPath(asemModule.getName());
+        this.deleteAndSynchronizeModel(moduleProjectModelPath);
+
+        // Check after deletion.
+        assertTrue("Deletion of ASEM class " + asemClass.getName() + " failed!", asemClass.eResource() == null);
+        assertTrue("Deletion of ASEM module " + asemModule.getName() + " failed!", asemModule.eResource() == null);
+
+        Block blockForClassDeleted = ASEMSysMLHelper.getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(),
+                asemClass, Block.class);
+        Block blockForModuleDeleted = ASEMSysMLHelper.getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(),
+                asemModule, Block.class);
+
+        assertTrue("Deletion of SysML block for ASEM class " + asemClass.getName() + " failed!",
+                blockForClassDeleted == null);
+        assertTrue("Deletion of SysML block for ASEM module " + asemModule.getName() + " failed!",
+                blockForModuleDeleted == null);
+
+        final Resource sysmlResource = this.getModelResource(this.sysmlProjectModelPath);
+
+        assertTrue("SysML blocks were not deleted from SysML model!", EcoreUtil
+                .getObjectsByType(sysmlResource.getContents(), BlocksPackage.eINSTANCE.getBlock()).size() == 0);
+
+    }
+
 }
