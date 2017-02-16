@@ -9,8 +9,9 @@ execute actions in uml
 
 reaction RenamingNamedElement {
 	after attribute replaced at asem::Named[name]
+		with oldValue != null
 	call {
-		logger.info("[ASEMSysML] A named element was renamed. Transform new name to SysML model ...");
+		logger.info("[ASEMSysML] The named element " + oldValue + " was renamed to " + newValue + ". Transform new name to SysML model ...");
 		doRenaming(affectedEObject, newValue);
 	}
 }
