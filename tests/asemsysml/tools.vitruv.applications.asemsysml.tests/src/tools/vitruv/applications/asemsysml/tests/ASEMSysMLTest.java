@@ -105,6 +105,18 @@ public abstract class ASEMSysMLTest extends VitruviusChangePropagationTest {
     }
 
     /**
+     * Create and synchronize a model with the given project model path and the given root element.
+     * 
+     * @param modelPathInProject
+     *            The project model path of the model to create.
+     * @param rootElement
+     *            The model root element.
+     */
+    public void createAndSynchronizeModel(final String modelPathInProject, final EObject rootElement) {
+        super.createAndSynchronizeModel(modelPathInProject, rootElement);
+    }
+
+    /**
      * Get the ASEM model resource which belongs to a SysML block, because for each SysML block a
      * separate ASEM model is created.
      * 
