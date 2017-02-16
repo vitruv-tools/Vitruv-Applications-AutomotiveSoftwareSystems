@@ -25,7 +25,9 @@ import org.eclipse.uml2.uml.Type;
 import org.eclipse.uml2.uml.util.UMLUtil.StereotypeApplicationHelper;
 
 import edu.kit.ipd.sdq.ASEM.base.TypedElement;
+import edu.kit.ipd.sdq.ASEM.classifiers.ClassifiersFactory;
 import edu.kit.ipd.sdq.ASEM.classifiers.Component;
+import edu.kit.ipd.sdq.ASEM.classifiers.Module;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.tests.ASEMSysMLTest;
 
@@ -175,6 +177,44 @@ public final class ASEMSysMLTestHelper {
 
         return sysmlBlock;
 
+    }
+
+    /**
+     * Create a new ASEM component as root element within a new ASEM model.
+     * 
+     * @param componentName
+     *            The name of the component to create.
+     * @param asemComponentType
+     *            The {@link Component component type} of the component to create.
+     * @param testCaseClass
+     *            Test case class. Needed for accessing synchronization method.
+     * @return The created ASEM component of the given type.
+     */
+    @SuppressWarnings("unchecked")
+    public static <T extends Component> T createASEMComponentAsModelRootAndSync(final String componentName,
+            final java.lang.Class<T> asemComponentType, final ASEMSysMLTest testCaseClass) {
+
+        T asemComponent;
+
+        if (asemComponentType.isAssignableFrom(edu.kit.ipd.sdq.ASEM.classifiers.Class.class)) {
+
+            asemComponent = (T) ClassifiersFactory.eINSTANCE.createClass();
+
+        } else if (asemComponentType.isAssignableFrom(Module.class)) {
+
+            asemComponent = (T) ClassifiersFactory.eINSTANCE.createModule();
+
+        } else {
+            throw new IllegalArgumentException(
+                    "ASEM component type " + asemComponentType + " can not be used for component creation!");
+        }
+        asemComponent.setName(componentName);
+
+        // Create new ASEM model and add component as root element.
+        final String asemProjectModelPath = ASEMSysMLHelper.getASEMProjectModelPath(componentName);
+        testCaseClass.createAndSynchronizeModel(asemProjectModelPath, asemComponent);
+
+        return asemComponent;
     }
 
     /**
