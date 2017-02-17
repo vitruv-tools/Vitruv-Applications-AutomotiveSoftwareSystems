@@ -13,6 +13,8 @@ import org.eclipse.papyrus.sysml14.portsandflows.FlowProperty;
 import org.eclipse.uml2.uml.Port;
 import org.junit.Test;
 
+import edu.kit.ipd.sdq.ASEM.classifiers.Class;
+import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import edu.kit.ipd.sdq.ASEM.classifiers.Module;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Message;
 import edu.kit.ipd.sdq.ASEM.primitivetypes.BooleanType;
@@ -39,8 +41,10 @@ public class MessageMappingTransformationTest extends ASEM2SysMLTest {
 
         Module module = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ModuleForMessages", Module.class,
                 this);
+        Class asemClassForMessageType = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ClassForMessageType",
+                Class.class, this);
 
-        Collection<Message> methods = this.prepareMessages(module);
+        Collection<Message> methods = this.prepareMessages(module, asemClassForMessageType);
 
         for (Message message : methods) {
 
@@ -51,7 +55,7 @@ public class MessageMappingTransformationTest extends ASEM2SysMLTest {
 
     }
 
-    private Collection<Message> prepareMessages(final Module module) {
+    private Collection<Message> prepareMessages(final Module module, final Class moduleAsType) {
 
         final PrimitiveType pBoolean = ASEMSysMLPrimitiveTypeHelper
                 .getASEMPrimitiveTypeFromRepository(BooleanType.class, module);
@@ -63,6 +67,8 @@ public class MessageMappingTransformationTest extends ASEM2SysMLTest {
                 module, this));
         messages.add(ASEMSysMLTestHelper.createASEMMessageAddToModuleAndSync("MessageBooleanINOUT", true, true,
                 pBoolean, module, this));
+        messages.add(ASEMSysMLTestHelper.createASEMMessageAddToModuleAndSync("MessageClassIN", true, false,
+                moduleAsType, module, this));
 
         return messages;
     }
@@ -110,13 +116,31 @@ public class MessageMappingTransformationTest extends ASEM2SysMLTest {
 
         final Port port = ASEMSysMLHelper.getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(), message,
                 Port.class);
-        final PrimitiveType asemType = (PrimitiveType) message.getType();
-        final org.eclipse.uml2.uml.PrimitiveType portType = ASEMSysMLPrimitiveTypeHelper
-                .getSysMLTypeByASEMType(asemType.getClass());
-        final org.eclipse.uml2.uml.PrimitiveType expectedPortType = ASEMSysMLPrimitiveTypeHelper
-                .getSysMLPrimitiveTypeFromSysMLModel(this.getCorrespondenceModel(), message, portType.eClass());
 
         assertTrue("Port type is not set!", port.getType() != null);
-        assertEquals("Invalid port type!", expectedPortType, port.getType());
+
+        if (message.getType() instanceof PrimitiveType) {
+
+            final PrimitiveType asemType = (PrimitiveType) message.getType();
+            final org.eclipse.uml2.uml.PrimitiveType portType = ASEMSysMLPrimitiveTypeHelper
+                    .getSysMLTypeByASEMType(asemType.getClass());
+            final org.eclipse.uml2.uml.PrimitiveType expectedPortType = ASEMSysMLPrimitiveTypeHelper
+                    .getSysMLPrimitiveTypeFromSysMLModel(this.getCorrespondenceModel(), message, portType.eClass());
+
+            assertEquals("Invalid port type!", expectedPortType, port.getType());
+
+        } else if (message.getType() instanceof Component) {
+
+            final Component messageType = (Component) message.getType();
+            final org.eclipse.uml2.uml.Class expectedPortType = ASEMSysMLHelper
+                    .getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(), messageType, Block.class)
+                    .getBase_Class();
+
+            assertEquals("Invalid port type!", expectedPortType, port.getType());
+
+        } else {
+            fail("Unsupported message type.");
+        }
+
     }
 }
