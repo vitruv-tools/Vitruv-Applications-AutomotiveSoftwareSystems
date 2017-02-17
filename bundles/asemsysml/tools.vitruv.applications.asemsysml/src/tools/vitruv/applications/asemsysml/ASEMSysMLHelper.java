@@ -213,6 +213,10 @@ public class ASEMSysMLHelper {
      * multiple ASEM elements corresponding to the given SysML element, the first of them will be
      * returned.
      * 
+     * @param <T>
+     *            Expected type of the corresponding ASEM element.
+     * @param correspondenceModel
+     *            The correspondence model.
      * @param sysmlElement
      *            The SysML element which corresponds with a ASEM element.
      * @param asemElementType
@@ -234,6 +238,10 @@ public class ASEMSysMLHelper {
      * multiple SysML elements corresponding to the given ASEM element, the first of them will be
      * returned.
      * 
+     * @param <T>
+     *            Expected type of the corresponding SysML element.
+     * @param correspondenceModel
+     *            The correspondence model.
      * @param asemElement
      *            The SysML element which corresponds with a ASEM element.
      * @param sysmlElementType
@@ -376,8 +384,8 @@ public class ASEMSysMLHelper {
     }
 
     /**
-     * Get the connector end of a port. If there exists more than on connector end the first one will be
-     * returned at the moment.
+     * Get the connector end of a port. If there exists more than on connector end the first one
+     * will be returned at the moment.
      * 
      * @param port
      *            The port which must have at least on connector end specified.
