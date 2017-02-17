@@ -1,0 +1,103 @@
+import edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType
+import org.eclipse.papyrus.sysml14.portsandflows.FlowDirection
+import tools.vitruv.applications.asemsysml.ASEMSysMLConstants
+import tools.vitruv.applications.asemsysml.ASEMSysMLHelper
+import tools.vitruv.applications.asemsysml.ASEMSysMLPrimitiveTypeHelper
+import tools.vitruv.domains.sysml.SysMlNamspace
+
+import "edu.kit.ipd.sdq.asem" as asem
+import "http://www.eclipse.org/papyrus/sysml/1.4/SysML" as sysml
+import "http://www.eclipse.org/uml2/5.0.0/UML" as uml
+
+reactions: asem2sysmlMessage
+in reaction to changes in asem
+execute actions in uml
+
+
+reaction MessageTransformation {
+	after element asem::Message created and inserted in asem::Component[typedElements]
+	call {
+		logger.info("[ASEMSysML] Create port for message " + newValue.name);
+		
+		val messageType = newValue.type;
+
+		if(messageType instanceof PrimitiveType) {
+			
+			val sysmlPrimitiveType = ASEMSysMLPrimitiveTypeHelper.getSysMLTypeByASEMType(messageType.class);
+			createPort(newValue, sysmlPrimitiveType);
+			
+		}else{
+			// TODO Implement!
+		}
+		
+		
+	}
+}
+routine createPort(asem::Message message, uml::PrimitiveType portType) {
+	match {
+		val baseClass = retrieve uml::Class corresponding to message.eContainer
+	}
+	action {
+		// Create the port property and apply the SysML FlowProperty stereotype.
+		val portProperty = create uml::Property and initialize {
+			portProperty.name = message.name + "Property";
+			portProperty.type = ASEMSysMLPrimitiveTypeHelper.getSysMLPrimitiveTypeFromSysMLModel(this.correspondenceModel, message, portType.eClass);
+			
+			baseClass.ownedAttributes.add(portProperty);
+		}
+		val flowProperty = create sysml::FlowProperty and initialize {
+			flowProperty.base_Property = portProperty;
+			
+			// Set direction based on the message read and write attributes.
+			if (message.readable && !message.writable) {
+								
+				flowProperty.direction = FlowDirection.IN;
+			
+			} else if (!message.readable && message.writable) {
+			
+				flowProperty.direction = FlowDirection.OUT;
+			
+			} else if (message.readable && message.writable) {
+			
+				flowProperty.direction = FlowDirection.INOUT;
+			
+			} else {
+				logger.warn("[ASEMSysML] Unsupported flow direction!");
+			}
+		}
+		
+		// Create the port.
+		val port = create uml::Port and initialize {
+			port.name = message.name;
+			port.type = ASEMSysMLPrimitiveTypeHelper.getSysMLPrimitiveTypeFromSysMLModel(this.correspondenceModel, message, portType.eClass);
+			
+			baseClass.ownedPorts.add(port);
+		}
+		
+		// Create the connector which connects the port property and the port and apply the SysML BindingConnector stereotype.
+		val propertyEnd = create uml::ConnectorEnd and initialize {
+			propertyEnd.role = portProperty;
+		}
+		val portEnd = create uml::ConnectorEnd and initialize {
+			portEnd.role = port;
+		}
+		val connector = create uml::Connector and initialize {
+			connector.name = "BindingConnector_" + portProperty.name + "-" + port.name;
+			connector.ends.add(propertyEnd);
+			connector.ends.add(portEnd);
+			
+			baseClass.ownedConnectors.add(connector);
+		}
+		val bindingConnector = create sysml::BindingConnector and initialize {
+			bindingConnector.base_Connector = connector;
+		}
+		
+		call {
+			// Persist the root elements at the end of the reaction to prevent empty resource element in the action block.
+			persistProjectRelative(message, flowProperty, ASEMSysMLHelper.getProjectModelPath(ASEMSysMLConstants.TEST_SYSML_MODEL_NAME, SysMlNamspace.FILE_EXTENSION));
+			persistProjectRelative(message, bindingConnector, ASEMSysMLHelper.getProjectModelPath(ASEMSysMLConstants.TEST_SYSML_MODEL_NAME, SysMlNamspace.FILE_EXTENSION));
+		}
+		
+		add correspondence between message and port
+	}
+}
