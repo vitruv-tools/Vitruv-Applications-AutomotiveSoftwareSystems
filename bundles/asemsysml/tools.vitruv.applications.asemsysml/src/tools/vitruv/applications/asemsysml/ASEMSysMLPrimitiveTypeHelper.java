@@ -79,6 +79,8 @@ public final class ASEMSysMLPrimitiveTypeHelper {
     /**
      * Get the primitive type instance from the ASEM primitive type repository.
      * 
+     * @param <T>
+     *            Type of the needed primitive type instance.
      * @param type
      *            Type of the primitive type which shall be returned.
      * @param alreadyPersistedObject
