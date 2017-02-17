@@ -375,8 +375,20 @@ public class ASEMSysMLHelper {
 
     }
 
+    /**
+     * Get the connector end of a port. If there exists more than on connector end the first one will be
+     * returned at the moment.
+     * 
+     * @param port
+     *            The port which must have at least on connector end specified.
+     * @return The first connector end of the given port.
+     */
     public static ConnectorEnd getConnectorEnd(final Port port) {
-        // TODO [BR] A port can have multiple connector ends. If this method should be reworked.
+        if (port.getEnds().isEmpty()) {
+            throw new IllegalArgumentException("The given port has no connector ends.");
+        }
+        // TODO [BR] A port can have multiple connector ends. If this this is necessary, this method
+        // must be reworked.
         return port.getEnds().get(0);
     }
 
