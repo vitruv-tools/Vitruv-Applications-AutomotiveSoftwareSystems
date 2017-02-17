@@ -2,20 +2,27 @@ package tools.vitruv.applications.asemsysml;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.uml2.types.TypesPackage;
+import org.eclipse.uml2.uml.Model;
 import org.eclipse.uml2.uml.PrimitiveType;
 import org.eclipse.uml2.uml.UMLFactory;
+import org.eclipse.uml2.uml.UMLPackage;
 
 import edu.kit.ipd.sdq.ASEM.primitivetypes.BooleanType;
 import edu.kit.ipd.sdq.ASEM.primitivetypes.ContinuousType;
 import edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveTypeRepository;
 import edu.kit.ipd.sdq.ASEM.primitivetypes.SignedDiscreteType;
+import tools.vitruv.domains.sysml.SysMlNamspace;
+import tools.vitruv.framework.correspondence.CorrespondenceModel;
 import tools.vitruv.framework.util.datatypes.VURI;
 
 /**
@@ -63,6 +70,24 @@ public final class ASEMSysMLPrimitiveTypeHelper {
         PRIMITIVE_TYPE_MAP.put(PRIMITIVE_TYPE_UNLIMITED_NATURAL, null);
     }
 
+    /**
+     * Get the SysML primitive type which is mapped to the given ASEM primitive type.
+     * 
+     * @param asemType
+     *            The ASEM primitive type class.
+     * @return The SysML primitive type which is mapped to the given ASEM primitive type.
+     */
+    public static final PrimitiveType getSysMLTypeByASEMType(
+            final Class<? extends edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType> asemType) {
+        for (Entry<PrimitiveType, Class<? extends edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType>> entry : PRIMITIVE_TYPE_MAP
+                .entrySet()) {
+            if (entry.getValue() != null && entry.getValue().isAssignableFrom(asemType)) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+
     /** Utility classes should not have a public or default constructor. */
     private ASEMSysMLPrimitiveTypeHelper() {
     }
@@ -105,6 +130,39 @@ public final class ASEMSysMLPrimitiveTypeHelper {
 
         return primitiveType;
 
+    }
+
+    /**
+     * Get the primitive type instance from the SysML model.
+     * 
+     * @param correspondenceModel
+     *            The correspondence model.
+     * @param alreadyPersistedObject
+     *            An object that already exists. This is needed to get the correct URI (test project
+     *            name, etc.).
+     * @param type
+     *            The primitive type for which an instance shall be returned.
+     * @return The instance of the primitive type.
+     */
+    public static PrimitiveType getSysMLPrimitiveTypeFromSysMLModel(final CorrespondenceModel correspondenceModel,
+            final EObject alreadyPersistedObject, final EClassifier type) {
+
+        String sysmlProjectModelPath = ASEMSysMLHelper.getProjectModelPath(ASEMSysMLConstants.TEST_SYSML_MODEL_NAME,
+                SysMlNamspace.FILE_EXTENSION);
+        Resource resource = ASEMSysMLHelper.getModelResource(correspondenceModel, alreadyPersistedObject,
+                sysmlProjectModelPath);
+
+        if (resource == null) {
+            throw new IllegalArgumentException("No SysML model resource exists.");
+        }
+
+        Model sysmlModel = (Model) EcoreUtil.getObjectByType(resource.getContents(), UMLPackage.eINSTANCE.getModel());
+
+        if (sysmlModel == null) {
+            throw new IllegalArgumentException("SysML model does not contain a UML model element.");
+        }
+
+        return (PrimitiveType) EcoreUtil.getObjectByType(sysmlModel.getPackagedElements(), type);
     }
 
     /**
