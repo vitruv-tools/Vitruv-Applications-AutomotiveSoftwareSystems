@@ -25,9 +25,12 @@ import org.eclipse.uml2.uml.Type;
 import org.eclipse.uml2.uml.util.UMLUtil.StereotypeApplicationHelper;
 
 import edu.kit.ipd.sdq.ASEM.base.TypedElement;
+import edu.kit.ipd.sdq.ASEM.classifiers.Classifier;
 import edu.kit.ipd.sdq.ASEM.classifiers.ClassifiersFactory;
 import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import edu.kit.ipd.sdq.ASEM.classifiers.Module;
+import edu.kit.ipd.sdq.ASEM.dataexchange.DataexchangeFactory;
+import edu.kit.ipd.sdq.ASEM.dataexchange.Message;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.tests.ASEMSysMLTest;
 
@@ -215,6 +218,39 @@ public final class ASEMSysMLTestHelper {
         testCaseClass.createAndSynchronizeModel(asemProjectModelPath, asemComponent);
 
         return asemComponent;
+    }
+
+    /**
+     * Create an ASEM message and it to a existing ASEM module. The method will save and synchronize
+     * the ASEM model, too.
+     * 
+     * @param messageName
+     *            The name of the message.
+     * @param readable
+     *            <code>True</code> if the message shall be readable, otherwise <code>false</code>.
+     * @param writable
+     *            <code>True</code> if the message shall be writable, otherwise <code>false</code>.
+     * @param type
+     *            The message type.
+     * @param module
+     *            The module the message shall be added to.
+     * @param testCaseClass
+     *            Test case class. Needed for accessing synchronization method.
+     * @return The created ASEM message element.
+     */
+    public static Message createASEMMessageAddToModuleAndSync(final String messageName, final boolean readable,
+            final boolean writable, final Classifier type, final Module module, final ASEMSysMLTest testCaseClass) {
+
+        Message message = DataexchangeFactory.eINSTANCE.createMessage();
+        message.setName(messageName);
+        message.setReadable(readable);
+        message.setWritable(writable);
+        message.setType(type);
+
+        module.getTypedElements().add(message);
+        testCaseClass.saveAndSynchronizeChanges(module);
+
+        return message;
     }
 
     /**

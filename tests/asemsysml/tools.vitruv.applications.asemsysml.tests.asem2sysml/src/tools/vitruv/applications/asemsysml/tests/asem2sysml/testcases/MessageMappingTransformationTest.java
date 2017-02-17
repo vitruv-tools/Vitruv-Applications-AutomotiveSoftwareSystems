@@ -2,6 +2,10 @@ package tools.vitruv.applications.asemsysml.tests.asem2sysml.testcases;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.util.Collection;
+import java.util.HashSet;
 
 import org.eclipse.papyrus.sysml14.blocks.Block;
 import org.eclipse.papyrus.sysml14.portsandflows.FlowDirection;
@@ -10,7 +14,6 @@ import org.eclipse.uml2.uml.Port;
 import org.junit.Test;
 
 import edu.kit.ipd.sdq.ASEM.classifiers.Module;
-import edu.kit.ipd.sdq.ASEM.dataexchange.DataexchangeFactory;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Message;
 import edu.kit.ipd.sdq.ASEM.primitivetypes.BooleanType;
 import edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType;
@@ -34,41 +37,79 @@ public class MessageMappingTransformationTest extends ASEM2SysMLTest {
     @Test
     public void testIfAMessageIsMappedToASysMLPort() {
 
-        Module module = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ModuleForMethod", Module.class,
+        Module module = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ModuleForMessages", Module.class,
                 this);
 
-        PrimitiveType pBoolean = ASEMSysMLPrimitiveTypeHelper.getASEMPrimitiveTypeFromRepository(BooleanType.class,
-                module);
+        Collection<Message> methods = this.prepareMessages(module);
 
-        Message message = DataexchangeFactory.eINSTANCE.createMessage();
-        message.setName("SampleMessage");
-        message.setReadable(true);
-        message.setWritable(false);
-        message.setType(pBoolean);
+        for (Message message : methods) {
 
-        module.getTypedElements().add(message);
-        this.saveAndSynchronizeChanges(module);
+            this.assertPortWasCreated(message, module);
+            this.assertPortHasCorrectDirection(message);
+            this.assertPortHasCorrectType(message);
+        }
 
-        // Check if an UML port with direction IN was created.
-        Port port = ASEMSysMLHelper.getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(), message,
+    }
+
+    private Collection<Message> prepareMessages(final Module module) {
+
+        final PrimitiveType pBoolean = ASEMSysMLPrimitiveTypeHelper
+                .getASEMPrimitiveTypeFromRepository(BooleanType.class, module);
+
+        Collection<Message> messages = new HashSet<Message>();
+        messages.add(ASEMSysMLTestHelper.createASEMMessageAddToModuleAndSync("MessageBooleanIN", true, false, pBoolean,
+                module, this));
+        messages.add(ASEMSysMLTestHelper.createASEMMessageAddToModuleAndSync("MessageBooleanOUT", false, true, pBoolean,
+                module, this));
+        messages.add(ASEMSysMLTestHelper.createASEMMessageAddToModuleAndSync("MessageBooleanINOUT", true, true,
+                pBoolean, module, this));
+
+        return messages;
+    }
+
+    private void assertPortWasCreated(final Message message, final Module module) {
+
+        final Port port = ASEMSysMLHelper.getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(), message,
                 Port.class);
 
         assertTrue("No correspondence between the message element " + message.getName() + " and an UML port exists!",
                 port != null);
 
-        Block block = ASEMSysMLHelper.getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(), module,
+        final Block block = ASEMSysMLHelper.getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(), module,
                 Block.class);
-        Block portsBlock = ASEMSysMLHelper.getPortsBlock(port);
+        final Block portsBlock = ASEMSysMLHelper.getPortsBlock(port);
 
         assertEquals("The port was not added to the expected SysML block!", block, portsBlock);
+    }
 
-        // Check direction.
-        FlowProperty flowProperty = ASEMSysMLHelper.getFlowProperty(port);
+    private void assertPortHasCorrectDirection(final Message message) {
+
+        final Port port = ASEMSysMLHelper.getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(), message,
+                Port.class);
+
+        final FlowProperty flowProperty = ASEMSysMLHelper.getFlowProperty(port);
+
+        FlowDirection expectedDirection = null;
+
+        if (message.isReadable() && !message.isWritable()) {
+            expectedDirection = FlowDirection.IN;
+        } else if (!message.isReadable() && message.isWritable()) {
+            expectedDirection = FlowDirection.OUT;
+        } else if (message.isReadable() && message.isWritable()) {
+            expectedDirection = FlowDirection.INOUT;
+        } else {
+            fail("Invalid message attributes! Messages were readable and writable are false cannot be transformed.");
+        }
 
         assertTrue("No flow property for port " + port.getName() + " was found!", flowProperty != null);
-        assertEquals("Port " + port.getName() + " has wrong direction!", FlowDirection.IN, flowProperty.getDirection());
+        assertEquals("Port " + port.getName() + " has wrong direction!", expectedDirection,
+                flowProperty.getDirection());
+    }
 
-        // Check type.
+    private void assertPortHasCorrectType(final Message message) {
+
+        final Port port = ASEMSysMLHelper.getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(), message,
+                Port.class);
         final PrimitiveType asemType = (PrimitiveType) message.getType();
         final org.eclipse.uml2.uml.PrimitiveType portType = ASEMSysMLPrimitiveTypeHelper
                 .getSysMLTypeByASEMType(asemType.getClass());
@@ -77,7 +118,5 @@ public class MessageMappingTransformationTest extends ASEM2SysMLTest {
 
         assertTrue("Port type is not set!", port.getType() != null);
         assertEquals("Invalid port type!", expectedPortType, port.getType());
-
     }
-
 }
