@@ -3,8 +3,6 @@ package tools.vitruv.applications.asemsysml.tests.asem2sysml.testcases;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.papyrus.sysml14.blocks.Block;
@@ -107,8 +105,6 @@ public class ComponentMappingTransformationTest extends ASEM2SysMLTest {
      */
     @Test
     public void testIfASysMLBlockIsDeleted() {
-
-        Logger.getRootLogger().setLevel(Level.INFO);
 
         Class asemClass = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("SampleClassToDelete", Class.class,
                 this);

@@ -21,7 +21,6 @@ import org.eclipse.uml2.uml.Port;
 import org.eclipse.uml2.uml.Property;
 import org.eclipse.uml2.uml.UMLPackage;
 import org.eclipse.uml2.uml.util.UMLUtil;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import edu.kit.ipd.sdq.ASEM.classifiers.Class;
@@ -73,7 +72,6 @@ public class MessageMappingTransformationTest extends ASEM2SysMLTest {
      * both must be deleted, too.
      */
     @Test
-    @Ignore
     public void testIfAPortWillBeDeleted() {
 
         Module module = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ModuleForMessageToDelete",
