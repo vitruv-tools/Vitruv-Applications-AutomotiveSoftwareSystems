@@ -223,8 +223,31 @@ public final class ASEMSysMLTestHelper {
     }
 
     /**
-     * Create an ASEM message and it to a existing ASEM module. The method will save and synchronize
-     * the ASEM model, too.
+     * Create an ASEM method and add it to an existing ASEM class. The method will save and
+     * synchronize the ASEM model, too.
+     * 
+     * @param methodName
+     *            The name of the method,
+     * @param asemClass
+     *            The ASEM class the method shall be added to.
+     * @param testCaseClass
+     *            Test case class. Needed for accessing synchronization method.
+     * @return The created ASEM method.
+     */
+    public static Method createASEMMethodAddToClassAndSync(final String methodName,
+            final edu.kit.ipd.sdq.ASEM.classifiers.Class asemClass, final ASEMSysMLTest testCaseClass) {
+
+        Method method = DataexchangeFactory.eINSTANCE.createMethod();
+        method.setName(methodName);
+        asemClass.getMethods().add(method);
+        testCaseClass.saveAndSynchronizeChanges(asemClass);
+
+        return method;
+    }
+
+    /**
+     * Create an ASEM message and add it to an existing ASEM module. The method will save and
+     * synchronize the ASEM model, too.
      * 
      * @param messageName
      *            The name of the message.

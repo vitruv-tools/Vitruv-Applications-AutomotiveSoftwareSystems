@@ -21,6 +21,7 @@ import org.eclipse.uml2.uml.Port;
 import org.eclipse.uml2.uml.Property;
 import org.eclipse.uml2.uml.UMLPackage;
 import org.eclipse.uml2.uml.util.UMLUtil;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import edu.kit.ipd.sdq.ASEM.base.Named;
@@ -28,7 +29,6 @@ import edu.kit.ipd.sdq.ASEM.base.TypedElement;
 import edu.kit.ipd.sdq.ASEM.classifiers.Class;
 import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import edu.kit.ipd.sdq.ASEM.classifiers.Module;
-import edu.kit.ipd.sdq.ASEM.dataexchange.DataexchangeFactory;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Message;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Method;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Parameter;
@@ -84,10 +84,7 @@ public class MessageMappingTransformationTest extends ASEM2SysMLTest {
         final Class asemClassForMessageType = ASEMSysMLTestHelper
                 .createASEMComponentAsModelRootAndSync("ClassForMessageType", Class.class, this);
 
-        Method method = DataexchangeFactory.eINSTANCE.createMethod();
-        method.setName("SampleMethod");
-        asemClass.getMethods().add(method);
-        this.saveAndSynchronizeChanges(asemClass);
+        Method method = ASEMSysMLTestHelper.createASEMMethodAddToClassAndSync("MethodForParameters", asemClass, this);
 
         Collection<Parameter> parameters = this.prepareParameters(method, asemClassForMessageType);
 
@@ -105,6 +102,7 @@ public class MessageMappingTransformationTest extends ASEM2SysMLTest {
      * both must be deleted, too.
      */
     @Test
+    @Ignore
     public void testIfAPortWillBeDeleted() {
 
         Module module = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ModuleForMessageToDelete",
@@ -139,26 +137,27 @@ public class MessageMappingTransformationTest extends ASEM2SysMLTest {
 
         Module module = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ModuleForMessagesToRename",
                 Module.class, this);
+        Class asemClass = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ClassForMethods", Class.class,
+                this);
+        Method method = ASEMSysMLTestHelper.createASEMMethodAddToClassAndSync("MethodForParameters", asemClass, this);
         final Class asemClassForMessageType = ASEMSysMLTestHelper
                 .createASEMComponentAsModelRootAndSync("ClassForMessageType", Class.class, this);
 
-        Collection<Message> messages = this.prepareMessages(module, asemClassForMessageType);
+        Collection<TypedElement> typedElements = this.prepareTypedElements(method, module, asemClassForMessageType);
 
-        for (Message message : messages) {
-
+        for (TypedElement typedElement : typedElements) {
             final Port portBeforeRenaming = ASEMSysMLHelper
-                    .getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(), message, Port.class);
-            assertEquals("Port " + portBeforeRenaming.getName() + " has wrong name!", message.getName(),
+                    .getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(), typedElement, Port.class);
+            assertEquals("Port " + portBeforeRenaming.getName() + " has wrong name!", typedElement.getName(),
                     portBeforeRenaming.getName());
 
-            final String newName = message.getName() + "Renamed";
-            message.setName(newName);
-            this.saveAndSynchronizeChanges(message);
+            final String newName = typedElement.getName() + "Renamed";
+            typedElement.setName(newName);
+            this.saveAndSynchronizeChanges(typedElement);
 
             final Port portAfterRenaming = ASEMSysMLHelper
-                    .getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(), message, Port.class);
+                    .getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(), typedElement, Port.class);
             assertEquals("Port was renamed successfully!", newName, portAfterRenaming.getName());
-
         }
 
     }
@@ -238,7 +237,7 @@ public class MessageMappingTransformationTest extends ASEM2SysMLTest {
 
     }
 
-    private Collection<Message> prepareMessages(final Module module, final Class moduleAsType) {
+    private Collection<Message> prepareMessages(final Module module, final Class classAsType) {
 
         final PrimitiveType pBoolean = ASEMSysMLPrimitiveTypeHelper
                 .getASEMPrimitiveTypeFromRepository(BooleanType.class, module);
@@ -269,13 +268,13 @@ public class MessageMappingTransformationTest extends ASEM2SysMLTest {
         messages.add(ASEMSysMLTestHelper.createASEMMessageAddToModuleAndSync("MessageSignedDiscreteINOUT", true, true,
                 pSignedDiscreteType, module, this));
 
-        messages.add(ASEMSysMLTestHelper.createASEMMessageAddToModuleAndSync("MessageClassIN", true, false,
-                moduleAsType, module, this));
+        messages.add(ASEMSysMLTestHelper.createASEMMessageAddToModuleAndSync("MessageClassIN", true, false, classAsType,
+                module, this));
 
         return messages;
     }
 
-    private Collection<Parameter> prepareParameters(final Method method, final Class classType) {
+    private Collection<Parameter> prepareParameters(final Method method, final Class classAsType) {
 
         final PrimitiveType pBoolean = ASEMSysMLPrimitiveTypeHelper
                 .getASEMPrimitiveTypeFromRepository(BooleanType.class, method);
@@ -293,9 +292,20 @@ public class MessageMappingTransformationTest extends ASEM2SysMLTest {
         parameters.add(ASEMSysMLTestHelper.createASEMParameterAddToMethodAndSync("ParameterSignedDiscrete",
                 pSignedDiscreteType, method, this));
         parameters.add(
-                ASEMSysMLTestHelper.createASEMParameterAddToMethodAndSync("ParameterClass", classType, method, this));
+                ASEMSysMLTestHelper.createASEMParameterAddToMethodAndSync("ParameterClass", classAsType, method, this));
 
         return parameters;
+    }
+
+    private Collection<TypedElement> prepareTypedElements(final Method method, final Module module,
+            final Class classAsType) {
+
+        Collection<TypedElement> typedElements = new HashSet<>();
+
+        typedElements.addAll(this.prepareMessages(module, classAsType));
+        typedElements.addAll(this.prepareParameters(method, classAsType));
+
+        return typedElements;
     }
 
     private void assertPortWasCreated(final Named named, final Component component) {
