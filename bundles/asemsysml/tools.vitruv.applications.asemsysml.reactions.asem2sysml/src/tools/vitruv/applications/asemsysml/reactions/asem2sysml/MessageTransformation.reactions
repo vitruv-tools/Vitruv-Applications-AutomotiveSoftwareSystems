@@ -5,6 +5,8 @@ import tools.vitruv.applications.asemsysml.ASEMSysMLHelper
 import tools.vitruv.applications.asemsysml.ASEMSysMLPrimitiveTypeHelper
 import tools.vitruv.domains.sysml.SysMlNamspace
 import edu.kit.ipd.sdq.ASEM.classifiers.Component
+import org.eclipse.uml2.uml.util.UMLUtil
+import org.eclipse.papyrus.sysml14.blocks.BindingConnector
 
 import "edu.kit.ipd.sdq.asem" as asem
 import "http://www.eclipse.org/papyrus/sysml/1.4/SysML" as sysml
@@ -157,5 +159,42 @@ routine createConnector(asem::Message message, uml::Property portProperty, sysml
 			persistProjectRelative(message, flowProperty, ASEMSysMLHelper.getProjectModelPath(ASEMSysMLConstants.TEST_SYSML_MODEL_NAME, SysMlNamspace.FILE_EXTENSION));
 			persistProjectRelative(message, bindingConnector, ASEMSysMLHelper.getProjectModelPath(ASEMSysMLConstants.TEST_SYSML_MODEL_NAME, SysMlNamspace.FILE_EXTENSION));
 		}
+	}
+}
+
+reaction MessageDeletionTransformation {
+	after element asem::Message deleted and removed from asem::Component[typedElements]
+	call {
+		logger.info("[ASEMSysML] Remove port for message " + oldValue.name + " ...");
+		
+		removePort(oldValue);
+	}
+}
+routine removePort(asem::Message message) {
+	match {
+		val port = retrieve uml::Port corresponding to message
+	}
+	action {
+		call {
+		
+			val connectorEnd = ASEMSysMLHelper.getConnectorEnd(port);
+			val connector = ASEMSysMLHelper.getConnector(connectorEnd);
+			val bindingConnector = UMLUtil.getStereotypeApplication(connector, BindingConnector);
+			
+			val flowProperty = ASEMSysMLHelper.getFlowProperty(port);
+			val property = flowProperty.base_Property;
+			
+			deletePortWithAllElements(port, connector, bindingConnector, property, flowProperty);
+			
+		}
+	}
+}
+routine deletePortWithAllElements(uml::Port port, uml::Connector connector, sysml::BindingConnector bindingConnector, uml::Property property, sysml::FlowProperty flowProperty) {
+	action {
+		delete property
+		delete flowProperty
+		delete connector
+		delete bindingConnector
+		delete port
 	}
 }

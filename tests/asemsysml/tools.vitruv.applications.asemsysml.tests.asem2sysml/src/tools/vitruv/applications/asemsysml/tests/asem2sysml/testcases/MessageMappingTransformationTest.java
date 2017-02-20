@@ -7,10 +7,20 @@ import static org.junit.Assert.fail;
 import java.util.Collection;
 import java.util.HashSet;
 
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.papyrus.sysml14.blocks.BindingConnector;
 import org.eclipse.papyrus.sysml14.blocks.Block;
 import org.eclipse.papyrus.sysml14.portsandflows.FlowDirection;
 import org.eclipse.papyrus.sysml14.portsandflows.FlowProperty;
+import org.eclipse.uml2.uml.Connector;
+import org.eclipse.uml2.uml.ConnectorEnd;
+import org.eclipse.uml2.uml.Model;
 import org.eclipse.uml2.uml.Port;
+import org.eclipse.uml2.uml.Property;
+import org.eclipse.uml2.uml.UMLPackage;
+import org.eclipse.uml2.uml.util.UMLUtil;
 import org.junit.Test;
 
 import edu.kit.ipd.sdq.ASEM.classifiers.Class;
@@ -43,8 +53,8 @@ public class MessageMappingTransformationTest extends ASEM2SysMLTest {
 
         Module module = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ModuleForMessages", Module.class,
                 this);
-        Class asemClassForMessageType = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ClassForMessageType",
-                Class.class, this);
+        final Class asemClassForMessageType = ASEMSysMLTestHelper
+                .createASEMComponentAsModelRootAndSync("ClassForMessageType", Class.class, this);
 
         Collection<Message> methods = this.prepareMessages(module, asemClassForMessageType);
 
@@ -53,6 +63,37 @@ public class MessageMappingTransformationTest extends ASEM2SysMLTest {
             this.assertPortWasCreated(message, module);
             this.assertPortHasCorrectDirection(message);
             this.assertPortHasCorrectType(message);
+        }
+
+    }
+
+    /**
+     * After deleting an ASEM message, the corresponding SysML port and the correspondence between
+     * both must be deleted, too.
+     */
+    @Test
+    public void testIfAPortWillBeDeleted() {
+
+        Module module = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ModuleForMessageToDelete",
+                Module.class, this);
+        final Class asemClassForMessageType = ASEMSysMLTestHelper
+                .createASEMComponentAsModelRootAndSync("ClassForMessageType", Class.class, this);
+
+        Collection<Message> methods = this.prepareMessages(module, asemClassForMessageType);
+
+        for (Message message : methods) {
+
+            final Port portBckp = ASEMSysMLHelper.getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(),
+                    message, Port.class);
+            final org.eclipse.uml2.uml.Class portContainerBckp = (org.eclipse.uml2.uml.Class) portBckp.eContainer();
+            final EObject rootElement = EcoreUtil.getRootContainer(message);
+            final FlowProperty flowPropertyBckp = ASEMSysMLHelper.getFlowProperty(portBckp);
+            final Property propertyBckp = flowPropertyBckp.getBase_Property();
+
+            EcoreUtil.delete(message);
+            this.saveAndSynchronizeChanges(rootElement);
+
+            this.assertPortWasDeleted(message, portBckp, portContainerBckp, propertyBckp, flowPropertyBckp);
         }
 
     }
@@ -162,6 +203,47 @@ public class MessageMappingTransformationTest extends ASEM2SysMLTest {
         } else {
             fail("Unsupported message type.");
         }
+
+    }
+
+    private void assertPortWasDeleted(final Message message, final Port port,
+            final org.eclipse.uml2.uml.Class portContainer, final Property property, final FlowProperty flowProperty) {
+
+        // Correspondence.
+        final Port correspondence = ASEMSysMLHelper.getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(),
+                message, Port.class);
+
+        assertTrue("Correspondence between message " + message.getName() + " and port " + port.getName()
+                + " was not deleted!", correspondence == null);
+
+        // SysML elements.
+        final Resource sysmlResource = this.getModelResource(this.sysmlProjectModelPath);
+        final Model sysmlModel = (Model) EcoreUtil.getObjectByType(sysmlResource.getContents(),
+                UMLPackage.eINSTANCE.getModel());
+
+        assertTrue("No SysML model element found!", sysmlModel != null);
+
+        // Port.
+        final Collection<Object> modelPorts = EcoreUtil.getObjectsByType(sysmlModel.getPackagedElements(),
+                UMLPackage.eINSTANCE.getPort());
+
+        assertTrue("Port element was not deleted from SysML model!", !modelPorts.contains(port));
+
+        // Port property.
+        assertTrue("FlowProperty for port " + port.getName() + " was not deleted!",
+                !sysmlModel.getPackagedElements().contains(flowProperty));
+        assertTrue("Port property for port " + port.getName() + " was not deleted!",
+                !sysmlModel.getPackagedElements().contains(property));
+
+        // Connector.
+        final ConnectorEnd connectorEnd = ASEMSysMLHelper.getConnectorEnd(port);
+        final Connector connector = ASEMSysMLHelper.getConnector(connectorEnd);
+        final BindingConnector bindingConnector = UMLUtil.getStereotypeApplication(connector, BindingConnector.class);
+
+        assertTrue("Connector for port " + port.getName() + " was not deleted!",
+                !portContainer.getOwnedConnectors().contains(connector));
+        assertTrue("BindingConnector stereoptype for port " + port.getName() + " was not deleted!",
+                !sysmlResource.getContents().contains(bindingConnector));
 
     }
 }
