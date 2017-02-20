@@ -98,6 +98,38 @@ public class MessageMappingTransformationTest extends ASEM2SysMLTest {
 
     }
 
+    /**
+     * After renaming an ASEM message, the port must be renamed, too.
+     */
+    @Test
+    public void testIfPortWillBeRenamed() {
+
+        Module module = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ModuleForMessagesToRename",
+                Module.class, this);
+        final Class asemClassForMessageType = ASEMSysMLTestHelper
+                .createASEMComponentAsModelRootAndSync("ClassForMessageType", Class.class, this);
+
+        Collection<Message> methods = this.prepareMessages(module, asemClassForMessageType);
+
+        for (Message message : methods) {
+
+            final Port portBeforeRenaming = ASEMSysMLHelper
+                    .getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(), message, Port.class);
+            assertEquals("Port " + portBeforeRenaming.getName() + " has wrong name!", message.getName(),
+                    portBeforeRenaming.getName());
+
+            final String newName = message.getName() + "Renamed";
+            message.setName(newName);
+            this.saveAndSynchronizeChanges(message);
+
+            final Port portAfterRenaming = ASEMSysMLHelper
+                    .getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(), message, Port.class);
+            assertEquals("Port was renamed successfully!", newName, portAfterRenaming.getName());
+
+        }
+
+    }
+
     private Collection<Message> prepareMessages(final Module module, final Class moduleAsType) {
 
         final PrimitiveType pBoolean = ASEMSysMLPrimitiveTypeHelper
