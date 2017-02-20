@@ -220,7 +220,7 @@ routine changeFlowDirection(sysml::FlowProperty flowProperty, asem::Message mess
 }
 
 reaction PrimitiveTypeChangeTransformation {
-	after element asem::PrimitiveType replaced at asem::Message[type]
+	after element asem::PrimitiveType replaced at asem::TypedElement[type]
 		with oldValue != null
 	call {
 		logger.info("[ASEMSysML] Message type changed from " + oldValue + " to " + newValue + ".");
@@ -229,19 +229,19 @@ reaction PrimitiveTypeChangeTransformation {
 		changePortTypeToPrimitiveType(affectedEObject, sysmlPrimitiveType);
 	}
 }
-routine changePortTypeToPrimitiveType(asem::Message message, uml::PrimitiveType type) {
+routine changePortTypeToPrimitiveType(asem::TypedElement typedElement, uml::PrimitiveType type) {
 	match {
-		val port = retrieve uml::Port corresponding to message
+		val port = retrieve uml::Port corresponding to typedElement
 	}
 	action {
 		update port {
-			port.type = ASEMSysMLPrimitiveTypeHelper.getSysMLPrimitiveTypeFromSysMLModel(this.correspondenceModel, message, type);
+			port.type = ASEMSysMLPrimitiveTypeHelper.getSysMLPrimitiveTypeFromSysMLModel(this.correspondenceModel, typedElement, type);
 		}
 	}
 }
 
 reaction ComponentTypeChangeTransformation {
-	after element asem::Component replaced at asem::Message[type]
+	after element asem::Component replaced at asem::TypedElement[type]
 		with oldValue != null
 	call {
 		logger.info("[ASEMSysML] Message type changed from " + oldValue + " to " + newValue + ".");
@@ -249,9 +249,9 @@ reaction ComponentTypeChangeTransformation {
 		changePortTypeToComponentType(affectedEObject, newValue);
 	}
 }
-routine changePortTypeToComponentType(asem::Message message, asem::Component component) {
+routine changePortTypeToComponentType(asem::TypedElement typedElement, asem::Component component) {
 	match {
-		val port = retrieve uml::Port corresponding to message
+		val port = retrieve uml::Port corresponding to typedElement
 		val baseClassType = retrieve uml::Class corresponding to component
 	}
 	action {

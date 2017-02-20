@@ -211,6 +211,10 @@ public class MessageMappingTransformationTest extends ASEM2SysMLTest {
 
         Module module = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ModuleForMessages", Module.class,
                 this);
+        Class asemClass = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ClassForMethods", Class.class,
+                this);
+        Method method = ASEMSysMLTestHelper.createASEMMethodAddToClassAndSync("MethodForParameters", asemClass, this);
+
         final PrimitiveType pBoolean = ASEMSysMLPrimitiveTypeHelper
                 .getASEMPrimitiveTypeFromRepository(BooleanType.class, module);
         final PrimitiveType pContinuous = ASEMSysMLPrimitiveTypeHelper
@@ -225,8 +229,15 @@ public class MessageMappingTransformationTest extends ASEM2SysMLTest {
         Message messageComponentType = ASEMSysMLTestHelper.createASEMMessageAddToModuleAndSync("MessageClass", true,
                 false, asemClassForMessageTypeA, module, this);
 
+        Parameter parameterPrimitiveType = ASEMSysMLTestHelper.createASEMParameterAddToMethodAndSync("ParameterBoolean",
+                pBoolean, method, this);
+        Parameter parameterComponentType = ASEMSysMLTestHelper.createASEMParameterAddToMethodAndSync("ParameterClass",
+                asemClassForMessageTypeA, method, this);
+
         this.assertPortHasCorrectType(messagePrimitiveType);
         this.assertPortHasCorrectType(messageComponentType);
+        this.assertPortHasCorrectType(parameterPrimitiveType);
+        this.assertPortHasCorrectType(parameterComponentType);
 
         messagePrimitiveType.setType(pContinuous);
         this.saveAndSynchronizeChanges(messagePrimitiveType);
@@ -235,6 +246,14 @@ public class MessageMappingTransformationTest extends ASEM2SysMLTest {
         messageComponentType.setType(asemClassForMessageTypeB);
         this.saveAndSynchronizeChanges(messageComponentType);
         this.assertPortHasCorrectType(messageComponentType);
+
+        parameterPrimitiveType.setType(pContinuous);
+        this.saveAndSynchronizeChanges(parameterPrimitiveType);
+        this.assertPortHasCorrectType(parameterPrimitiveType);
+
+        parameterComponentType.setType(asemClassForMessageTypeB);
+        this.saveAndSynchronizeChanges(parameterComponentType);
+        this.assertPortHasCorrectType(parameterComponentType);
 
     }
 
