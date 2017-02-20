@@ -52,23 +52,6 @@ routine createPortWithComponentType(asem::Message message) {
 		}
 		val flowProperty = create sysml::FlowProperty and initialize {
 			flowProperty.base_Property = portProperty;
-			
-			// Set direction based on the message read and write attributes.
-			if (message.readable && !message.writable) {
-								
-				flowProperty.direction = FlowDirection.IN;
-			
-			} else if (!message.readable && message.writable) {
-			
-				flowProperty.direction = FlowDirection.OUT;
-			
-			} else if (message.readable && message.writable) {
-			
-				flowProperty.direction = FlowDirection.INOUT;
-			
-			} else {
-				logger.warn("[ASEMSysML] Unsupported flow direction!");
-			}
 		}
 		
 		// Create the port.
@@ -80,6 +63,7 @@ routine createPortWithComponentType(asem::Message message) {
 		}
 		
 		call {
+			changeFlowDirection(flowProperty, message);
 			createConnector(message, portProperty, flowProperty, port, baseClass);
 		}
 		
@@ -196,5 +180,49 @@ routine deletePortWithAllElements(uml::Port port, uml::Connector connector, sysm
 		delete connector
 		delete bindingConnector
 		delete port
+	}
+}
+
+reaction ReadableChangeTransformation {
+	after attribute replaced at asem::Message[readable]
+	call changePortDirection(affectedEObject)
+}
+reaction WritableChangeTransformation {
+	after attribute replaced at asem::Message[writable]
+	call changePortDirection(affectedEObject)
+}
+routine changePortDirection(asem::Message message) {
+	match {
+		val port = retrieve uml::Port corresponding to message	
+	}
+	action {
+		call {
+			val flowProperty = ASEMSysMLHelper.getFlowProperty(port);
+			changeFlowDirection(flowProperty, message);
+		}
+	}
+}
+routine changeFlowDirection(sysml::FlowProperty flowProperty, asem::Message message) {
+	match {
+		check flowProperty != null
+	}
+	action {
+		update flowProperty {
+			if (message.readable && !message.writable) {
+								
+				flowProperty.direction = FlowDirection.IN;
+			
+			} else if (!message.readable && message.writable) {
+			
+				flowProperty.direction = FlowDirection.OUT;
+			
+			} else if (message.readable && message.writable) {
+			
+				flowProperty.direction = FlowDirection.INOUT;
+			
+			} else {
+				logger.warn("[ASEMSysML] Unsupported flow direction!");
+			}
+		}
 	}
 }

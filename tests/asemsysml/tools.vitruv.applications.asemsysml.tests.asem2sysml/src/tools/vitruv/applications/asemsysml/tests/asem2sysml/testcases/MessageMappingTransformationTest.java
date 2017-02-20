@@ -130,6 +130,35 @@ public class MessageMappingTransformationTest extends ASEM2SysMLTest {
 
     }
 
+    /**
+     * After changing the access parameters of an ASEM message (readable, writable), the port
+     * direction must be adapted.
+     */
+    @Test
+    public void testIfPortDirectionWillBeUpdated() {
+
+        Module module = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ModuleForMessagesToRename",
+                Module.class, this);
+        final PrimitiveType pBoolean = ASEMSysMLPrimitiveTypeHelper
+                .getASEMPrimitiveTypeFromRepository(BooleanType.class, module);
+
+        Message message = ASEMSysMLTestHelper.createASEMMessageAddToModuleAndSync("MessageBoolean", true, false,
+                pBoolean, module, this);
+
+        this.assertPortHasCorrectDirection(message);
+
+        // INOUT
+        message.setWritable(true);
+        this.saveAndSynchronizeChanges(message);
+        this.assertPortHasCorrectDirection(message);
+
+        // OUT
+        message.setReadable(false);
+        this.saveAndSynchronizeChanges(message);
+        this.assertPortHasCorrectDirection(message);
+
+    }
+
     private Collection<Message> prepareMessages(final Module module, final Class moduleAsType) {
 
         final PrimitiveType pBoolean = ASEMSysMLPrimitiveTypeHelper
