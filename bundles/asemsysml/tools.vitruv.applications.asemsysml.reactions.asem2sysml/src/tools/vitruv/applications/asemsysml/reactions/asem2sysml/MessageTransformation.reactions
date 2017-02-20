@@ -139,9 +139,16 @@ reaction MessageDeletionTransformation {
 		removePort(oldValue);
 	}
 }
-routine removePort(asem::Message message) {
+reaction ParameterDeletionTransformation {
+	after element asem::Parameter deleted and removed from asem::Method[parameters]
+	call {
+		logger.info("[ASEMSysML] Remove port for parameter " + oldValue.name + " ...");
+		removePort(oldValue);
+	}
+}
+routine removePort(asem::TypedElement typedElement) {
 	match {
-		val port = retrieve uml::Port corresponding to message
+		val port = retrieve uml::Port corresponding to typedElement
 	}
 	action {
 		call {

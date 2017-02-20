@@ -21,7 +21,6 @@ import org.eclipse.uml2.uml.Port;
 import org.eclipse.uml2.uml.Property;
 import org.eclipse.uml2.uml.UMLPackage;
 import org.eclipse.uml2.uml.util.UMLUtil;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import edu.kit.ipd.sdq.ASEM.base.Named;
@@ -102,29 +101,31 @@ public class MessageMappingTransformationTest extends ASEM2SysMLTest {
      * both must be deleted, too.
      */
     @Test
-    @Ignore
     public void testIfAPortWillBeDeleted() {
 
         Module module = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ModuleForMessageToDelete",
                 Module.class, this);
+        Class asemClass = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ClassForMethods", Class.class,
+                this);
+        Method method = ASEMSysMLTestHelper.createASEMMethodAddToClassAndSync("MethodForParameters", asemClass, this);
         final Class asemClassForMessageType = ASEMSysMLTestHelper
                 .createASEMComponentAsModelRootAndSync("ClassForMessageType", Class.class, this);
 
-        Collection<Message> messages = this.prepareMessages(module, asemClassForMessageType);
+        Collection<TypedElement> typedElements = this.prepareTypedElements(method, module, asemClassForMessageType);
 
-        for (Message message : messages) {
+        for (TypedElement typedElement : typedElements) {
 
             final Port portBckp = ASEMSysMLHelper.getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(),
-                    message, Port.class);
+                    typedElement, Port.class);
             final org.eclipse.uml2.uml.Class portContainerBckp = (org.eclipse.uml2.uml.Class) portBckp.eContainer();
-            final EObject rootElement = EcoreUtil.getRootContainer(message);
+            final EObject rootElement = EcoreUtil.getRootContainer(typedElement);
             final FlowProperty flowPropertyBckp = ASEMSysMLHelper.getFlowProperty(portBckp);
             final Property propertyBckp = flowPropertyBckp.getBase_Property();
 
-            EcoreUtil.delete(message);
+            EcoreUtil.delete(typedElement);
             this.saveAndSynchronizeChanges(rootElement);
 
-            this.assertPortWasDeleted(message, portBckp, portContainerBckp, propertyBckp, flowPropertyBckp);
+            this.assertPortWasDeleted(typedElement, portBckp, portContainerBckp, propertyBckp, flowPropertyBckp);
         }
 
     }
@@ -393,14 +394,14 @@ public class MessageMappingTransformationTest extends ASEM2SysMLTest {
 
     }
 
-    private void assertPortWasDeleted(final Message message, final Port port,
+    private void assertPortWasDeleted(final TypedElement typedElement, final Port port,
             final org.eclipse.uml2.uml.Class portContainer, final Property property, final FlowProperty flowProperty) {
 
         // Correspondence.
         final Port correspondence = ASEMSysMLHelper.getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(),
-                message, Port.class);
+                typedElement, Port.class);
 
-        assertTrue("Correspondence between message " + message.getName() + " and port " + port.getName()
+        assertTrue("Correspondence between typed element " + typedElement.getName() + " and port " + port.getName()
                 + " was not deleted!", correspondence == null);
 
         // SysML elements.
