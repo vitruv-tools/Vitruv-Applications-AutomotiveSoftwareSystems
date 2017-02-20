@@ -226,3 +226,45 @@ routine changeFlowDirection(sysml::FlowProperty flowProperty, asem::Message mess
 		}
 	}
 }
+
+reaction PrimitiveTypeChangeTransformation {
+	after element asem::PrimitiveType replaced at asem::Message[type]
+		with oldValue != null
+	call {
+		logger.info("[ASEMSysML] Message type changed from " + oldValue + " to " + newValue + ".");
+		
+		val sysmlPrimitiveType = ASEMSysMLPrimitiveTypeHelper.getSysMLTypeByASEMType(newValue.class);
+		changePortTypeToPrimitiveType(affectedEObject, sysmlPrimitiveType);
+	}
+}
+routine changePortTypeToPrimitiveType(asem::Message message, uml::PrimitiveType type) {
+	match {
+		val port = retrieve uml::Port corresponding to message
+	}
+	action {
+		update port {
+			port.type = ASEMSysMLPrimitiveTypeHelper.getSysMLPrimitiveTypeFromSysMLModel(this.correspondenceModel, message, type);
+		}
+	}
+}
+
+reaction ComponentTypeChangeTransformation {
+	after element asem::Component replaced at asem::Message[type]
+		with oldValue != null
+	call {
+		logger.info("[ASEMSysML] Message type changed from " + oldValue + " to " + newValue + ".");
+
+		changePortTypeToComponentType(affectedEObject, newValue);
+	}
+}
+routine changePortTypeToComponentType(asem::Message message, asem::Component component) {
+	match {
+		val port = retrieve uml::Port corresponding to message
+		val baseClassType = retrieve uml::Class corresponding to component
+	}
+	action {
+		update port {
+			port.type = baseClassType;
+		}
+	}
+}
