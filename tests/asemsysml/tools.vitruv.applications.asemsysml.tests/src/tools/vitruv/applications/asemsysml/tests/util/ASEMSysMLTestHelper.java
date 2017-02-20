@@ -31,6 +31,8 @@ import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import edu.kit.ipd.sdq.ASEM.classifiers.Module;
 import edu.kit.ipd.sdq.ASEM.dataexchange.DataexchangeFactory;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Message;
+import edu.kit.ipd.sdq.ASEM.dataexchange.Method;
+import edu.kit.ipd.sdq.ASEM.dataexchange.Parameter;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.tests.ASEMSysMLTest;
 
@@ -251,6 +253,33 @@ public final class ASEMSysMLTestHelper {
         testCaseClass.saveAndSynchronizeChanges(module);
 
         return message;
+    }
+
+    /**
+     * Create an ASEM parameter and it to an existing ASEM method. This method will save and
+     * synchronize the ASEM model, too.
+     * 
+     * @param parameterName
+     *            The name of the parameter.
+     * @param type
+     *            The parameter type.
+     * @param method
+     *            The method the parameter shall be added to.
+     * @param testCaseClass
+     *            Test case class. Needed for accessing synchronization method.
+     * @return The created ASEM parameter.
+     */
+    public static Parameter createASEMParameterAddToMethodAndSync(final String parameterName, final Classifier type,
+            final Method method, final ASEMSysMLTest testCaseClass) {
+
+        Parameter parameter = DataexchangeFactory.eINSTANCE.createParameter();
+        parameter.setName(parameterName);
+        parameter.setType(type);
+
+        method.getParameters().add(parameter);
+        testCaseClass.saveAndSynchronizeChanges(method);
+
+        return parameter;
     }
 
     /**

@@ -23,10 +23,15 @@ import org.eclipse.uml2.uml.UMLPackage;
 import org.eclipse.uml2.uml.util.UMLUtil;
 import org.junit.Test;
 
+import edu.kit.ipd.sdq.ASEM.base.Named;
+import edu.kit.ipd.sdq.ASEM.base.TypedElement;
 import edu.kit.ipd.sdq.ASEM.classifiers.Class;
 import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import edu.kit.ipd.sdq.ASEM.classifiers.Module;
+import edu.kit.ipd.sdq.ASEM.dataexchange.DataexchangeFactory;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Message;
+import edu.kit.ipd.sdq.ASEM.dataexchange.Method;
+import edu.kit.ipd.sdq.ASEM.dataexchange.Parameter;
 import edu.kit.ipd.sdq.ASEM.primitivetypes.BooleanType;
 import edu.kit.ipd.sdq.ASEM.primitivetypes.ContinuousType;
 import edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType;
@@ -63,6 +68,34 @@ public class MessageMappingTransformationTest extends ASEM2SysMLTest {
             this.assertPortWasCreated(message, module);
             this.assertPortHasCorrectDirection(message);
             this.assertPortHasCorrectType(message);
+        }
+
+    }
+
+    /**
+     * After adding an ASEM parameter, an UML port with the same name (and a SysML FlowProperty and
+     * BindingConnector, too) must be added to the SysML model.
+     */
+    @Test
+    public void testIfAParameterIsMappedToASysMLPort() {
+
+        Class asemClass = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ClassForMethods", Class.class,
+                this);
+        final Class asemClassForMessageType = ASEMSysMLTestHelper
+                .createASEMComponentAsModelRootAndSync("ClassForMessageType", Class.class, this);
+
+        Method method = DataexchangeFactory.eINSTANCE.createMethod();
+        method.setName("SampleMethod");
+        asemClass.getMethods().add(method);
+        this.saveAndSynchronizeChanges(asemClass);
+
+        Collection<Parameter> parameters = this.prepareParameters(method, asemClassForMessageType);
+
+        for (Parameter parameter : parameters) {
+
+            this.assertPortWasCreated(parameter, asemClass);
+            this.assertPortHasCorrectDirection(parameter);
+            this.assertPortHasCorrectType(parameter);
         }
 
     }
@@ -242,15 +275,38 @@ public class MessageMappingTransformationTest extends ASEM2SysMLTest {
         return messages;
     }
 
-    private void assertPortWasCreated(final Message message, final Module module) {
+    private Collection<Parameter> prepareParameters(final Method method, final Class classType) {
 
-        final Port port = ASEMSysMLHelper.getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(), message,
+        final PrimitiveType pBoolean = ASEMSysMLPrimitiveTypeHelper
+                .getASEMPrimitiveTypeFromRepository(BooleanType.class, method);
+        final PrimitiveType pContinuous = ASEMSysMLPrimitiveTypeHelper
+                .getASEMPrimitiveTypeFromRepository(ContinuousType.class, method);
+        final PrimitiveType pSignedDiscreteType = ASEMSysMLPrimitiveTypeHelper
+                .getASEMPrimitiveTypeFromRepository(SignedDiscreteType.class, method);
+
+        Collection<Parameter> parameters = new HashSet<>();
+
+        parameters.add(
+                ASEMSysMLTestHelper.createASEMParameterAddToMethodAndSync("ParameterBoolean", pBoolean, method, this));
+        parameters.add(ASEMSysMLTestHelper.createASEMParameterAddToMethodAndSync("ParameterContinuous", pContinuous,
+                method, this));
+        parameters.add(ASEMSysMLTestHelper.createASEMParameterAddToMethodAndSync("ParameterSignedDiscrete",
+                pSignedDiscreteType, method, this));
+        parameters.add(
+                ASEMSysMLTestHelper.createASEMParameterAddToMethodAndSync("ParameterClass", classType, method, this));
+
+        return parameters;
+    }
+
+    private void assertPortWasCreated(final Named named, final Component component) {
+
+        final Port port = ASEMSysMLHelper.getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(), named,
                 Port.class);
 
-        assertTrue("No correspondence between the message element " + message.getName() + " and an UML port exists!",
+        assertTrue("No correspondence between the named element " + named.getName() + " and an UML port exists!",
                 port != null);
 
-        final Block block = ASEMSysMLHelper.getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(), module,
+        final Block block = ASEMSysMLHelper.getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(), component,
                 Block.class);
         final Block portsBlock = ASEMSysMLHelper.getPortsBlock(port);
 
@@ -281,26 +337,40 @@ public class MessageMappingTransformationTest extends ASEM2SysMLTest {
                 flowProperty.getDirection());
     }
 
-    private void assertPortHasCorrectType(final Message message) {
+    private void assertPortHasCorrectDirection(final Parameter parameter) {
 
-        final Port port = ASEMSysMLHelper.getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(), message,
+        final Port port = ASEMSysMLHelper.getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(), parameter,
+                Port.class);
+
+        final FlowProperty flowProperty = ASEMSysMLHelper.getFlowProperty(port);
+
+        FlowDirection expectedDirection = FlowDirection.IN;
+
+        assertTrue("No flow property for port " + port.getName() + " was found!", flowProperty != null);
+        assertEquals("Port " + port.getName() + " has wrong direction!", expectedDirection,
+                flowProperty.getDirection());
+    }
+
+    private void assertPortHasCorrectType(final TypedElement typedElement) {
+
+        final Port port = ASEMSysMLHelper.getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(), typedElement,
                 Port.class);
 
         assertTrue("Port type is not set!", port.getType() != null);
 
-        if (message.getType() instanceof PrimitiveType) {
+        if (typedElement.getType() instanceof PrimitiveType) {
 
-            final PrimitiveType asemType = (PrimitiveType) message.getType();
+            final PrimitiveType asemType = (PrimitiveType) typedElement.getType();
             final org.eclipse.uml2.uml.PrimitiveType portType = ASEMSysMLPrimitiveTypeHelper
                     .getSysMLTypeByASEMType(asemType.getClass());
             final org.eclipse.uml2.uml.PrimitiveType expectedPortType = ASEMSysMLPrimitiveTypeHelper
-                    .getSysMLPrimitiveTypeFromSysMLModel(this.getCorrespondenceModel(), message, portType);
+                    .getSysMLPrimitiveTypeFromSysMLModel(this.getCorrespondenceModel(), typedElement, portType);
 
             assertEquals("Invalid port type!", expectedPortType, port.getType());
 
-        } else if (message.getType() instanceof Component) {
+        } else if (typedElement.getType() instanceof Component) {
 
-            final Component messageType = (Component) message.getType();
+            final Component messageType = (Component) typedElement.getType();
             final org.eclipse.uml2.uml.Class expectedPortType = ASEMSysMLHelper
                     .getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(), messageType, Block.class)
                     .getBase_Class();
