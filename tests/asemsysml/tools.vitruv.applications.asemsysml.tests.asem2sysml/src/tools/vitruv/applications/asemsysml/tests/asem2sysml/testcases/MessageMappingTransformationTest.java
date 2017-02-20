@@ -137,25 +137,36 @@ public class MessageMappingTransformationTest extends ASEM2SysMLTest {
     @Test
     public void testIfPortDirectionWillBeUpdated() {
 
-        Module module = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ModuleForMessagesToRename",
+        Module module = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ModuleForMessages",
                 Module.class, this);
         final PrimitiveType pBoolean = ASEMSysMLPrimitiveTypeHelper
                 .getASEMPrimitiveTypeFromRepository(BooleanType.class, module);
+        final Class asemClassForMessageType = ASEMSysMLTestHelper
+                .createASEMComponentAsModelRootAndSync("ClassForMessageType", Class.class, this);
 
-        Message message = ASEMSysMLTestHelper.createASEMMessageAddToModuleAndSync("MessageBoolean", true, false,
-                pBoolean, module, this);
+        Message messagePrimitiveType = ASEMSysMLTestHelper.createASEMMessageAddToModuleAndSync("MessageBoolean", true,
+                false, pBoolean, module, this);
+        Message messageComponentType = ASEMSysMLTestHelper.createASEMMessageAddToModuleAndSync("MessageClass", true,
+                false, asemClassForMessageType, module, this);
 
-        this.assertPortHasCorrectDirection(message);
+        this.assertPortHasCorrectDirection(messagePrimitiveType);
+        this.assertPortHasCorrectDirection(messageComponentType);
 
         // INOUT
-        message.setWritable(true);
-        this.saveAndSynchronizeChanges(message);
-        this.assertPortHasCorrectDirection(message);
+        messagePrimitiveType.setWritable(true);
+        messageComponentType.setWritable(true);
+        this.saveAndSynchronizeChanges(messagePrimitiveType);
+        this.assertPortHasCorrectDirection(messagePrimitiveType);
+        this.saveAndSynchronizeChanges(messageComponentType);
+        this.assertPortHasCorrectDirection(messageComponentType);
 
         // OUT
-        message.setReadable(false);
-        this.saveAndSynchronizeChanges(message);
-        this.assertPortHasCorrectDirection(message);
+        messagePrimitiveType.setReadable(false);
+        messageComponentType.setReadable(false);
+        this.saveAndSynchronizeChanges(messagePrimitiveType);
+        this.assertPortHasCorrectDirection(messagePrimitiveType);
+        this.saveAndSynchronizeChanges(messageComponentType);
+        this.assertPortHasCorrectDirection(messageComponentType);
 
     }
 
