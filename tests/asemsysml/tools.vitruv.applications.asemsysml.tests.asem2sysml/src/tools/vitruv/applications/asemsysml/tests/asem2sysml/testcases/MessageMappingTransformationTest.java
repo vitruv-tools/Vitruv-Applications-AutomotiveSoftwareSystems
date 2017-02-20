@@ -130,7 +130,7 @@ public class MessageMappingTransformationTest extends ASEM2SysMLTest {
     }
 
     /**
-     * After renaming an ASEM message, the port must be renamed, too.
+     * After renaming an ASEM message or ASEM parameter, the port must be renamed, too.
      */
     @Test
     public void testIfPortWillBeRenamed() {
