@@ -56,9 +56,9 @@ public class MessageMappingTransformationTest extends ASEM2SysMLTest {
         final Class asemClassForMessageType = ASEMSysMLTestHelper
                 .createASEMComponentAsModelRootAndSync("ClassForMessageType", Class.class, this);
 
-        Collection<Message> methods = this.prepareMessages(module, asemClassForMessageType);
+        Collection<Message> messages = this.prepareMessages(module, asemClassForMessageType);
 
-        for (Message message : methods) {
+        for (Message message : messages) {
 
             this.assertPortWasCreated(message, module);
             this.assertPortHasCorrectDirection(message);
@@ -79,9 +79,9 @@ public class MessageMappingTransformationTest extends ASEM2SysMLTest {
         final Class asemClassForMessageType = ASEMSysMLTestHelper
                 .createASEMComponentAsModelRootAndSync("ClassForMessageType", Class.class, this);
 
-        Collection<Message> methods = this.prepareMessages(module, asemClassForMessageType);
+        Collection<Message> messages = this.prepareMessages(module, asemClassForMessageType);
 
-        for (Message message : methods) {
+        for (Message message : messages) {
 
             final Port portBckp = ASEMSysMLHelper.getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(),
                     message, Port.class);
@@ -109,9 +109,9 @@ public class MessageMappingTransformationTest extends ASEM2SysMLTest {
         final Class asemClassForMessageType = ASEMSysMLTestHelper
                 .createASEMComponentAsModelRootAndSync("ClassForMessageType", Class.class, this);
 
-        Collection<Message> methods = this.prepareMessages(module, asemClassForMessageType);
+        Collection<Message> messages = this.prepareMessages(module, asemClassForMessageType);
 
-        for (Message message : methods) {
+        for (Message message : messages) {
 
             final Port portBeforeRenaming = ASEMSysMLHelper
                     .getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(), message, Port.class);
