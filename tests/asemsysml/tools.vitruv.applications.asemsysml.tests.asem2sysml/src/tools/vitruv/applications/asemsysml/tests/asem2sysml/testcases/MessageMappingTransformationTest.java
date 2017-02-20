@@ -18,7 +18,9 @@ import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import edu.kit.ipd.sdq.ASEM.classifiers.Module;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Message;
 import edu.kit.ipd.sdq.ASEM.primitivetypes.BooleanType;
+import edu.kit.ipd.sdq.ASEM.primitivetypes.ContinuousType;
 import edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType;
+import edu.kit.ipd.sdq.ASEM.primitivetypes.SignedDiscreteType;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.ASEMSysMLPrimitiveTypeHelper;
 import tools.vitruv.applications.asemsysml.tests.asem2sysml.ASEM2SysMLTest;
@@ -33,7 +35,7 @@ import tools.vitruv.applications.asemsysml.tests.util.ASEMSysMLTestHelper;
 public class MessageMappingTransformationTest extends ASEM2SysMLTest {
 
     /**
-     * After adding a ASEM message to an ASEM model, an UML Port with the same name (and a SysML
+     * After adding an ASEM message to an ASEM model, an UML Port with the same name (and a SysML
      * FlowProperty and BindingConnector, too) must be added to the SysML model.
      */
     @Test
@@ -59,6 +61,10 @@ public class MessageMappingTransformationTest extends ASEM2SysMLTest {
 
         final PrimitiveType pBoolean = ASEMSysMLPrimitiveTypeHelper
                 .getASEMPrimitiveTypeFromRepository(BooleanType.class, module);
+        final PrimitiveType pContinuous = ASEMSysMLPrimitiveTypeHelper
+                .getASEMPrimitiveTypeFromRepository(ContinuousType.class, module);
+        final PrimitiveType pSignedDiscreteType = ASEMSysMLPrimitiveTypeHelper
+                .getASEMPrimitiveTypeFromRepository(SignedDiscreteType.class, module);
 
         Collection<Message> messages = new HashSet<Message>();
         messages.add(ASEMSysMLTestHelper.createASEMMessageAddToModuleAndSync("MessageBooleanIN", true, false, pBoolean,
@@ -67,6 +73,21 @@ public class MessageMappingTransformationTest extends ASEM2SysMLTest {
                 module, this));
         messages.add(ASEMSysMLTestHelper.createASEMMessageAddToModuleAndSync("MessageBooleanINOUT", true, true,
                 pBoolean, module, this));
+
+        messages.add(ASEMSysMLTestHelper.createASEMMessageAddToModuleAndSync("MessageContinuousIN", true, false,
+                pContinuous, module, this));
+        messages.add(ASEMSysMLTestHelper.createASEMMessageAddToModuleAndSync("MessageContinuousOUT", false, true,
+                pContinuous, module, this));
+        messages.add(ASEMSysMLTestHelper.createASEMMessageAddToModuleAndSync("MessageContinuousINOUT", true, true,
+                pContinuous, module, this));
+
+        messages.add(ASEMSysMLTestHelper.createASEMMessageAddToModuleAndSync("MessageSignedDiscreteIN", true, false,
+                pSignedDiscreteType, module, this));
+        messages.add(ASEMSysMLTestHelper.createASEMMessageAddToModuleAndSync("MessageSignedDiscreteOUT", false, true,
+                pSignedDiscreteType, module, this));
+        messages.add(ASEMSysMLTestHelper.createASEMMessageAddToModuleAndSync("MessageSignedDiscreteINOUT", true, true,
+                pSignedDiscreteType, module, this));
+
         messages.add(ASEMSysMLTestHelper.createASEMMessageAddToModuleAndSync("MessageClassIN", true, false,
                 moduleAsType, module, this));
 
@@ -125,7 +146,7 @@ public class MessageMappingTransformationTest extends ASEM2SysMLTest {
             final org.eclipse.uml2.uml.PrimitiveType portType = ASEMSysMLPrimitiveTypeHelper
                     .getSysMLTypeByASEMType(asemType.getClass());
             final org.eclipse.uml2.uml.PrimitiveType expectedPortType = ASEMSysMLPrimitiveTypeHelper
-                    .getSysMLPrimitiveTypeFromSysMLModel(this.getCorrespondenceModel(), message, portType.eClass());
+                    .getSysMLPrimitiveTypeFromSysMLModel(this.getCorrespondenceModel(), message, portType);
 
             assertEquals("Invalid port type!", expectedPortType, port.getType());
 

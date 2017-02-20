@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
@@ -13,6 +12,7 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.uml2.types.TypesPackage;
 import org.eclipse.uml2.uml.Model;
+import org.eclipse.uml2.uml.PackageableElement;
 import org.eclipse.uml2.uml.PrimitiveType;
 import org.eclipse.uml2.uml.UMLFactory;
 import org.eclipse.uml2.uml.UMLPackage;
@@ -142,10 +142,10 @@ public final class ASEMSysMLPrimitiveTypeHelper {
      *            name, etc.).
      * @param type
      *            The primitive type for which an instance shall be returned.
-     * @return The instance of the primitive type.
+     * @return The instance of the primitive type or <code>null</code> if no instance was found.
      */
     public static PrimitiveType getSysMLPrimitiveTypeFromSysMLModel(final CorrespondenceModel correspondenceModel,
-            final EObject alreadyPersistedObject, final EClassifier type) {
+            final EObject alreadyPersistedObject, final PrimitiveType type) {
 
         String sysmlProjectModelPath = ASEMSysMLHelper.getProjectModelPath(ASEMSysMLConstants.TEST_SYSML_MODEL_NAME,
                 SysMlNamspace.FILE_EXTENSION);
@@ -162,7 +162,14 @@ public final class ASEMSysMLPrimitiveTypeHelper {
             throw new IllegalArgumentException("SysML model does not contain a UML model element.");
         }
 
-        return (PrimitiveType) EcoreUtil.getObjectByType(sysmlModel.getPackagedElements(), type);
+        for (PackageableElement modelType : sysmlModel.getPackagedElements()) {
+            PrimitiveType pType = (PrimitiveType) modelType;
+            if (pType.getName().equals(type.getName())) {
+                return pType;
+            }
+        }
+
+        return null;
     }
 
     /**

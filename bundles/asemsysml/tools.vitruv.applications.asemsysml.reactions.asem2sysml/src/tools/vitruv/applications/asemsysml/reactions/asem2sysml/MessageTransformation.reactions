@@ -92,7 +92,7 @@ routine createPortWithPrimitiveType(asem::Message message, uml::PrimitiveType po
 		// Create the port property and apply the SysML FlowProperty stereotype.
 		val portProperty = create uml::Property and initialize {
 			portProperty.name = message.name + "Property";
-			portProperty.type = ASEMSysMLPrimitiveTypeHelper.getSysMLPrimitiveTypeFromSysMLModel(this.correspondenceModel, message, portType.eClass);
+			portProperty.type = ASEMSysMLPrimitiveTypeHelper.getSysMLPrimitiveTypeFromSysMLModel(this.correspondenceModel, message, portType);
 			
 			baseClass.ownedAttributes.add(portProperty);
 		}
@@ -120,7 +120,7 @@ routine createPortWithPrimitiveType(asem::Message message, uml::PrimitiveType po
 		// Create the port.
 		val port = create uml::Port and initialize {
 			port.name = message.name;
-			port.type = ASEMSysMLPrimitiveTypeHelper.getSysMLPrimitiveTypeFromSysMLModel(this.correspondenceModel, message, portType.eClass);
+			port.type = ASEMSysMLPrimitiveTypeHelper.getSysMLPrimitiveTypeFromSysMLModel(this.correspondenceModel, message, portType);
 			
 			baseClass.ownedPorts.add(port);
 		}
