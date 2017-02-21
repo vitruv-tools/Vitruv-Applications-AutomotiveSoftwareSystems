@@ -21,7 +21,6 @@ import org.eclipse.uml2.uml.Port;
 import org.eclipse.uml2.uml.Property;
 import org.eclipse.uml2.uml.UMLPackage;
 import org.eclipse.uml2.uml.util.UMLUtil;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import edu.kit.ipd.sdq.ASEM.base.Named;
@@ -126,7 +125,6 @@ public class ASEMElementToPortMappingTransformationTest extends ASEM2SysMLTest {
      * correspondence between both must be deleted, too.
      */
     @Test
-    @Ignore
     public void testIfAPortWillBeDeleted() {
 
         Module module = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ModuleForMessageToDelete",
@@ -137,7 +135,8 @@ public class ASEMElementToPortMappingTransformationTest extends ASEM2SysMLTest {
         final Class asemClassForMessageType = ASEMSysMLTestHelper
                 .createASEMComponentAsModelRootAndSync("ClassForMessageType", Class.class, this);
 
-        Collection<TypedElement> typedElements = this.prepareTypedElements(method, module, asemClassForMessageType);
+        Collection<TypedElement> typedElements = this.prepareTypedElements(method, module, asemClass,
+                asemClassForMessageType);
 
         for (TypedElement typedElement : typedElements) {
 
@@ -170,7 +169,8 @@ public class ASEMElementToPortMappingTransformationTest extends ASEM2SysMLTest {
         final Class asemClassForMessageType = ASEMSysMLTestHelper
                 .createASEMComponentAsModelRootAndSync("ClassForMessageType", Class.class, this);
 
-        Collection<TypedElement> typedElements = this.prepareTypedElements(method, module, asemClassForMessageType);
+        Collection<TypedElement> typedElements = this.prepareTypedElements(method, module, asemClass,
+                asemClassForMessageType);
 
         for (TypedElement typedElement : typedElements) {
             final Port portBeforeRenaming = ASEMSysMLHelper
@@ -372,12 +372,13 @@ public class ASEMElementToPortMappingTransformationTest extends ASEM2SysMLTest {
     }
 
     private Collection<TypedElement> prepareTypedElements(final Method method, final Module module,
-            final Class classAsType) {
+            final Class asemClass, final Class classAsType) {
 
         Collection<TypedElement> typedElements = new HashSet<>();
 
         typedElements.addAll(this.prepareMessages(module, classAsType));
         typedElements.addAll(this.prepareParameters(method, classAsType));
+        typedElements.addAll(this.prepareReturnTypes(asemClass, classAsType));
 
         return typedElements;
     }

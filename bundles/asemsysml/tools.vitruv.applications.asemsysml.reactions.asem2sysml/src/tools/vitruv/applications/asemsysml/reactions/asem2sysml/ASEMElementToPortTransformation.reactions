@@ -146,6 +146,14 @@ reaction ParameterDeletionTransformation {
 		removePort(oldValue);
 	}
 }
+reaction ReturnTypeDeletionTransformation {
+	after element replaced at asem::Method[returnType]
+		with newValue == null
+	call {
+		logger.info("[ASEMSysML] Remove port for return type " + oldValue.name + " ...");
+		removePort(oldValue);
+	}
+}
 routine removePort(asem::TypedElement typedElement) {
 	match {
 		val port = retrieve uml::Port corresponding to typedElement
@@ -353,6 +361,7 @@ routine createPortForParameterWithComponentType(asem::Parameter parameter) {
 
 reaction ReturnTypeTransformation {
 	after element asem::ReturnType replaced at asem::Method[returnType]
+		with newValue != null
 	call {
 		logger.info("[ASEMSysML] Create port for return type " + newValue.name);
 
