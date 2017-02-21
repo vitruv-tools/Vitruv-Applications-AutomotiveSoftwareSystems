@@ -41,12 +41,13 @@ import tools.vitruv.applications.asemsysml.tests.asem2sysml.ASEM2SysMLTest;
 import tools.vitruv.applications.asemsysml.tests.util.ASEMSysMLTestHelper;
 
 /**
- * Class for all ASEM message mapping tests. An ASEM message must be transformed to an UML port.
+ * Class with test cases for all ASEM elements which are mapped to an UML port (ASEM message,
+ * parameter and return type).
  * 
  * @author Benjamin Rupp
  *
  */
-public class MessageMappingTransformationTest extends ASEM2SysMLTest {
+public class ASEMElementToPortMappingTransformationTest extends ASEM2SysMLTest {
 
     /**
      * After adding an ASEM message to an ASEM model, an UML Port with the same name (and a SysML
@@ -97,8 +98,8 @@ public class MessageMappingTransformationTest extends ASEM2SysMLTest {
     }
 
     /**
-     * After deleting an ASEM message, the corresponding SysML port and the correspondence between
-     * both must be deleted, too.
+     * After deleting an ASEM message or ASEM parameter, the corresponding UML port and the
+     * correspondence between both must be deleted, too.
      */
     @Test
     public void testIfAPortWillBeDeleted() {
@@ -204,7 +205,7 @@ public class MessageMappingTransformationTest extends ASEM2SysMLTest {
     }
 
     /**
-     * After changing the type of an ASEM message, the port type must be adapted.
+     * After changing the type of an ASEM message or ASEM parameter, the port type must be adapted.
      */
     @Test
     public void testIfPortTypeWillBeUpdated() {

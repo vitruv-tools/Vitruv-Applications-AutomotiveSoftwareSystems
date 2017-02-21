@@ -13,7 +13,7 @@ import "edu.kit.ipd.sdq.asem" as asem
 import "http://www.eclipse.org/papyrus/sysml/1.4/SysML" as sysml
 import "http://www.eclipse.org/uml2/5.0.0/UML" as uml
 
-reactions: asem2sysmlMessage
+reactions: asem2sysmlElementsToPort
 in reaction to changes in asem
 execute actions in uml
 
