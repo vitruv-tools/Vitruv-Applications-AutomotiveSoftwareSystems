@@ -29,6 +29,7 @@ import edu.kit.ipd.sdq.ASEM.classifiers.Classifier;
 import edu.kit.ipd.sdq.ASEM.classifiers.ClassifiersFactory;
 import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import edu.kit.ipd.sdq.ASEM.classifiers.Module;
+import edu.kit.ipd.sdq.ASEM.dataexchange.Constant;
 import edu.kit.ipd.sdq.ASEM.dataexchange.DataexchangeFactory;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Message;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Method;
@@ -331,6 +332,34 @@ public final class ASEMSysMLTestHelper {
         testCaseClass.saveAndSynchronizeChanges(method);
 
         return returnType;
+    }
+
+    /**
+     * Create an ASEM constant and add it to an existing ASEM component. This method will save and
+     * synchronize the ASEM model, too.
+     * 
+     * @param constantName
+     *            The name of the constant.
+     * @param type
+     *            The ASEM class which shall be referenced.
+     * @param component
+     *            The component the constant shall be added to.
+     * @param testCaseClass
+     *            Test case class. Needed for accessing synchronization method.
+     * @return The created ASEM constant.
+     */
+    public static Constant createASEMConstantAddToComponentAndSync(final String constantName,
+            final edu.kit.ipd.sdq.ASEM.classifiers.Class type, final Component component,
+            final ASEMSysMLTest testCaseClass) {
+
+        Constant constant = DataexchangeFactory.eINSTANCE.createConstant();
+        constant.setName(constantName);
+        constant.setType(type);
+
+        component.getTypedElements().add(constant);
+        testCaseClass.saveAndSynchronizeChanges(component);
+
+        return constant;
     }
 
     /**

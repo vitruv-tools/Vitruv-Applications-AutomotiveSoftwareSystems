@@ -7,6 +7,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 import tools.vitruv.applications.asemsysml.tests.ASEMSysMLTest;
 import tools.vitruv.applications.asemsysml.tests.asem2sysml.testcases.ComponentMappingTransformationTest;
+import tools.vitruv.applications.asemsysml.tests.asem2sysml.testcases.ConstantMappingTransformationTest;
 import tools.vitruv.applications.asemsysml.tests.asem2sysml.testcases.InitializationTest;
 import tools.vitruv.applications.asemsysml.tests.asem2sysml.testcases.ASEMElementToPortMappingTransformationTest;
 import tools.vitruv.applications.asemsysml.tests.util.ASEMSysMLTestHelper.TransformationType;
@@ -16,8 +17,8 @@ import tools.vitruv.applications.asemsysml.tests.util.ASEMSysMLTestHelper.Transf
  * transformations</b>.
  */
 @RunWith(Suite.class)
-@SuiteClasses({ InitializationTest.class, ComponentMappingTransformationTest.class,
-        ASEMElementToPortMappingTransformationTest.class })
+@SuiteClasses({ /*InitializationTest.class, ComponentMappingTransformationTest.class,
+        ASEMElementToPortMappingTransformationTest.class*/ ConstantMappingTransformationTest.class })
 public class ASEM2SysMLReactionsTestSuite {
 
     /**

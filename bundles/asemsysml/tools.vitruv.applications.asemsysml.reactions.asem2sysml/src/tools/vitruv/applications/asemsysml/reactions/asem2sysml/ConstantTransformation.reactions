@@ -1,0 +1,34 @@
+import org.eclipse.uml2.uml.AggregationKind
+
+import "edu.kit.ipd.sdq.asem" as asem
+import "http://www.eclipse.org/papyrus/sysml/1.4/SysML" as sysml
+import "http://www.eclipse.org/uml2/5.0.0/UML" as uml
+
+reactions: asem2sysmlConstant
+in reaction to changes in asem
+execute actions in uml
+
+reaction ConstantTransformation{
+	after element asem::Constant created and inserted in asem::Component[typedElements]
+	call {
+		logger.info("[ASEMSysML] Create part reference for constant " + newValue.name);
+		createPartReference(newValue);
+	}
+}
+routine createPartReference(asem::Constant constant) {
+	match {
+		val blockBaseClass = retrieve uml::Class corresponding to constant.eContainer
+		val type = retrieve uml::Class corresponding to constant.type
+	}
+	action {
+		val partReference = create uml::Property and initialize {
+			partReference.name = constant.name;
+			partReference.type = type;
+			partReference.aggregation = AggregationKind.COMPOSITE_LITERAL;
+			
+			blockBaseClass.ownedAttributes.add(partReference);
+		}
+		
+		add correspondence between constant and partReference
+	}
+}
