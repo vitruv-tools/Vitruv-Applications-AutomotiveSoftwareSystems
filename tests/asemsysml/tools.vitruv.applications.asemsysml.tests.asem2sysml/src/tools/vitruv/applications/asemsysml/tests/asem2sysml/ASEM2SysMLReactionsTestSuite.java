@@ -17,8 +17,8 @@ import tools.vitruv.applications.asemsysml.tests.util.ASEMSysMLTestHelper.Transf
  * transformations</b>.
  */
 @RunWith(Suite.class)
-@SuiteClasses({ /*InitializationTest.class, ComponentMappingTransformationTest.class,
-        ASEMElementToPortMappingTransformationTest.class*/ ConstantMappingTransformationTest.class })
+@SuiteClasses({ InitializationTest.class, ComponentMappingTransformationTest.class,
+        ASEMElementToPortMappingTransformationTest.class, ConstantMappingTransformationTest.class })
 public class ASEM2SysMLReactionsTestSuite {
 
     /**

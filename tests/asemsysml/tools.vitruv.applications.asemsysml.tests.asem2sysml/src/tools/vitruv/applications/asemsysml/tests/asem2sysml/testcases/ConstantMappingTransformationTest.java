@@ -35,8 +35,6 @@ public class ConstantMappingTransformationTest extends ASEM2SysMLTest {
     @Test
     public void testIfAConstantIsMappedToASysMLPartReference() {
 
-        Logger.getRootLogger().setLevel(Level.INFO);
-
         final Class asemClass = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ClassForConstants",
                 Class.class, this);
         final Module asemModule = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ModuleForConstants",
@@ -77,6 +75,57 @@ public class ConstantMappingTransformationTest extends ASEM2SysMLTest {
                 correspondenceA.getType());
         assertEquals("Wrong type of part reference " + correspondenceB.getName() + "!", expectedType,
                 correspondenceB.getType());
+
+    }
+
+    /**
+     * After changing the name of an ASEM constant, the name of the corresponding part reference
+     * must be adapted.
+     */
+    @Test
+    public void testIfPartReferenceWillBeRenamed() {
+
+        Logger.getRootLogger().setLevel(Level.INFO);
+
+        final Class asemClass = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ClassForConstants",
+                Class.class, this);
+        final Module asemModule = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ModuleForConstants",
+                Module.class, this);
+        final Class asemClassAsPart = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ClassAsPart",
+                Class.class, this);
+
+        Constant constantInClass = ASEMSysMLTestHelper.createASEMConstantAddToComponentAndSync("ConstantInClass",
+                asemClassAsPart, asemClass, this);
+        Constant constantInModule = ASEMSysMLTestHelper.createASEMConstantAddToComponentAndSync("ConstantInModule",
+                asemClassAsPart, asemModule, this);
+
+        final Property correspondenceA = ASEMSysMLHelper
+                .getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(), constantInClass, Property.class);
+        final Property correspondenceB = ASEMSysMLHelper
+                .getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(), constantInModule, Property.class);
+
+        assertEquals("Wrong name of part reference " + correspondenceA.getName() + "!", constantInClass.getName(),
+                correspondenceA.getName());
+        assertEquals("Wrong name of part reference " + correspondenceB.getName() + "!", constantInModule.getName(),
+                correspondenceB.getName());
+
+        final String newNameA = constantInClass.getName() + "Renamed";
+        final String newNameB = constantInModule.getName() + "Renamed";
+
+        constantInClass.setName(newNameA);
+        this.saveAndSynchronizeChanges(constantInClass);
+        constantInModule.setName(newNameB);
+        this.saveAndSynchronizeChanges(constantInModule);
+
+        final Property correspondenceAAfter = ASEMSysMLHelper
+                .getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(), constantInClass, Property.class);
+        final Property correspondenceBAfter = ASEMSysMLHelper
+                .getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(), constantInModule, Property.class);
+
+        assertEquals("Renaming of part reference " + correspondenceA.getName() + " failed!", newNameA,
+                correspondenceAAfter.getName());
+        assertEquals("Renaming of part reference " + correspondenceB.getName() + " failed!", newNameB,
+                correspondenceBAfter.getName());
 
     }
 
