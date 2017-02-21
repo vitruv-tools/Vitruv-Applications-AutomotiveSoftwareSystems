@@ -3,8 +3,7 @@ package tools.vitruv.applications.asemsysml.tests.asem2sysml.testcases;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.papyrus.sysml14.blocks.Block;
 import org.eclipse.uml2.uml.AggregationKind;
 import org.eclipse.uml2.uml.Property;
@@ -85,8 +84,6 @@ public class ConstantMappingTransformationTest extends ASEM2SysMLTest {
     @Test
     public void testIfPartReferenceWillBeRenamed() {
 
-        Logger.getRootLogger().setLevel(Level.INFO);
-
         final Class asemClass = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ClassForConstants",
                 Class.class, this);
         final Module asemModule = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ModuleForConstants",
@@ -126,6 +123,45 @@ public class ConstantMappingTransformationTest extends ASEM2SysMLTest {
                 correspondenceAAfter.getName());
         assertEquals("Renaming of part reference " + correspondenceB.getName() + " failed!", newNameB,
                 correspondenceBAfter.getName());
+
+    }
+
+    /**
+     * After deleting an ASEM constant, the corresponding part reference must be deleted, too.
+     */
+    @Test
+    public void testIfPartReferenceWillBeDeleted() {
+
+        final Class asemClass = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ClassForConstants",
+                Class.class, this);
+        final Module asemModule = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ModuleForConstants",
+                Module.class, this);
+        final Class asemClassAsPart = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ClassAsPart",
+                Class.class, this);
+
+        Constant constantInClass = ASEMSysMLTestHelper.createASEMConstantAddToComponentAndSync("ConstantInClass",
+                asemClassAsPart, asemClass, this);
+        Constant constantInModule = ASEMSysMLTestHelper.createASEMConstantAddToComponentAndSync("ConstantInModule",
+                asemClassAsPart, asemModule, this);
+
+        EcoreUtil.delete(constantInClass);
+        this.saveAndSynchronizeChanges(asemClass);
+
+        EcoreUtil.delete(constantInModule);
+        this.saveAndSynchronizeChanges(asemModule);
+
+        final Property correspondenceA = ASEMSysMLHelper
+                .getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(), constantInClass, Property.class);
+        final Property correspondenceB = ASEMSysMLHelper
+                .getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(), constantInModule, Property.class);
+
+        assertTrue("Correspondence for " + constantInClass.getName() + " was not deleted!", correspondenceA == null);
+        assertTrue("Correspondence for " + constantInModule.getName() + " was not deleted!", correspondenceB == null);
+
+        assertTrue("Part reference was not deleted from model!",
+                !asemClass.getTypedElements().contains(constantInClass));
+        assertTrue("Part reference was not deleted from model!",
+                !asemModule.getTypedElements().contains(constantInModule));
 
     }
 

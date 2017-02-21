@@ -32,3 +32,19 @@ routine createPartReference(asem::Constant constant) {
 		add correspondence between constant and partReference
 	}
 }
+
+reaction ConstantDeletionTransformation{
+	after element asem::Constant deleted and removed from asem::Component[typedElements]
+	call {
+		logger.info("[ASEMSysML] Delete part reference for constant " + oldValue.name);
+		removePartReference(oldValue);
+	}
+}
+routine removePartReference(asem::Constant constant) {
+	match {
+		val partReference = retrieve uml::Property corresponding to constant
+	}
+	action {
+		delete partReference
+	}
+}
