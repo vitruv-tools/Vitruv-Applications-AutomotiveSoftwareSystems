@@ -3,6 +3,8 @@ package tools.vitruv.applications.asemsysml.tests.asem2sysml.testcases;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.papyrus.sysml14.blocks.Block;
 import org.eclipse.uml2.uml.AggregationKind;
@@ -162,6 +164,51 @@ public class ConstantMappingTransformationTest extends ASEM2SysMLTest {
                 !asemClass.getTypedElements().contains(constantInClass));
         assertTrue("Part reference was not deleted from model!",
                 !asemModule.getTypedElements().contains(constantInModule));
+
+    }
+
+    /**
+     * After changing the type of an ASEM constant, the type of the corresponding part property must
+     * be adapted.
+     */
+    @Test
+    public void testIfPartReferenceTypeWillBeUpdated() {
+
+        Logger.getRootLogger().setLevel(Level.INFO);
+        
+        final Class asemClass = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ClassForConstants",
+                Class.class, this);
+        final Module asemModule = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ModuleForConstants",
+                Module.class, this);
+        final Class asemClassAsPartA = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ClassAsPartA",
+                Class.class, this);
+        final Class asemClassAsPartB = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ClassAsPartB",
+                Class.class, this);
+
+        Constant constantInClass = ASEMSysMLTestHelper.createASEMConstantAddToComponentAndSync("ConstantInClass",
+                asemClassAsPartA, asemClass, this);
+        Constant constantInModule = ASEMSysMLTestHelper.createASEMConstantAddToComponentAndSync("ConstantInModule",
+                asemClassAsPartA, asemModule, this);
+
+        constantInClass.setType(asemClassAsPartB);
+        this.saveAndSynchronizeChanges(asemClass);
+
+        constantInModule.setType(asemClassAsPartB);
+        this.saveAndSynchronizeChanges(asemModule);
+
+        final Property correspondenceA = ASEMSysMLHelper
+                .getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(), constantInClass, Property.class);
+        final Property correspondenceB = ASEMSysMLHelper
+                .getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(), constantInModule, Property.class);
+
+        final org.eclipse.uml2.uml.Class expectedType = ASEMSysMLHelper
+                .getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(), asemClassAsPartB, Block.class)
+                .getBase_Class();
+
+        assertEquals("Type change of part reference " + correspondenceA.getName() + " failed!", expectedType,
+                correspondenceA.getType());
+        assertEquals("Type change of part reference " + correspondenceB.getName() + " failed!", expectedType,
+                correspondenceB.getType());
 
     }
 

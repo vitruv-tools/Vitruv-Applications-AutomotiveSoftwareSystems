@@ -48,3 +48,23 @@ routine removePartReference(asem::Constant constant) {
 		delete partReference
 	}
 }
+
+reaction ConstantTypeChangeTransformation {
+	after element replaced at asem::Constant[type]
+		with oldValue != null || newValue != null
+	call {
+		logger.info("[ASEMSysML] Change type of part reference for constant " + affectedEObject.name);
+		changeType(affectedEObject, newValue);
+	}
+}
+routine changeType(asem::Constant constant, asem::Classifier newType) {
+	match {
+		val blockBaseClass = retrieve uml::Class corresponding to newType
+		val partProperty = retrieve uml::Property corresponding to constant
+	}
+	action {
+		update partProperty {
+			partProperty.type = blockBaseClass;
+		}
+	}
+}
