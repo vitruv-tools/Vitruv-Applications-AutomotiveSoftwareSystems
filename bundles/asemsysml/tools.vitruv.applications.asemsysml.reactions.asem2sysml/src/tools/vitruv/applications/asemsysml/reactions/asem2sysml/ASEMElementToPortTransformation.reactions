@@ -350,3 +350,92 @@ routine createPortForParameterWithComponentType(asem::Parameter parameter) {
 		add correspondence between parameter and port
 	}
 }
+
+reaction ReturnTypeTransformation {
+	after element asem::ReturnType replaced at asem::Method[returnType]
+	call {
+		logger.info("[ASEMSysML] Create port for return type " + newValue.name);
+
+		val type = newValue.type;
+		if(type instanceof PrimitiveType) {
+			
+			val sysmlPrimitiveType = ASEMSysMLPrimitiveTypeHelper.getSysMLTypeByASEMType(type.class);
+			createPortForReturnTypeWithPrimitiveType(newValue, sysmlPrimitiveType);
+			
+		}else if(type instanceof Component){
+			
+			createPortForReturnTypeWithComponentType(newValue);
+			
+		}
+	}
+}
+routine createPortForReturnTypeWithPrimitiveType(asem::ReturnType returnType, uml::PrimitiveType type) {
+	match {
+		check returnType.eContainer.eContainer instanceof Component
+		val baseClass = retrieve uml::Class corresponding to returnType.eContainer.eContainer
+	}
+	action {
+		// TODO [BR] Remove code duplication!
+		val property = create uml::Property and initialize {
+			property.name = returnType.name + "Property";
+			property.type = ASEMSysMLPrimitiveTypeHelper.getSysMLPrimitiveTypeFromSysMLModel(this.correspondenceModel, returnType, type);
+			
+			baseClass.ownedAttributes.add(property);
+		}
+		
+		val flowProperty = create sysml::FlowProperty and initialize {
+			flowProperty.base_Property = property;
+			flowProperty.direction = FlowDirection.OUT;
+		}
+		
+		val port = create uml::Port and initialize {
+			port.name = returnType.name;
+			port.type = ASEMSysMLPrimitiveTypeHelper.getSysMLPrimitiveTypeFromSysMLModel(this.correspondenceModel, returnType, type);
+			
+			baseClass.ownedPorts.add(port);
+		}
+		
+		call {
+			val method = returnType.eContainer as Method;
+			createConnector(method, property, flowProperty, port, baseClass);
+		}
+		
+		add correspondence between returnType and port
+	}
+}
+routine createPortForReturnTypeWithComponentType(asem::ReturnType returnType) {
+	match {
+		check returnType.eContainer.eContainer instanceof Component
+		val baseClass = retrieve uml::Class corresponding to returnType.eContainer.eContainer
+		val baseClassType = retrieve uml::Class corresponding to returnType.type
+		
+	}
+	action {
+		// TODO [BR] Remove code duplication!
+		val property = create uml::Property and initialize {
+			property.name = returnType.name + "Property";
+			property.type = baseClassType;
+			
+			baseClass.ownedAttributes.add(property);
+		}
+		
+		val flowProperty = create sysml::FlowProperty and initialize {
+			flowProperty.base_Property = property;
+			flowProperty.direction = FlowDirection.OUT;
+		}
+		
+		val port = create uml::Port and initialize {
+			port.name = returnType.name;
+			port.type = baseClassType;
+			
+			baseClass.ownedPorts.add(port);
+		}
+		
+		call {
+			val method = returnType.eContainer as Method;
+			createConnector(method, property, flowProperty, port, baseClass);
+		}
+		
+		add correspondence between returnType and port
+	}
+}

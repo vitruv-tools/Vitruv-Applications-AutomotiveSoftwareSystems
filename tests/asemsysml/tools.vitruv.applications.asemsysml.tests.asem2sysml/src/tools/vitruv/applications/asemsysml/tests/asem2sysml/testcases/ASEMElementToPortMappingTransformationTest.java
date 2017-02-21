@@ -21,6 +21,7 @@ import org.eclipse.uml2.uml.Port;
 import org.eclipse.uml2.uml.Property;
 import org.eclipse.uml2.uml.UMLPackage;
 import org.eclipse.uml2.uml.util.UMLUtil;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import edu.kit.ipd.sdq.ASEM.base.Named;
@@ -31,6 +32,7 @@ import edu.kit.ipd.sdq.ASEM.classifiers.Module;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Message;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Method;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Parameter;
+import edu.kit.ipd.sdq.ASEM.dataexchange.ReturnType;
 import edu.kit.ipd.sdq.ASEM.primitivetypes.BooleanType;
 import edu.kit.ipd.sdq.ASEM.primitivetypes.ContinuousType;
 import edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType;
@@ -98,10 +100,33 @@ public class ASEMElementToPortMappingTransformationTest extends ASEM2SysMLTest {
     }
 
     /**
+     * After adding an ASEM return type, an UML port with the same name (and a SysML FlowProperty
+     * and BindingConnector, too) must be added to the SysML model.
+     */
+    @Test
+    public void testIfAReturnTypeIsMappedToASysMLPort() {
+
+        Class asemClass = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ClassForMethods", Class.class,
+                this);
+        final Class asemClassForMessageType = ASEMSysMLTestHelper
+                .createASEMComponentAsModelRootAndSync("ClassForMessageType", Class.class, this);
+
+        Collection<ReturnType> returnTypes = this.prepareReturnTypes(asemClass, asemClassForMessageType);
+
+        for (ReturnType returnType : returnTypes) {
+
+            this.assertPortWasCreated(returnType, asemClass);
+            this.assertPortHasCorrectDirection(returnType);
+            this.assertPortHasCorrectType(returnType);
+        }
+    }
+
+    /**
      * After deleting an ASEM message or ASEM parameter, the corresponding UML port and the
      * correspondence between both must be deleted, too.
      */
     @Test
+    @Ignore
     public void testIfAPortWillBeDeleted() {
 
         Module module = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ModuleForMessageToDelete",
@@ -318,6 +343,34 @@ public class ASEMElementToPortMappingTransformationTest extends ASEM2SysMLTest {
         return parameters;
     }
 
+    private Collection<ReturnType> prepareReturnTypes(final Class asemClass, final Class classAsType) {
+
+        Collection<ReturnType> returnTypes = new HashSet<>();
+
+        final PrimitiveType pBoolean = ASEMSysMLPrimitiveTypeHelper
+                .getASEMPrimitiveTypeFromRepository(BooleanType.class, asemClass);
+        final PrimitiveType pContinuous = ASEMSysMLPrimitiveTypeHelper
+                .getASEMPrimitiveTypeFromRepository(ContinuousType.class, asemClass);
+        final PrimitiveType pSignedDiscreteType = ASEMSysMLPrimitiveTypeHelper
+                .getASEMPrimitiveTypeFromRepository(SignedDiscreteType.class, asemClass);
+
+        Method methodA = ASEMSysMLTestHelper.createASEMMethodAddToClassAndSync("MethodForReturnTypeA", asemClass, this);
+        Method methodB = ASEMSysMLTestHelper.createASEMMethodAddToClassAndSync("MethodForReturnTypeB", asemClass, this);
+        Method methodC = ASEMSysMLTestHelper.createASEMMethodAddToClassAndSync("MethodForReturnTypeC", asemClass, this);
+        Method methodD = ASEMSysMLTestHelper.createASEMMethodAddToClassAndSync("MethodForReturnTypeD", asemClass, this);
+
+        returnTypes.add(ASEMSysMLTestHelper.createASEMReturnTypeAddToMethodAndSync("ReturnTypeBoolean", pBoolean,
+                methodA, this));
+        returnTypes.add(ASEMSysMLTestHelper.createASEMReturnTypeAddToMethodAndSync("ReturnTypeContinuous", pContinuous,
+                methodB, this));
+        returnTypes.add(ASEMSysMLTestHelper.createASEMReturnTypeAddToMethodAndSync("ReturnTypeSignedDiscrete",
+                pSignedDiscreteType, methodC, this));
+        returnTypes.add(ASEMSysMLTestHelper.createASEMReturnTypeAddToMethodAndSync("ReturnTypeClass", classAsType,
+                methodD, this));
+
+        return returnTypes;
+    }
+
     private Collection<TypedElement> prepareTypedElements(final Method method, final Module module,
             final Class classAsType) {
 
@@ -376,6 +429,20 @@ public class ASEMElementToPortMappingTransformationTest extends ASEM2SysMLTest {
         final FlowProperty flowProperty = ASEMSysMLHelper.getFlowProperty(port);
 
         FlowDirection expectedDirection = FlowDirection.IN;
+
+        assertTrue("No flow property for port " + port.getName() + " was found!", flowProperty != null);
+        assertEquals("Port " + port.getName() + " has wrong direction!", expectedDirection,
+                flowProperty.getDirection());
+    }
+
+    private void assertPortHasCorrectDirection(final ReturnType returnType) {
+
+        final Port port = ASEMSysMLHelper.getFirstCorrespondingSysMLElement(this.getCorrespondenceModel(), returnType,
+                Port.class);
+
+        final FlowProperty flowProperty = ASEMSysMLHelper.getFlowProperty(port);
+
+        FlowDirection expectedDirection = FlowDirection.OUT;
 
         assertTrue("No flow property for port " + port.getName() + " was found!", flowProperty != null);
         assertEquals("Port " + port.getName() + " has wrong direction!", expectedDirection,

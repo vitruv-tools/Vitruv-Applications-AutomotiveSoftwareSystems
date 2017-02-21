@@ -33,6 +33,7 @@ import edu.kit.ipd.sdq.ASEM.dataexchange.DataexchangeFactory;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Message;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Method;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Parameter;
+import edu.kit.ipd.sdq.ASEM.dataexchange.ReturnType;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.tests.ASEMSysMLTest;
 
@@ -279,7 +280,7 @@ public final class ASEMSysMLTestHelper {
     }
 
     /**
-     * Create an ASEM parameter and it to an existing ASEM method. This method will save and
+     * Create an ASEM parameter and add it to an existing ASEM method. This method will save and
      * synchronize the ASEM model, too.
      * 
      * @param parameterName
@@ -303,6 +304,33 @@ public final class ASEMSysMLTestHelper {
         testCaseClass.saveAndSynchronizeChanges(method);
 
         return parameter;
+    }
+
+    /**
+     * Create an ASEM return type and add it to an existing ASEM method. This method will save and
+     * synchronize the ASEM model, too.
+     * 
+     * @param returnTypeName
+     *            The name of the return type.
+     * @param type
+     *            The type of the return type.
+     * @param method
+     *            The method the return type shall be added to.
+     * @param testCaseClass
+     *            Test case class. Needed for accessing synchronization method.
+     * @return The created ASEM return type.
+     */
+    public static ReturnType createASEMReturnTypeAddToMethodAndSync(final String returnTypeName, final Classifier type,
+            final Method method, final ASEMSysMLTest testCaseClass) {
+
+        ReturnType returnType = DataexchangeFactory.eINSTANCE.createReturnType();
+        returnType.setName(returnTypeName);
+        returnType.setType(type);
+
+        method.setReturnType(returnType);
+        testCaseClass.saveAndSynchronizeChanges(method);
+
+        return returnType;
     }
 
     /**
