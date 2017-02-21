@@ -3,8 +3,6 @@ package tools.vitruv.applications.asemsysml.tests.asem2sysml.testcases;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.papyrus.sysml14.blocks.Block;
 import org.eclipse.uml2.uml.AggregationKind;
@@ -174,8 +172,6 @@ public class ConstantMappingTransformationTest extends ASEM2SysMLTest {
     @Test
     public void testIfPartReferenceTypeWillBeUpdated() {
 
-        Logger.getRootLogger().setLevel(Level.INFO);
-        
         final Class asemClass = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ClassForConstants",
                 Class.class, this);
         final Module asemModule = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ModuleForConstants",
