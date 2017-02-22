@@ -4,11 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.papyrus.sysml14.portsandflows.FlowDirection;
 
 import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import edu.kit.ipd.sdq.ASEM.classifiers.Module;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Method;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Parameter;
+import tools.vitruv.framework.correspondence.CorrespondenceModel;
 import tools.vitruv.framework.tests.TestUserInteractor;
 import tools.vitruv.framework.userinteraction.UserInteracting;
 import tools.vitruv.framework.userinteraction.UserInteractionType;
@@ -151,14 +154,61 @@ public final class ASEMSysMLUserInteractionHelper {
     }
 
     /**
+     * Get the number of the given {@link ASEMMethodMode ASEM method creation mode} which has to be
+     * used to set the next selection of the {@link TestUserInteractor}.
+     * 
+     * @param mode
+     *            The mode which shall be selected next.
+     * @return The magic number for the {@link TestUserInteractor}.
+     */
+    public static int getNextUserInteractionSelectionForASEMMethodMode(final ASEMMethodMode mode) {
+
+        return mode.ordinal();
+    }
+
+    /**
+     * Get the number of the given ASEM method which should be selected next for adding a parameter
+     * or return type to. This number has to be used to set the next selection of the
+     * {@link TestUserInteractor}.
+     * 
+     * @param method
+     *            The method which shall be selected next.
+     * @param directionOfPortToAdd
+     *            The port direction to distinguish between parameters and return types.
+     * @param correspondenceModel
+     *            The correspondence model for the ASEM resources.
+     * @return The magic number for the {@link TestUserInteractor}.
+     */
+    public static int getNextUserInteractionSelectionForASEMMethodSelection(final Method method,
+            final FlowDirection directionOfPortToAdd, final CorrespondenceModel correspondenceModel) {
+
+        if (!(EcoreUtil.getRootContainer(method) instanceof Component)) {
+            throw new IllegalArgumentException("Invalid root element of ASEM method " + method.getName());
+        }
+
+        final Component rootComponent = (Component) EcoreUtil.getRootContainer(method);
+        final String asemProjectModelPath = ASEMSysMLHelper.getASEMProjectModelPath(rootComponent.getName());
+        final Resource asemResource = ASEMSysMLHelper.getModelResource(correspondenceModel, method,
+                asemProjectModelPath);
+
+        if (directionOfPortToAdd.equals(FlowDirection.OUT)) {
+            return ASEMSysMLUserInteractionHelper
+                    .getNextUserInteractionSelectionForASEMMethodSelectionForReturnTypes(method, asemResource);
+        } else {
+            return ASEMSysMLUserInteractionHelper
+                    .getNextUserInteractionSelectionForASEMMethodSelectionForParameter(method, asemResource);
+        }
+
+    }
+
+    /**
      * Do user interaction for selecting a ASEM component type.
      * 
      * @param userInteracting
      *            User interacting of the current transformation.
      * @return An ASEM component class.
      */
-    public static Class<? extends Component> selectASEMComponentType(
-            final UserInteracting userInteracting) {
+    public static Class<? extends Component> selectASEMComponentType(final UserInteracting userInteracting) {
 
         List<Class<? extends Component>> asemComponentTypes = new ArrayList<java.lang.Class<? extends Component>>();
         asemComponentTypes.add(Module.class);
