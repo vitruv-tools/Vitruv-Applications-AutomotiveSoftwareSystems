@@ -59,11 +59,11 @@ routine deleteBaseClass(asem::Component component) {
 		
 		call {
 			val block = UMLUtil.getStereotypeApplication(baseClass, Block);
-			deleteTest(block);
+			deleteStereotype(block);
 		}
 	}
 }
-routine deleteTest(sysml::Block block) {
+routine deleteStereotype(sysml::Block block) {
 	action {
 		delete block
 	}
