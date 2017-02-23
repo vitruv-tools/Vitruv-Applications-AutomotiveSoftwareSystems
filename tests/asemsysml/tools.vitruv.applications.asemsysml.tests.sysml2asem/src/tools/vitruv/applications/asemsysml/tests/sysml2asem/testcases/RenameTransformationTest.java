@@ -97,16 +97,16 @@ public class RenameTransformationTest extends SysML2ASEMTest {
 
         // Add a block and port.
         Resource sysmlResource = this.getModelResource(sysmlProjectModelPath);
-        Block blockToModule = ASEMSysMLTestHelper.createSysMLBlock(sysmlResource, "BlockToRename-Module", true,
-                Module.class, this);
-        Block blockToClass = ASEMSysMLTestHelper.createSysMLBlock(sysmlResource, "BlockToRename-Class", true,
-                Class.class, this);
-        Block blockPortType = ASEMSysMLTestHelper.createSysMLBlock(sysmlResource, "BlockPortType", true, Class.class,
-                this);
+        Block blockToModule = ASEMSysMLTestHelper.createSysMLBlockAddToModelAndSync(sysmlResource,
+                "BlockToRename-Module", true, Module.class, this);
+        Block blockToClass = ASEMSysMLTestHelper.createSysMLBlockAddToModelAndSync(sysmlResource, "BlockToRename-Class",
+                true, Class.class, this);
+        Block blockPortType = ASEMSysMLTestHelper.createSysMLBlockAddToModelAndSync(sysmlResource, "BlockPortType",
+                true, Class.class, this);
 
-        Port portOfModule = ASEMSysMLTestHelper.addPortToBlockAndSync(blockToModule, "PortToRename-Module",
+        Port portOfModule = ASEMSysMLTestHelper.createUMLPortAddToBlockAndSync(blockToModule, "PortToRename-Module",
                 FlowDirection.IN, blockPortType.getBase_Class(), this);
-        Port portOfClass = ASEMSysMLTestHelper.addPortToBlockAndSync(blockToClass, "PortToRename-Class",
+        Port portOfClass = ASEMSysMLTestHelper.createUMLPortAddToBlockAndSync(blockToClass, "PortToRename-Class",
                 FlowDirection.IN, blockPortType.getBase_Class(), this);
 
         elements.add(blockToModule.getBase_Class());

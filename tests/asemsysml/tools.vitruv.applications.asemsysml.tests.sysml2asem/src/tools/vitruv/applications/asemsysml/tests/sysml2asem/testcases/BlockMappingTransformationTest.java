@@ -56,10 +56,11 @@ public class BlockMappingTransformationTest extends SysML2ASEMTest {
         final Boolean isEncapsulated = false;
 
         Resource sysmlModelResource = this.getModelResource(this.sysmlProjectModelPath);
-        blockWhichShouldNotBeTransformedToAModule = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource,
-                "BlockWhichShouldNotBeTransformed", isEncapsulated, Module.class, this);
-        blockWhichShouldNotBeTransformedToAClass = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource,
-                "BlockWhichShouldNotBeTransformed", isEncapsulated, edu.kit.ipd.sdq.ASEM.classifiers.Class.class, this);
+        blockWhichShouldNotBeTransformedToAModule = ASEMSysMLTestHelper.createSysMLBlockAddToModelAndSync(
+                sysmlModelResource, "BlockWhichShouldNotBeTransformed", isEncapsulated, Module.class, this);
+        blockWhichShouldNotBeTransformedToAClass = ASEMSysMLTestHelper.createSysMLBlockAddToModelAndSync(
+                sysmlModelResource, "BlockWhichShouldNotBeTransformed", isEncapsulated,
+                edu.kit.ipd.sdq.ASEM.classifiers.Class.class, this);
 
         assertASEMModelDoesNotExistForSysMLBlock(blockWhichShouldNotBeTransformedToAModule);
         assertASEMModelDoesNotExistForSysMLBlock(blockWhichShouldNotBeTransformedToAClass);
@@ -83,9 +84,9 @@ public class BlockMappingTransformationTest extends SysML2ASEMTest {
 
         // Create two blocks. One which corresponds to an ASEM module and one which corresponds to
         // an ASEM class.
-        blockToModule = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockToModule", true, Module.class,
-                this);
-        blockToClass = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockToClass", true,
+        blockToModule = ASEMSysMLTestHelper.createSysMLBlockAddToModelAndSync(sysmlModelResource, "BlockToModule", true,
+                Module.class, this);
+        blockToClass = ASEMSysMLTestHelper.createSysMLBlockAddToModelAndSync(sysmlModelResource, "BlockToClass", true,
                 edu.kit.ipd.sdq.ASEM.classifiers.Class.class, this);
 
         // Check if the names of the SysML block an the ASEM component are equal.
@@ -117,8 +118,8 @@ public class BlockMappingTransformationTest extends SysML2ASEMTest {
 
         Resource sysmlModelResource = this.getModelResource(sysmlProjectModelPath);
 
-        Block block = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockToDelete", true, Module.class,
-                this);
+        Block block = ASEMSysMLTestHelper.createSysMLBlockAddToModelAndSync(sysmlModelResource, "BlockToDelete", true,
+                Module.class, this);
         EObject rootElement = EcoreUtil.getRootContainer(block.getBase_Class());
         org.eclipse.uml2.uml.Class baseClassBckp = block.getBase_Class();
 
@@ -183,7 +184,7 @@ public class BlockMappingTransformationTest extends SysML2ASEMTest {
         final String sysmlBlockName = "BlockTo" + expectedComponentType.getSimpleName();
         Resource sysmlModelResource = this.getModelResource(sysmlProjectModelPath);
 
-        Block block = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, sysmlBlockName, true,
+        Block block = ASEMSysMLTestHelper.createSysMLBlockAddToModelAndSync(sysmlModelResource, sysmlBlockName, true,
                 expectedComponentType, this);
 
         // Check that the ASEM model was created and the root element is of the expected type.

@@ -50,10 +50,10 @@ public class PartMappingTransformationTest extends SysML2ASEMTest {
         Resource sysmlModelResource = this.getModelResource(sysmlProjectModelPath);
         Class<? extends Component> asemComponentType = edu.kit.ipd.sdq.ASEM.classifiers.Class.class;
 
-        Block blockA = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockA", true, asemComponentType,
-                this);
-        Block blockB1 = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockB1", true, asemComponentType,
-                this);
+        Block blockA = ASEMSysMLTestHelper.createSysMLBlockAddToModelAndSync(sysmlModelResource, "BlockA", true,
+                asemComponentType, this);
+        Block blockB1 = ASEMSysMLTestHelper.createSysMLBlockAddToModelAndSync(sysmlModelResource, "BlockB1", true,
+                asemComponentType, this);
 
         // Add a part property to BlockA. The aggregation kind is needed for the getParts() method.
         Property partPropertyB1 = blockA.getBase_Class().createOwnedAttribute("partReferenceB1",
@@ -83,12 +83,12 @@ public class PartMappingTransformationTest extends SysML2ASEMTest {
         Resource sysmlModelResource = this.getModelResource(sysmlProjectModelPath);
         Class<? extends Component> asemComponentType = edu.kit.ipd.sdq.ASEM.classifiers.Class.class;
 
-        Block blockN1 = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockN1", true, asemComponentType,
-                this);
-        Block blockN2 = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockN2", true, asemComponentType,
-                this);
-        Block blockN3 = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockN3", true, asemComponentType,
-                this);
+        Block blockN1 = ASEMSysMLTestHelper.createSysMLBlockAddToModelAndSync(sysmlModelResource, "BlockN1", true,
+                asemComponentType, this);
+        Block blockN2 = ASEMSysMLTestHelper.createSysMLBlockAddToModelAndSync(sysmlModelResource, "BlockN2", true,
+                asemComponentType, this);
+        Block blockN3 = ASEMSysMLTestHelper.createSysMLBlockAddToModelAndSync(sysmlModelResource, "BlockN3", true,
+                asemComponentType, this);
 
         Property partPropertyN2 = blockN1.getBase_Class().createOwnedAttribute("partReferenceN2",
                 blockN2.getBase_Class());
@@ -123,9 +123,9 @@ public class PartMappingTransformationTest extends SysML2ASEMTest {
         Resource sysmlModelResource = this.getModelResource(sysmlProjectModelPath);
         Class<? extends Component> asemComponentType = Module.class;
 
-        Block blockA = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockWithModuleAsPart", true,
-                asemComponentType, this);
-        Block blockB = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockAsModule", true,
+        Block blockA = ASEMSysMLTestHelper.createSysMLBlockAddToModelAndSync(sysmlModelResource,
+                "BlockWithModuleAsPart", true, asemComponentType, this);
+        Block blockB = ASEMSysMLTestHelper.createSysMLBlockAddToModelAndSync(sysmlModelResource, "BlockAsModule", true,
                 asemComponentType, this);
 
         Property partPropertyB = blockA.getBase_Class().createOwnedAttribute("partReferenceB", blockB.getBase_Class());
@@ -164,9 +164,9 @@ public class PartMappingTransformationTest extends SysML2ASEMTest {
         Resource sysmlResource = this.getModelResource(sysmlProjectModelPath);
         Class<? extends Component> asemComponentType = edu.kit.ipd.sdq.ASEM.classifiers.Class.class;
 
-        Block blockA = ASEMSysMLTestHelper.createSysMLBlock(sysmlResource, "BlockADeletionTest", true,
+        Block blockA = ASEMSysMLTestHelper.createSysMLBlockAddToModelAndSync(sysmlResource, "BlockADeletionTest", true,
                 asemComponentType, this);
-        Block blockB = ASEMSysMLTestHelper.createSysMLBlock(sysmlResource, "BlockBDeletionTest", true,
+        Block blockB = ASEMSysMLTestHelper.createSysMLBlockAddToModelAndSync(sysmlResource, "BlockBDeletionTest", true,
                 asemComponentType, this);
 
         Property partProperty = blockA.getBase_Class().createOwnedAttribute("partReference", blockB.getBase_Class());

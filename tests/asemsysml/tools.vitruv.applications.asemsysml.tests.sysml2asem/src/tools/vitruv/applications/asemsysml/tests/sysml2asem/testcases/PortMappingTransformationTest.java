@@ -95,8 +95,8 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
         final String methodName = "MethodWithSecondParameter";
 
         // Add a block which will be contain all the ports.
-        Block blockA = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "BlockA", true, asemComponentType,
-                this);
+        Block blockA = ASEMSysMLTestHelper.createSysMLBlockAddToModelAndSync(sysmlModelResource, "BlockA", true,
+                asemComponentType, this);
 
         // Add a port PortX to the block, to test if the correct method is selected by the user
         // interacting.
@@ -104,14 +104,14 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
                 .getNextUserInteractionSelectionForASEMMethodMode(ASEMMethodMode.CREATE_NEW);
         this.testUserInteractor.addNextSelections(parameterModeSelection);
         this.testUserInteractor.addNextSelections("MethodWithoutSecondParameter");
-        ASEMSysMLTestHelper.addPortToBlockAndSync(blockA, "PortX", FlowDirection.IN, pInteger, this);
+        ASEMSysMLTestHelper.createUMLPortAddToBlockAndSync(blockA, "PortX", FlowDirection.IN, pInteger, this);
 
         // Add a port PortA which will be mapped to an ASEM parameter in a new ASEM method.
         final int parameterModeSelectionA = ASEMSysMLUserInteractionHelper
                 .getNextUserInteractionSelectionForASEMMethodMode(ASEMMethodMode.CREATE_NEW);
         this.testUserInteractor.addNextSelections(parameterModeSelectionA);
         this.testUserInteractor.addNextSelections(methodName);
-        final Port portA = ASEMSysMLTestHelper.addPortToBlockAndSync(blockA, "PortA", FlowDirection.IN, pInteger, this);
+        final Port portA = ASEMSysMLTestHelper.createUMLPortAddToBlockAndSync(blockA, "PortA", FlowDirection.IN, pInteger, this);
 
         // Add a port PortB which will be mapped to an ASEM parameter of the ASEM method of PortA.
         final int parameterModeSelectionB = ASEMSysMLUserInteractionHelper
@@ -120,7 +120,7 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
                 .getNextUserInteractionSelectionForASEMMethodSelection(this.getMethodOfPortCorrespondence(portA),
                         FlowDirection.IN, this.getCorrespondenceModel());
         this.testUserInteractor.addNextSelections(parameterModeSelectionB, methodSelection);
-        final Port portB = ASEMSysMLTestHelper.addPortToBlockAndSync(blockA, "PortB", FlowDirection.IN, pInteger, this);
+        final Port portB = ASEMSysMLTestHelper.createUMLPortAddToBlockAndSync(blockA, "PortB", FlowDirection.IN, pInteger, this);
 
         // Check transformation results.
         this.assertMethodsForParameterCheckWereAddedCorrectly(blockA, portA, methodName, 2);
@@ -144,8 +144,8 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
         final PrimitiveType pInteger = ASEMSysMLPrimitiveTypeHelper.PRIMITIVE_TYPE_INTEGER;
 
         // Add a block which will be contain all the ports.
-        Block block = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "SampleBlock", true, asemComponentType,
-                this);
+        Block block = ASEMSysMLTestHelper.createSysMLBlockAddToModelAndSync(sysmlModelResource, "SampleBlock", true,
+                asemComponentType, this);
 
         // Add a port PortA with direction 'in' which will be mapped to an ASEM parameter in a new
         // ASEM method. The created method will NOT have a return type.
@@ -153,7 +153,7 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
                 .getNextUserInteractionSelectionForASEMMethodMode(ASEMMethodMode.CREATE_NEW);
         this.testUserInteractor.addNextSelections(parameterModeSelectionA);
         this.testUserInteractor.addNextSelections("MethodWithoutReturnValue");
-        Port portA = ASEMSysMLTestHelper.addPortToBlockAndSync(block, "PortA", FlowDirection.IN, pInteger, this);
+        Port portA = ASEMSysMLTestHelper.createUMLPortAddToBlockAndSync(block, "PortA", FlowDirection.IN, pInteger, this);
 
         // Add a port PortB with direction 'out' which will be mapped to an ASEM return type in a
         // new ASEM method. The created method will have a return type.
@@ -161,7 +161,7 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
                 .getNextUserInteractionSelectionForASEMMethodMode(ASEMMethodMode.CREATE_NEW);
         this.testUserInteractor.addNextSelections(parameterModeSelectionB);
         this.testUserInteractor.addNextSelections("MethodWithReturnValue");
-        Port portB = ASEMSysMLTestHelper.addPortToBlockAndSync(block, "PortB", FlowDirection.OUT, pInteger, this);
+        Port portB = ASEMSysMLTestHelper.createUMLPortAddToBlockAndSync(block, "PortB", FlowDirection.OUT, pInteger, this);
 
         // Add a port PortC with direction 'out' which shall be mapped to an ASEM return type which
         // will be added to the existing method of PortA.
@@ -171,7 +171,7 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
                 .getNextUserInteractionSelectionForASEMMethodSelection(this.getMethodOfPortCorrespondence(portA),
                         FlowDirection.OUT, this.getCorrespondenceModel());
         this.testUserInteractor.addNextSelections(parameterModeSelectionC, methodSelectionC);
-        Port portC = ASEMSysMLTestHelper.addPortToBlockAndSync(block, "PortC", FlowDirection.OUT, pInteger, this);
+        Port portC = ASEMSysMLTestHelper.createUMLPortAddToBlockAndSync(block, "PortC", FlowDirection.OUT, pInteger, this);
 
         // Add a port PortD with direction 'out' and try to add its return type to the existing
         // method of PortB. This attempt must be fail and a new method for the return type of PortD
@@ -194,7 +194,7 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
         }
 
         this.testUserInteractor.addNextSelections(parameterModeSelectionD);
-        Port portD = ASEMSysMLTestHelper.addPortToBlockAndSync(block, "PortD", FlowDirection.OUT, pInteger, this);
+        Port portD = ASEMSysMLTestHelper.createUMLPortAddToBlockAndSync(block, "PortD", FlowDirection.OUT, pInteger, this);
 
         // Check transformation result.
         this.assertMethodsForReturnTypeCheckWereAddedCorrectly(block, portA, portB);
@@ -421,8 +421,8 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
 
         // Add a block which owns all ports for this test.
         final String blockName = "BlockWithPortFor" + asemComponentType.getSimpleName();
-        Block block = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, blockName, true, asemComponentType,
-                this);
+        Block block = ASEMSysMLTestHelper.createSysMLBlockAddToModelAndSync(sysmlModelResource, blockName, true,
+                asemComponentType, this);
 
         // The different port types to test.
         // TODO [BR] String and unlimited natural are ignored at the moment.
@@ -434,17 +434,17 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
         // Add ports and test if their transformation was successfully.
         Collection<Port> portsToTest = new HashSet<Port>();
         portsToTest.add(
-                ASEMSysMLTestHelper.addPortToBlockAndSync(block, "SamplePortIN", FlowDirection.IN, blockType, this));
+                ASEMSysMLTestHelper.createUMLPortAddToBlockAndSync(block, "SamplePortIN", FlowDirection.IN, blockType, this));
         portsToTest.add(
-                ASEMSysMLTestHelper.addPortToBlockAndSync(block, "SamplePortOUT", FlowDirection.OUT, blockType, this));
-        portsToTest.add(ASEMSysMLTestHelper.addPortToBlockAndSync(block, "SamplePortINOUT", FlowDirection.INOUT,
+                ASEMSysMLTestHelper.createUMLPortAddToBlockAndSync(block, "SamplePortOUT", FlowDirection.OUT, blockType, this));
+        portsToTest.add(ASEMSysMLTestHelper.createUMLPortAddToBlockAndSync(block, "SamplePortINOUT", FlowDirection.INOUT,
                 blockType, this));
-        portsToTest.add(ASEMSysMLTestHelper.addPortToBlockAndSync(block, "SampleBooleanPortIN", FlowDirection.IN,
+        portsToTest.add(ASEMSysMLTestHelper.createUMLPortAddToBlockAndSync(block, "SampleBooleanPortIN", FlowDirection.IN,
                 pBoolean, this));
-        portsToTest.add(ASEMSysMLTestHelper.addPortToBlockAndSync(block, "SampleIntegerPortIN", FlowDirection.IN,
+        portsToTest.add(ASEMSysMLTestHelper.createUMLPortAddToBlockAndSync(block, "SampleIntegerPortIN", FlowDirection.IN,
                 pInteger, this));
         portsToTest.add(
-                ASEMSysMLTestHelper.addPortToBlockAndSync(block, "SampleRealPortIN", FlowDirection.IN, pReal, this));
+                ASEMSysMLTestHelper.createUMLPortAddToBlockAndSync(block, "SampleRealPortIN", FlowDirection.IN, pReal, this));
 
         return portsToTest;
     }

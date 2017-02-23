@@ -147,7 +147,7 @@ public final class ASEMSysMLTestHelper {
     }
 
     /**
-     * Create a SysML block and add it to the SysML model.
+     * Create a SysML block and add it to the existing SysML model.
      * 
      * @param sysmlModelResource
      *            SysML model resource.
@@ -163,7 +163,7 @@ public final class ASEMSysMLTestHelper {
      * 
      * @see Block#isEncapsulated
      */
-    public static Block createSysMLBlock(Resource sysmlModelResource, final String blockName,
+    public static Block createSysMLBlockAddToModelAndSync(Resource sysmlModelResource, final String blockName,
             final Boolean isEncapsulated, final java.lang.Class<? extends Component> asemComponentType,
             final ASEMSysMLTest testCaseClass) {
 
@@ -363,7 +363,7 @@ public final class ASEMSysMLTestHelper {
     }
 
     /**
-     * Add a UML port with the given name and the given flow direction to an existing block. The
+     * Add an UML port with the given name and the given flow direction to an existing block. The
      * method will save and synchronize the model, too.
      * 
      * @param block
@@ -380,7 +380,7 @@ public final class ASEMSysMLTestHelper {
      * 
      * @see FlowDirection
      */
-    public static Port addPortToBlockAndSync(final Block block, final String portName,
+    public static Port createUMLPortAddToBlockAndSync(final Block block, final String portName,
             final FlowDirection flowDirection, final Type portType, final ASEMSysMLTest testCaseClass) {
 
         Port port = addPortToBlock(block, portName, flowDirection, portType);

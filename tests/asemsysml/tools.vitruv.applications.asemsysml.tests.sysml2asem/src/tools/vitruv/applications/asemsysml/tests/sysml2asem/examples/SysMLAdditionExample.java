@@ -98,7 +98,7 @@ public class SysMLAdditionExample extends SysML2ASEMTest {
 
         Resource sysmlModelResource = this.getModelResource(this.sysmlProjectModelPath);
 
-        block = ASEMSysMLTestHelper.createSysMLBlock(sysmlModelResource, "Addition", true, Class.class, this);
+        block = ASEMSysMLTestHelper.createSysMLBlockAddToModelAndSync(sysmlModelResource, "Addition", true, Class.class, this);
 
         final PrimitiveType pType = ASEMSysMLPrimitiveTypeHelper.getSysMLTypeByASEMType(ContinuousType.class);
         final PrimitiveType pTypeInstance = ASEMSysMLPrimitiveTypeHelper
@@ -110,7 +110,7 @@ public class SysMLAdditionExample extends SysML2ASEMTest {
         this.testUserInteractor.addNextSelections(methodModeSelectionA);
         this.testUserInteractor.addNextSelections("doAddition");
 
-        input1 = ASEMSysMLTestHelper.addPortToBlockAndSync(block, "input1", FlowDirection.IN, pTypeInstance, this);
+        input1 = ASEMSysMLTestHelper.createUMLPortAddToBlockAndSync(block, "input1", FlowDirection.IN, pTypeInstance, this);
 
         // Add input parameter 2 corresponding to the existing ASEM method of input parameter 1.
         final Parameter parameterInput1 = ASEMSysMLHelper
@@ -124,11 +124,11 @@ public class SysMLAdditionExample extends SysML2ASEMTest {
                 .getNextUserInteractionSelectionForASEMMethodSelection(method, FlowDirection.IN,
                         this.getCorrespondenceModel());
         this.testUserInteractor.addNextSelections(methodModeSelectionB, methodSelection);
-        input2 = ASEMSysMLTestHelper.addPortToBlockAndSync(block, "input2", FlowDirection.IN, pTypeInstance, this);
+        input2 = ASEMSysMLTestHelper.createUMLPortAddToBlockAndSync(block, "input2", FlowDirection.IN, pTypeInstance, this);
 
         // Add return type corresponding to the existing ASEM method of input parameter 1.
         this.testUserInteractor.addNextSelections(methodModeSelectionB, methodSelection);
-        returnType = ASEMSysMLTestHelper.addPortToBlockAndSync(block, "return", FlowDirection.OUT, pTypeInstance, this);
+        returnType = ASEMSysMLTestHelper.createUMLPortAddToBlockAndSync(block, "return", FlowDirection.OUT, pTypeInstance, this);
 
     }
 
