@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.SysML2ASEMTest;
-import tools.vitruv.applications.asemsysml.tests.util.ASEMSysMLTestHelper;
+import tools.vitruv.applications.asemsysml.tests.util.ASEMSysMLAssertionHelper;
 import tools.vitruv.domains.sysml.SysMlNamspace;
 
 /**
@@ -45,7 +45,7 @@ public class ModelInitializationTest extends SysML2ASEMTest {
     private void assertModelRootExists(final String projectModelPath) {
 
         final Resource modelResource = this.getModelResource(projectModelPath);
-        ASEMSysMLTestHelper.assertRootElementExists(modelResource);
+        ASEMSysMLAssertionHelper.assertRootElementExists(modelResource);
 
     }
 

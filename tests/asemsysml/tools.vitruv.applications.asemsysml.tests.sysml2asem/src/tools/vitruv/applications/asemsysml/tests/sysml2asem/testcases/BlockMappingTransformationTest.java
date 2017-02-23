@@ -14,6 +14,7 @@ import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import edu.kit.ipd.sdq.ASEM.classifiers.Module;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.SysML2ASEMTest;
+import tools.vitruv.applications.asemsysml.tests.util.ASEMSysMLAssertionHelper;
 import tools.vitruv.applications.asemsysml.tests.util.ASEMSysMLTestHelper;
 
 /**
@@ -187,7 +188,7 @@ public class BlockMappingTransformationTest extends SysML2ASEMTest {
 
         // Check that the ASEM model was created and the root element is of the expected type.
         Resource asemModelResource = this.getASEMModelResource(sysmlBlockName);
-        ASEMSysMLTestHelper.assertValidModelResource(asemModelResource, expectedComponentType);
+        ASEMSysMLAssertionHelper.assertValidModelResource(asemModelResource, expectedComponentType);
 
         // Check that the correspondence was created, too.
         Component asemComponent = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), block,

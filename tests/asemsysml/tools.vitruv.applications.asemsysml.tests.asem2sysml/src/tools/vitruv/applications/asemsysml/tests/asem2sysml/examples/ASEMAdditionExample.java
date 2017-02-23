@@ -16,6 +16,7 @@ import edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.ASEMSysMLPrimitiveTypeHelper;
 import tools.vitruv.applications.asemsysml.tests.asem2sysml.ASEM2SysMLTest;
+import tools.vitruv.applications.asemsysml.tests.util.ASEMSysMLAssertionHelper;
 import tools.vitruv.applications.asemsysml.tests.util.ASEMSysMLTestHelper;
 
 /**
@@ -58,16 +59,16 @@ public class ASEMAdditionExample extends ASEM2SysMLTest {
         assertTrue("No corresponding SysML block for asem class " + asemClass.getName() + " was found!", block != null);
         assertEquals("SysML block has wrong name.", asemClass.getName(), block.getBase_Class().getName());
 
-        ASEMSysMLTestHelper.assertPortWasCreated(input1, asemClass, this.getCorrespondenceModel());
-        ASEMSysMLTestHelper.assertPortWasCreated(input2, asemClass, this.getCorrespondenceModel());
+        ASEMSysMLAssertionHelper.assertPortWasCreated(input1, asemClass, this.getCorrespondenceModel());
+        ASEMSysMLAssertionHelper.assertPortWasCreated(input2, asemClass, this.getCorrespondenceModel());
 
-        ASEMSysMLTestHelper.assertPortHasCorrectDirection(input1, this.getCorrespondenceModel());
-        ASEMSysMLTestHelper.assertPortHasCorrectDirection(input2, this.getCorrespondenceModel());
-        ASEMSysMLTestHelper.assertPortHasCorrectDirection(returnType, this.getCorrespondenceModel());
+        ASEMSysMLAssertionHelper.assertPortHasCorrectDirection(input1, this.getCorrespondenceModel());
+        ASEMSysMLAssertionHelper.assertPortHasCorrectDirection(input2, this.getCorrespondenceModel());
+        ASEMSysMLAssertionHelper.assertPortHasCorrectDirection(returnType, this.getCorrespondenceModel());
 
-        ASEMSysMLTestHelper.assertPortHasCorrectType(input1, this.getCorrespondenceModel());
-        ASEMSysMLTestHelper.assertPortHasCorrectType(input2, this.getCorrespondenceModel());
-        ASEMSysMLTestHelper.assertPortHasCorrectType(returnType, this.getCorrespondenceModel());
+        ASEMSysMLAssertionHelper.assertPortHasCorrectType(input1, this.getCorrespondenceModel());
+        ASEMSysMLAssertionHelper.assertPortHasCorrectType(input2, this.getCorrespondenceModel());
+        ASEMSysMLAssertionHelper.assertPortHasCorrectType(returnType, this.getCorrespondenceModel());
 
     }
 

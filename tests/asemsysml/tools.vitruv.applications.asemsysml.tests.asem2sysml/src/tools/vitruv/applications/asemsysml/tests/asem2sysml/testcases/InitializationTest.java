@@ -11,7 +11,7 @@ import org.junit.Test;
 import edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveTypeRepository;
 import tools.vitruv.applications.asemsysml.ASEMSysMLPrimitiveTypeHelper;
 import tools.vitruv.applications.asemsysml.tests.asem2sysml.ASEM2SysMLTest;
-import tools.vitruv.applications.asemsysml.tests.util.ASEMSysMLTestHelper;
+import tools.vitruv.applications.asemsysml.tests.util.ASEMSysMLAssertionHelper;
 
 /**
  * Class for all initialization tests. For each test case the SysML model must be initialized with a
@@ -32,7 +32,7 @@ public class InitializationTest extends ASEM2SysMLTest {
         final Resource sysmlModelResource = this.getModelResource(this.sysmlProjectModelPath);
 
         this.assertModelExists(this.sysmlProjectModelPath);
-        ASEMSysMLTestHelper.assertValidModelResource(sysmlModelResource, Model.class);
+        ASEMSysMLAssertionHelper.assertValidModelResource(sysmlModelResource, Model.class);
     }
 
     /**
@@ -47,7 +47,7 @@ public class InitializationTest extends ASEM2SysMLTest {
 
         // Check the ASEM primitive types repository.
         this.assertModelExists(primitiveTypesProjectModelPath);
-        ASEMSysMLTestHelper.assertValidModelResource(primitiveTypesResource, PrimitiveTypeRepository.class);
+        ASEMSysMLAssertionHelper.assertValidModelResource(primitiveTypesResource, PrimitiveTypeRepository.class);
 
         PrimitiveTypeRepository repo = (PrimitiveTypeRepository) this.getRoot(primitiveTypesProjectModelPath);
         assertTrue("The ASEM primitive types repository must contain at least one primitive type.",

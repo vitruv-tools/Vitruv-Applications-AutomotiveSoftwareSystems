@@ -26,6 +26,7 @@ import edu.kit.ipd.sdq.ASEM.primitivetypes.SignedDiscreteType;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.ASEMSysMLPrimitiveTypeHelper;
 import tools.vitruv.applications.asemsysml.tests.asem2sysml.ASEM2SysMLTest;
+import tools.vitruv.applications.asemsysml.tests.util.ASEMSysMLAssertionHelper;
 import tools.vitruv.applications.asemsysml.tests.util.ASEMSysMLTestHelper;
 
 /**
@@ -53,9 +54,9 @@ public class ASEMElementToPortMappingTransformationTest extends ASEM2SysMLTest {
 
         for (Message message : messages) {
 
-            ASEMSysMLTestHelper.assertPortWasCreated(message, module, this.getCorrespondenceModel());
-            ASEMSysMLTestHelper.assertPortHasCorrectDirection(message, this.getCorrespondenceModel());
-            ASEMSysMLTestHelper.assertPortHasCorrectType(message, this.getCorrespondenceModel());
+            ASEMSysMLAssertionHelper.assertPortWasCreated(message, module, this.getCorrespondenceModel());
+            ASEMSysMLAssertionHelper.assertPortHasCorrectDirection(message, this.getCorrespondenceModel());
+            ASEMSysMLAssertionHelper.assertPortHasCorrectType(message, this.getCorrespondenceModel());
         }
 
     }
@@ -78,9 +79,9 @@ public class ASEMElementToPortMappingTransformationTest extends ASEM2SysMLTest {
 
         for (Parameter parameter : parameters) {
 
-            ASEMSysMLTestHelper.assertPortWasCreated(parameter, asemClass, this.getCorrespondenceModel());
-            ASEMSysMLTestHelper.assertPortHasCorrectDirection(parameter, this.getCorrespondenceModel());
-            ASEMSysMLTestHelper.assertPortHasCorrectType(parameter, this.getCorrespondenceModel());
+            ASEMSysMLAssertionHelper.assertPortWasCreated(parameter, asemClass, this.getCorrespondenceModel());
+            ASEMSysMLAssertionHelper.assertPortHasCorrectDirection(parameter, this.getCorrespondenceModel());
+            ASEMSysMLAssertionHelper.assertPortHasCorrectType(parameter, this.getCorrespondenceModel());
         }
 
     }
@@ -101,9 +102,9 @@ public class ASEMElementToPortMappingTransformationTest extends ASEM2SysMLTest {
 
         for (ReturnType returnType : returnTypes) {
 
-            ASEMSysMLTestHelper.assertPortWasCreated(returnType, asemClass, this.getCorrespondenceModel());
-            ASEMSysMLTestHelper.assertPortHasCorrectDirection(returnType, this.getCorrespondenceModel());
-            ASEMSysMLTestHelper.assertPortHasCorrectType(returnType, this.getCorrespondenceModel());
+            ASEMSysMLAssertionHelper.assertPortWasCreated(returnType, asemClass, this.getCorrespondenceModel());
+            ASEMSysMLAssertionHelper.assertPortHasCorrectDirection(returnType, this.getCorrespondenceModel());
+            ASEMSysMLAssertionHelper.assertPortHasCorrectType(returnType, this.getCorrespondenceModel());
         }
     }
 
@@ -137,7 +138,7 @@ public class ASEMElementToPortMappingTransformationTest extends ASEM2SysMLTest {
             EcoreUtil.delete(typedElement);
             this.saveAndSynchronizeChanges(rootElement);
 
-            ASEMSysMLTestHelper.assertPortWasDeleted(typedElement, portBckp, portContainerBckp, propertyBckp,
+            ASEMSysMLAssertionHelper.assertPortWasDeleted(typedElement, portBckp, portContainerBckp, propertyBckp,
                     flowPropertyBckp, this.getCorrespondenceModel(), module);
         }
 
@@ -196,24 +197,24 @@ public class ASEMElementToPortMappingTransformationTest extends ASEM2SysMLTest {
         Message messageComponentType = ASEMSysMLTestHelper.createASEMMessageAddToModuleAndSync("MessageClass", true,
                 false, asemClassForMessageType, module, this);
 
-        ASEMSysMLTestHelper.assertPortHasCorrectDirection(messagePrimitiveType, this.getCorrespondenceModel());
-        ASEMSysMLTestHelper.assertPortHasCorrectDirection(messageComponentType, this.getCorrespondenceModel());
+        ASEMSysMLAssertionHelper.assertPortHasCorrectDirection(messagePrimitiveType, this.getCorrespondenceModel());
+        ASEMSysMLAssertionHelper.assertPortHasCorrectDirection(messageComponentType, this.getCorrespondenceModel());
 
         // INOUT
         messagePrimitiveType.setWritable(true);
         messageComponentType.setWritable(true);
         this.saveAndSynchronizeChanges(messagePrimitiveType);
-        ASEMSysMLTestHelper.assertPortHasCorrectDirection(messagePrimitiveType, this.getCorrespondenceModel());
+        ASEMSysMLAssertionHelper.assertPortHasCorrectDirection(messagePrimitiveType, this.getCorrespondenceModel());
         this.saveAndSynchronizeChanges(messageComponentType);
-        ASEMSysMLTestHelper.assertPortHasCorrectDirection(messageComponentType, this.getCorrespondenceModel());
+        ASEMSysMLAssertionHelper.assertPortHasCorrectDirection(messageComponentType, this.getCorrespondenceModel());
 
         // OUT
         messagePrimitiveType.setReadable(false);
         messageComponentType.setReadable(false);
         this.saveAndSynchronizeChanges(messagePrimitiveType);
-        ASEMSysMLTestHelper.assertPortHasCorrectDirection(messagePrimitiveType, this.getCorrespondenceModel());
+        ASEMSysMLAssertionHelper.assertPortHasCorrectDirection(messagePrimitiveType, this.getCorrespondenceModel());
         this.saveAndSynchronizeChanges(messageComponentType);
-        ASEMSysMLTestHelper.assertPortHasCorrectDirection(messageComponentType, this.getCorrespondenceModel());
+        ASEMSysMLAssertionHelper.assertPortHasCorrectDirection(messageComponentType, this.getCorrespondenceModel());
 
     }
 
@@ -248,26 +249,26 @@ public class ASEMElementToPortMappingTransformationTest extends ASEM2SysMLTest {
         Parameter parameterComponentType = ASEMSysMLTestHelper.createASEMParameterAddToMethodAndSync("ParameterClass",
                 asemClassForMessageTypeA, method, this);
 
-        ASEMSysMLTestHelper.assertPortHasCorrectType(messagePrimitiveType, this.getCorrespondenceModel());
-        ASEMSysMLTestHelper.assertPortHasCorrectType(messageComponentType, this.getCorrespondenceModel());
-        ASEMSysMLTestHelper.assertPortHasCorrectType(parameterPrimitiveType, this.getCorrespondenceModel());
-        ASEMSysMLTestHelper.assertPortHasCorrectType(parameterComponentType, this.getCorrespondenceModel());
+        ASEMSysMLAssertionHelper.assertPortHasCorrectType(messagePrimitiveType, this.getCorrespondenceModel());
+        ASEMSysMLAssertionHelper.assertPortHasCorrectType(messageComponentType, this.getCorrespondenceModel());
+        ASEMSysMLAssertionHelper.assertPortHasCorrectType(parameterPrimitiveType, this.getCorrespondenceModel());
+        ASEMSysMLAssertionHelper.assertPortHasCorrectType(parameterComponentType, this.getCorrespondenceModel());
 
         messagePrimitiveType.setType(pContinuous);
         this.saveAndSynchronizeChanges(messagePrimitiveType);
-        ASEMSysMLTestHelper.assertPortHasCorrectType(messagePrimitiveType, this.getCorrespondenceModel());
+        ASEMSysMLAssertionHelper.assertPortHasCorrectType(messagePrimitiveType, this.getCorrespondenceModel());
 
         messageComponentType.setType(asemClassForMessageTypeB);
         this.saveAndSynchronizeChanges(messageComponentType);
-        ASEMSysMLTestHelper.assertPortHasCorrectType(messageComponentType, this.getCorrespondenceModel());
+        ASEMSysMLAssertionHelper.assertPortHasCorrectType(messageComponentType, this.getCorrespondenceModel());
 
         parameterPrimitiveType.setType(pContinuous);
         this.saveAndSynchronizeChanges(parameterPrimitiveType);
-        ASEMSysMLTestHelper.assertPortHasCorrectType(parameterPrimitiveType, this.getCorrespondenceModel());
+        ASEMSysMLAssertionHelper.assertPortHasCorrectType(parameterPrimitiveType, this.getCorrespondenceModel());
 
         parameterComponentType.setType(asemClassForMessageTypeB);
         this.saveAndSynchronizeChanges(parameterComponentType);
-        ASEMSysMLTestHelper.assertPortHasCorrectType(parameterComponentType, this.getCorrespondenceModel());
+        ASEMSysMLAssertionHelper.assertPortHasCorrectType(parameterComponentType, this.getCorrespondenceModel());
 
     }
 
