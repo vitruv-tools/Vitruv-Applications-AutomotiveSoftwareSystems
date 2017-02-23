@@ -13,6 +13,7 @@ import org.eclipse.papyrus.sysml14.blocks.BindingConnector;
 import org.eclipse.papyrus.sysml14.blocks.Block;
 import org.eclipse.papyrus.sysml14.portsandflows.FlowDirection;
 import org.eclipse.papyrus.sysml14.portsandflows.FlowProperty;
+import org.eclipse.uml2.uml.AggregationKind;
 import org.eclipse.uml2.uml.Class;
 import org.eclipse.uml2.uml.Connector;
 import org.eclipse.uml2.uml.ConnectorEnd;
@@ -42,11 +43,11 @@ import tools.vitruv.framework.correspondence.CorrespondenceModel;
  *
  */
 public class ASEMSysMLAssertionHelper {
-    
+
     /** Utility classes should not have a public or default constructor. */
     private ASEMSysMLAssertionHelper() {
     }
-    
+
     /**
      * The given model resource should exists.
      * 
@@ -58,7 +59,7 @@ public class ASEMSysMLAssertionHelper {
         final Boolean modelResourceExists = (modelResource != null);
         assertTrue("Model resource doesn't exist.", modelResourceExists);
     }
-    
+
     /**
      * The given model resource should have a root element.
      * 
@@ -70,7 +71,7 @@ public class ASEMSysMLAssertionHelper {
             fail("Model " + modelResource.getURI() + " doesn't contain a root element.");
         }
     }
-    
+
     /**
      * The root element of the given model should be an instance of the given type.
      * 
@@ -86,7 +87,7 @@ public class ASEMSysMLAssertionHelper {
             fail("SysML root element is not an instance of " + rootClass.getTypeName() + ".");
         }
     }
-    
+
     /**
      * For a valid model resource the resource itself must exist and must contain a root element
      * which must be typed by the given class.
@@ -102,7 +103,7 @@ public class ASEMSysMLAssertionHelper {
         ASEMSysMLAssertionHelper.assertRootElementExists(modelResource);
         ASEMSysMLAssertionHelper.assertRootElementIsTypeOf(modelResource, rootElementClass);
     }
-    
+
     /**
      * For a given ASEM Named element a port must exist. The port itself must be contained in the
      * given ASEM component.
@@ -121,6 +122,8 @@ public class ASEMSysMLAssertionHelper {
 
         assertTrue("No correspondence between the named element " + named.getName() + " and an UML port exists!",
                 port != null);
+        assertEquals("Wrong aggregation kind for port " + port.getName(), AggregationKind.COMPOSITE_LITERAL,
+                port.getAggregation());
 
         final Block block = ASEMSysMLHelper.getFirstCorrespondingSysMLElement(correspondenceModel, component,
                 Block.class);
@@ -128,7 +131,7 @@ public class ASEMSysMLAssertionHelper {
 
         assertEquals("The port was not added to the expected SysML block!", block, portsBlock);
     }
-    
+
     /**
      * Check if the port direction was set correctly.
      * 
@@ -160,7 +163,7 @@ public class ASEMSysMLAssertionHelper {
         assertEquals("Port " + port.getName() + " has wrong direction!", expectedDirection,
                 flowProperty.getDirection());
     }
-    
+
     /**
      * Check if the port direction was set correctly.
      * 
@@ -182,7 +185,7 @@ public class ASEMSysMLAssertionHelper {
         assertEquals("Port " + port.getName() + " has wrong direction!", expectedDirection,
                 flowProperty.getDirection());
     }
-    
+
     /**
      * Check if the port direction was set correctly.
      * 
@@ -205,7 +208,7 @@ public class ASEMSysMLAssertionHelper {
         assertEquals("Port " + port.getName() + " has wrong direction!", expectedDirection,
                 flowProperty.getDirection());
     }
-    
+
     /**
      * Check if the port type was set correctly.
      * 
@@ -244,7 +247,7 @@ public class ASEMSysMLAssertionHelper {
             fail("Unsupported message type.");
         }
     }
-    
+
     /**
      * Check if the port was deleted successfully.
      * 

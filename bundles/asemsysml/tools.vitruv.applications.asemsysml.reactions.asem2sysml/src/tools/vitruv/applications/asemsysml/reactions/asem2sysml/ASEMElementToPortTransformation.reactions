@@ -8,6 +8,7 @@ import edu.kit.ipd.sdq.ASEM.classifiers.Component
 import org.eclipse.uml2.uml.util.UMLUtil
 import org.eclipse.papyrus.sysml14.blocks.BindingConnector
 import edu.kit.ipd.sdq.ASEM.dataexchange.Method
+import org.eclipse.uml2.uml.AggregationKind
 
 import "edu.kit.ipd.sdq.asem" as asem
 import "http://www.eclipse.org/papyrus/sysml/1.4/SysML" as sysml
@@ -59,6 +60,7 @@ routine createPortWithComponentType(asem::Message message) {
 		val port = create uml::Port and initialize {
 			port.name = message.name;
 			port.type = baseClassType;
+			port.aggregation = AggregationKind.COMPOSITE_LITERAL;
 			
 			baseClass.ownedPorts.add(port);
 		}
@@ -91,6 +93,7 @@ routine createPortWithPrimitiveType(asem::Message message, uml::PrimitiveType po
 		val port = create uml::Port and initialize {
 			port.name = message.name;
 			port.type = ASEMSysMLPrimitiveTypeHelper.getSysMLPrimitiveTypeFromSysMLModel(this.correspondenceModel, message, portType);
+			port.aggregation = AggregationKind.COMPOSITE_LITERAL;
 			
 			baseClass.ownedPorts.add(port);
 		}
@@ -310,6 +313,7 @@ routine createPortForParameterWithPrimitiveType(asem::Parameter parameter, uml::
 		val port = create uml::Port and initialize {
 			port.name = parameter.name;
 			port.type = ASEMSysMLPrimitiveTypeHelper.getSysMLPrimitiveTypeFromSysMLModel(this.correspondenceModel, parameter, type);
+			port.aggregation = AggregationKind.COMPOSITE_LITERAL;
 			
 			baseClass.ownedPorts.add(port);
 		}
@@ -346,6 +350,7 @@ routine createPortForParameterWithComponentType(asem::Parameter parameter) {
 		val port = create uml::Port and initialize {
 			port.name = parameter.name;
 			port.type = baseClassType;
+			port.aggregation = AggregationKind.COMPOSITE_LITERAL;
 			
 			baseClass.ownedPorts.add(port);
 		}
@@ -400,6 +405,7 @@ routine createPortForReturnTypeWithPrimitiveType(asem::ReturnType returnType, um
 		val port = create uml::Port and initialize {
 			port.name = returnType.name;
 			port.type = ASEMSysMLPrimitiveTypeHelper.getSysMLPrimitiveTypeFromSysMLModel(this.correspondenceModel, returnType, type);
+			port.aggregation = AggregationKind.COMPOSITE_LITERAL;
 			
 			baseClass.ownedPorts.add(port);
 		}
@@ -436,6 +442,7 @@ routine createPortForReturnTypeWithComponentType(asem::ReturnType returnType) {
 		val port = create uml::Port and initialize {
 			port.name = returnType.name;
 			port.type = baseClassType;
+			port.aggregation = AggregationKind.COMPOSITE_LITERAL;
 			
 			baseClass.ownedPorts.add(port);
 		}
