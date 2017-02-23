@@ -152,11 +152,28 @@ public final class ASEMSysMLPrimitiveTypeHelper {
         Resource resource = ASEMSysMLHelper.getModelResource(correspondenceModel, alreadyPersistedObject,
                 sysmlProjectModelPath);
 
-        if (resource == null) {
+        return getSysMLPrimitiveTypeFromSysMLModel(resource, type);
+
+    }
+
+    /**
+     * Get the primitive type instance from the given SysML model.
+     * 
+     * @param sysmlResource
+     *            SysML model resource.
+     * @param type
+     *            The primitive type for which an instance shall be returned.
+     * @return The instance of the primitive type or <code>null</code> if no instance was found.
+     */
+    public static PrimitiveType getSysMLPrimitiveTypeFromSysMLModel(final Resource sysmlResource,
+            final PrimitiveType type) {
+
+        if (sysmlResource == null) {
             throw new IllegalArgumentException("No SysML model resource exists.");
         }
 
-        Model sysmlModel = (Model) EcoreUtil.getObjectByType(resource.getContents(), UMLPackage.eINSTANCE.getModel());
+        Model sysmlModel = (Model) EcoreUtil.getObjectByType(sysmlResource.getContents(),
+                UMLPackage.eINSTANCE.getModel());
 
         if (sysmlModel == null) {
             throw new IllegalArgumentException("SysML model does not contain a UML model element.");
