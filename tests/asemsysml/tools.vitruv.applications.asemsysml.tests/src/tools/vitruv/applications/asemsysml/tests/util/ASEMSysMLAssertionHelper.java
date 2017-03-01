@@ -42,7 +42,7 @@ import tools.vitruv.framework.correspondence.CorrespondenceModel;
  * @author Benjamin Rupp
  *
  */
-public class ASEMSysMLAssertionHelper {
+public final class ASEMSysMLAssertionHelper {
 
     /** Utility classes should not have a public or default constructor. */
     private ASEMSysMLAssertionHelper() {
