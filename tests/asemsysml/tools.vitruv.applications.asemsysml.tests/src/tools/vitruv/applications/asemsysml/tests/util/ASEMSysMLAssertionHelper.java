@@ -111,7 +111,7 @@ public final class ASEMSysMLAssertionHelper {
      * @param named
      *            The {@link Named} element which shall correspond to a port.
      * @param component
-     *            The {@link Component} which shall contain the port which corresponds to the Named
+     *            The {@link Component} which contains the port which corresponds to the Named
      *            element.
      * @param correspondenceModel
      *            The test case correspondence model.
