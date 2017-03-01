@@ -26,6 +26,7 @@ import org.eclipse.uml2.uml.util.UMLUtil;
 import edu.kit.ipd.sdq.ASEM.base.Named;
 import edu.kit.ipd.sdq.ASEM.base.TypedElement;
 import edu.kit.ipd.sdq.ASEM.classifiers.Component;
+import edu.kit.ipd.sdq.ASEM.dataexchange.Constant;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Message;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Parameter;
 import edu.kit.ipd.sdq.ASEM.dataexchange.ReturnType;
@@ -312,5 +313,36 @@ public final class ASEMSysMLAssertionHelper {
         assertTrue("BindingConnector stereoptype for port " + portBckp.getName() + " was not deleted!",
                 !sysmlResource.getContents().contains(bindingConnector));
 
+    }
+
+    /**
+     * Check if an ASEM constant was transformed as expected.
+     * 
+     * @param constant
+     *            The constant which shall be mapped correctly.
+     * @param referencedClass
+     *            The ASEM class to which the constant is referencing.
+     * @param correspondenceModel
+     *            The test case correspondence model.
+     */
+    public static void assertConstantWasTransformedAsExpected(final Constant constant,
+            final edu.kit.ipd.sdq.ASEM.classifiers.Class referencedClass,
+            final CorrespondenceModel correspondenceModel) {
+
+        final Property property = ASEMSysMLHelper.getFirstCorrespondingSysMLElement(correspondenceModel, constant,
+                Property.class);
+
+        assertTrue("No corresponding part property for constant " + constant.getName() + " found!", property != null);
+
+        assertEquals("Wrong name of part reference " + property.getName() + "!", constant.getName(),
+                property.getName());
+
+        assertEquals("Wrong aggregation kind of part reference " + property.getName() + "!",
+                AggregationKind.COMPOSITE_LITERAL, property.getAggregation());
+
+        final org.eclipse.uml2.uml.Class expectedType = ASEMSysMLHelper
+                .getFirstCorrespondingSysMLElement(correspondenceModel, referencedClass, Block.class).getBase_Class();
+
+        assertEquals("Wrong type of part reference " + property.getName() + "!", expectedType, property.getType());
     }
 }
