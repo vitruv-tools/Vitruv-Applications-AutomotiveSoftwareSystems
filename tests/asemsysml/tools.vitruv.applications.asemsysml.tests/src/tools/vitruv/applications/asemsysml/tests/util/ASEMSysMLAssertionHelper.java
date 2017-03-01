@@ -114,6 +114,7 @@ public final class ASEMSysMLAssertionHelper {
      *            The {@link Component} which shall contain the port which corresponds to the Named
      *            element.
      * @param correspondenceModel
+     *            The test case correspondence model.
      */
     public static void assertPortWasCreated(final Named named, final Component component,
             final CorrespondenceModel correspondenceModel) {
