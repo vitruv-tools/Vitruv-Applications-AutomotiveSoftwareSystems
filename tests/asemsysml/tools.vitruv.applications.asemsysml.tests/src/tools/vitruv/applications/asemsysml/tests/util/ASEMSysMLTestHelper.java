@@ -35,6 +35,7 @@ import edu.kit.ipd.sdq.ASEM.dataexchange.Message;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Method;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Parameter;
 import edu.kit.ipd.sdq.ASEM.dataexchange.ReturnType;
+import edu.kit.ipd.sdq.ASEM.dataexchange.Variable;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.tests.ASEMSysMLTest;
 
@@ -189,6 +190,8 @@ public final class ASEMSysMLTestHelper {
     /**
      * Create a new ASEM component as root element within a new ASEM model.
      * 
+     * @param <T>
+     *            The ASEM component type.
      * @param componentName
      *            The name of the component to create.
      * @param asemComponentType
@@ -230,19 +233,19 @@ public final class ASEMSysMLTestHelper {
      * 
      * @param methodName
      *            The name of the method,
-     * @param asemClass
-     *            The ASEM class the method shall be added to.
+     * @param component
+     *            The ASEM component the method shall be added to.
      * @param testCaseClass
      *            Test case class. Needed for accessing synchronization method.
      * @return The created ASEM method.
      */
-    public static Method createASEMMethodAddToClassAndSync(final String methodName,
-            final edu.kit.ipd.sdq.ASEM.classifiers.Class asemClass, final ASEMSysMLTest testCaseClass) {
+    public static Method createASEMMethodAddToComponentAndSync(final String methodName,
+            final Component component, final ASEMSysMLTest testCaseClass) {
 
         Method method = DataexchangeFactory.eINSTANCE.createMethod();
         method.setName(methodName);
-        asemClass.getMethods().add(method);
-        testCaseClass.saveAndSynchronizeChanges(asemClass);
+        component.getMethods().add(method);
+        testCaseClass.saveAndSynchronizeChanges(component);
 
         return method;
     }
@@ -360,6 +363,41 @@ public final class ASEMSysMLTestHelper {
         testCaseClass.saveAndSynchronizeChanges(component);
 
         return constant;
+    }
+
+    /**
+     * Create an ASEM variable and add it to an existing ASEM component. This method will save and
+     * synchronize the ASEM model, too.
+     * 
+     * @param variableName
+     *            The name of the variable.
+     * @param isReadable
+     *            <code>True</code> if the variable shall be readable.
+     * @param isWritable
+     *            <code>True</code> if the variable shall be writable.
+     * @param variableType
+     *            The variable type.
+     * @param component
+     *            The component the variable shall be added to.
+     * @param testCaseClass
+     *            Test case class. Needed for accessing synchronization method.
+     * @return The created ASEM variable.
+     */
+    public static Variable createASEMVariableAddToComponentAndSync(final String variableName, final boolean isReadable,
+            final boolean isWritable, final Classifier variableType, final Component component,
+            final ASEMSysMLTest testCaseClass) {
+
+        Variable variable = DataexchangeFactory.eINSTANCE.createVariable();
+        variable.setName(variableName);
+        variable.setReadable(isReadable);
+        variable.setWritable(isWritable);
+        variable.setType(variableType);
+
+        component.getTypedElements().add(variable);
+        testCaseClass.saveAndSynchronizeChanges(component);
+
+        return variable;
+
     }
 
     /**
