@@ -14,6 +14,7 @@ import org.eclipse.papyrus.sysml14.blocks.BlocksPackage;
 import org.eclipse.papyrus.sysml14.portsandflows.FlowDirection;
 import org.eclipse.papyrus.sysml14.portsandflows.FlowProperty;
 import org.eclipse.papyrus.sysml14.portsandflows.PortsandflowsPackage;
+import org.eclipse.uml2.uml.AggregationKind;
 import org.eclipse.uml2.uml.Class;
 import org.eclipse.uml2.uml.Connector;
 import org.eclipse.uml2.uml.ConnectorEnd;
@@ -470,6 +471,7 @@ public final class ASEMSysMLTestHelper {
 
         // 2) Create UML port for the block.
         Port port = block.getBase_Class().createOwnedPort(portName, portType);
+        port.setAggregation(AggregationKind.COMPOSITE_LITERAL);
 
         // 3) Create SysML binding connector between property and port.
         Connector connector = block.getBase_Class()
