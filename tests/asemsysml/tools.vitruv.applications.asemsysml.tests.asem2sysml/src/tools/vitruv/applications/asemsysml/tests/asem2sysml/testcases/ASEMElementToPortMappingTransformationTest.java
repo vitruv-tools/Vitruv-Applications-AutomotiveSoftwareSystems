@@ -73,7 +73,7 @@ public class ASEMElementToPortMappingTransformationTest extends ASEM2SysMLTest {
         final Class asemClassForMessageType = ASEMSysMLTestHelper
                 .createASEMComponentAsModelRootAndSync("ClassForMessageType", Class.class, this);
 
-        Method method = ASEMSysMLTestHelper.createASEMMethodAddToClassAndSync("MethodForParameters", asemClass, this);
+        Method method = ASEMSysMLTestHelper.createASEMMethodAddToComponentAndSync("MethodForParameters", asemClass, this);
 
         Collection<Parameter> parameters = this.prepareParameters(method, asemClassForMessageType);
 
@@ -119,7 +119,7 @@ public class ASEMElementToPortMappingTransformationTest extends ASEM2SysMLTest {
                 Module.class, this);
         Class asemClass = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ClassForMethods", Class.class,
                 this);
-        Method method = ASEMSysMLTestHelper.createASEMMethodAddToClassAndSync("MethodForParameters", asemClass, this);
+        Method method = ASEMSysMLTestHelper.createASEMMethodAddToComponentAndSync("MethodForParameters", asemClass, this);
         final Class asemClassForMessageType = ASEMSysMLTestHelper
                 .createASEMComponentAsModelRootAndSync("ClassForMessageType", Class.class, this);
 
@@ -154,7 +154,7 @@ public class ASEMElementToPortMappingTransformationTest extends ASEM2SysMLTest {
                 Module.class, this);
         Class asemClass = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ClassForMethods", Class.class,
                 this);
-        Method method = ASEMSysMLTestHelper.createASEMMethodAddToClassAndSync("MethodForParameters", asemClass, this);
+        Method method = ASEMSysMLTestHelper.createASEMMethodAddToComponentAndSync("MethodForParameters", asemClass, this);
         final Class asemClassForMessageType = ASEMSysMLTestHelper
                 .createASEMComponentAsModelRootAndSync("ClassForMessageType", Class.class, this);
 
@@ -228,7 +228,7 @@ public class ASEMElementToPortMappingTransformationTest extends ASEM2SysMLTest {
                 this);
         Class asemClass = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ClassForMethods", Class.class,
                 this);
-        Method method = ASEMSysMLTestHelper.createASEMMethodAddToClassAndSync("MethodForParameters", asemClass, this);
+        Method method = ASEMSysMLTestHelper.createASEMMethodAddToComponentAndSync("MethodForParameters", asemClass, this);
 
         final PrimitiveType pBoolean = ASEMSysMLPrimitiveTypeHelper
                 .getASEMPrimitiveTypeFromRepository(BooleanType.class, module);
@@ -343,10 +343,10 @@ public class ASEMElementToPortMappingTransformationTest extends ASEM2SysMLTest {
         final PrimitiveType pSignedDiscreteType = ASEMSysMLPrimitiveTypeHelper
                 .getASEMPrimitiveTypeFromRepository(SignedDiscreteType.class, asemClass);
 
-        Method methodA = ASEMSysMLTestHelper.createASEMMethodAddToClassAndSync("MethodForReturnTypeA", asemClass, this);
-        Method methodB = ASEMSysMLTestHelper.createASEMMethodAddToClassAndSync("MethodForReturnTypeB", asemClass, this);
-        Method methodC = ASEMSysMLTestHelper.createASEMMethodAddToClassAndSync("MethodForReturnTypeC", asemClass, this);
-        Method methodD = ASEMSysMLTestHelper.createASEMMethodAddToClassAndSync("MethodForReturnTypeD", asemClass, this);
+        Method methodA = ASEMSysMLTestHelper.createASEMMethodAddToComponentAndSync("MethodForReturnTypeA", asemClass, this);
+        Method methodB = ASEMSysMLTestHelper.createASEMMethodAddToComponentAndSync("MethodForReturnTypeB", asemClass, this);
+        Method methodC = ASEMSysMLTestHelper.createASEMMethodAddToComponentAndSync("MethodForReturnTypeC", asemClass, this);
+        Method methodD = ASEMSysMLTestHelper.createASEMMethodAddToComponentAndSync("MethodForReturnTypeD", asemClass, this);
 
         returnTypes.add(ASEMSysMLTestHelper.createASEMReturnTypeAddToMethodAndSync("ReturnTypeBoolean", pBoolean,
                 methodA, this));
