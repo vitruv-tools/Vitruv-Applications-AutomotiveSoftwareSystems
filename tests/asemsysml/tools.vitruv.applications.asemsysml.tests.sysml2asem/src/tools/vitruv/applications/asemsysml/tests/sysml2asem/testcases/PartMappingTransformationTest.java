@@ -7,7 +7,6 @@ import static org.junit.Assert.fail;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.papyrus.sysml14.blocks.Block;
-import org.eclipse.uml2.uml.AggregationKind;
 import org.eclipse.uml2.uml.Property;
 import org.junit.Test;
 
@@ -55,12 +54,7 @@ public class PartMappingTransformationTest extends SysML2ASEMTest {
         Block blockB1 = ASEMSysMLTestHelper.createSysMLBlockAddToModelAndSync(sysmlModelResource, "BlockB1", true,
                 asemComponentType, this);
 
-        // Add a part property to BlockA. The aggregation kind is needed for the getParts() method.
-        Property partPropertyB1 = blockA.getBase_Class().createOwnedAttribute("partReferenceB1",
-                blockB1.getBase_Class());
-        partPropertyB1.setAggregation(AggregationKind.COMPOSITE_LITERAL);
-
-        saveAndSynchronizeChanges(blockA);
+        ASEMSysMLTestHelper.createPartReferenceForBlockAndSync("partReferenceB1", blockA, blockB1, this);
 
         assertTrue("Block A doesn't contain a part!", !blockA.getParts().isEmpty());
 
@@ -90,13 +84,8 @@ public class PartMappingTransformationTest extends SysML2ASEMTest {
         Block blockN3 = ASEMSysMLTestHelper.createSysMLBlockAddToModelAndSync(sysmlModelResource, "BlockN3", true,
                 asemComponentType, this);
 
-        Property partPropertyN2 = blockN1.getBase_Class().createOwnedAttribute("partReferenceN2",
-                blockN2.getBase_Class());
-        partPropertyN2.setAggregation(AggregationKind.COMPOSITE_LITERAL);
-
-        Property partPropertyN3 = blockN2.getBase_Class().createOwnedAttribute("partReferenceN3",
-                blockN3.getBase_Class());
-        partPropertyN3.setAggregation(AggregationKind.COMPOSITE_LITERAL);
+        ASEMSysMLTestHelper.createPartReferenceForBlockAndSync("partReferenceN2", blockN1, blockN2, this);
+        ASEMSysMLTestHelper.createPartReferenceForBlockAndSync("partReferenceN3", blockN2, blockN3, this);
 
         saveAndSynchronizeChanges(blockN1);
         saveAndSynchronizeChanges(blockN2);
@@ -128,8 +117,7 @@ public class PartMappingTransformationTest extends SysML2ASEMTest {
         Block blockB = ASEMSysMLTestHelper.createSysMLBlockAddToModelAndSync(sysmlModelResource, "BlockAsModule", true,
                 asemComponentType, this);
 
-        Property partPropertyB = blockA.getBase_Class().createOwnedAttribute("partReferenceB", blockB.getBase_Class());
-        partPropertyB.setAggregation(AggregationKind.COMPOSITE_LITERAL);
+        ASEMSysMLTestHelper.createPartReferenceForBlockAndSync("partReferenceB", blockA, blockB, this);
 
         saveAndSynchronizeChanges(blockA);
         saveAndSynchronizeChanges(blockB);
@@ -169,8 +157,8 @@ public class PartMappingTransformationTest extends SysML2ASEMTest {
         Block blockB = ASEMSysMLTestHelper.createSysMLBlockAddToModelAndSync(sysmlResource, "BlockBDeletionTest", true,
                 asemComponentType, this);
 
-        Property partProperty = blockA.getBase_Class().createOwnedAttribute("partReference", blockB.getBase_Class());
-        partProperty.setAggregation(AggregationKind.COMPOSITE_LITERAL);
+        Property partProperty = ASEMSysMLTestHelper.createPartReferenceForBlockAndSync("partReference", blockA, blockB,
+                this);
 
         saveAndSynchronizeChanges(blockA);
         saveAndSynchronizeChanges(blockB);

@@ -430,6 +430,33 @@ public final class ASEMSysMLTestHelper {
     }
 
     /**
+     * Create a part reference and it to an existing SysML block. This method will save and
+     * synchronize the SysML model, too.
+     * 
+     * @param partReferenceName
+     *            Name of the part reference.
+     * @param blockWithPart
+     *            The block which shall contain the part reference.
+     * @param referencedBlock
+     *            The block which shall be referenced as part of <code>blockWithPart</code>.
+     * @param testCaseClass
+     *            Test case class. Needed for accessing synchronization method.
+     * @return The created part property.
+     */
+    public static Property createPartReferenceForBlockAndSync(final String partReferenceName, final Block blockWithPart,
+            final Block referencedBlock, final ASEMSysMLTest testCaseClass) {
+
+        Property partProperty = blockWithPart.getBase_Class().createOwnedAttribute(partReferenceName,
+                referencedBlock.getBase_Class());
+        // The aggregation kind is needed for the getParts() method.
+        partProperty.setAggregation(AggregationKind.COMPOSITE_LITERAL);
+
+        testCaseClass.saveAndSynchronizeChanges(blockWithPart);
+
+        return partProperty;
+    }
+
+    /**
      * Check whether the given parent component references to the given child component or not.
      * 
      * @param parentComponent
