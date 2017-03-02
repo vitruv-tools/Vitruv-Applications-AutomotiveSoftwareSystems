@@ -240,8 +240,8 @@ public final class ASEMSysMLTestHelper {
      *            Test case class. Needed for accessing synchronization method.
      * @return The created ASEM method.
      */
-    public static Method createASEMMethodAddToComponentAndSync(final String methodName,
-            final Component component, final ASEMSysMLTest testCaseClass) {
+    public static Method createASEMMethodAddToComponentAndSync(final String methodName, final Component component,
+            final ASEMSysMLTest testCaseClass) {
 
         Method method = DataexchangeFactory.eINSTANCE.createMethod();
         method.setName(methodName);

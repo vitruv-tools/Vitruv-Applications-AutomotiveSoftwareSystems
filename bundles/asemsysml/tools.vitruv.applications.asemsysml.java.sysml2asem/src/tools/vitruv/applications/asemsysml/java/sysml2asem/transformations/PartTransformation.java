@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.papyrus.sysml14.blocks.Block;
 import org.eclipse.uml2.uml.AggregationKind;
+import org.eclipse.uml2.uml.Port;
 import org.eclipse.uml2.uml.Property;
 import org.eclipse.uml2.uml.util.UMLUtil;
 
@@ -82,12 +83,16 @@ public class PartTransformation
     @Override
     protected boolean checkPreconditions(ReplaceSingleValuedEAttribute<EObject, Object> change) {
 
-        return (isProperty(change) && isPropertyTypeSet(change)
+        return (isProperty(change) && isNotAPort(change) && isPropertyTypeSet(change)
                 && isPartProperty((Property) change.getAffectedEObject()));
     }
 
     private boolean isProperty(final ReplaceSingleValuedEAttribute<EObject, Object> change) {
         return (change.getAffectedEObject() instanceof Property);
+    }
+    
+    private boolean isNotAPort(final ReplaceSingleValuedEAttribute<EObject, Object> change) {
+        return !(change.getAffectedEObject() instanceof Port);
     }
 
     private boolean isPropertyTypeSet(final ReplaceSingleValuedEAttribute<EObject, Object> change) {

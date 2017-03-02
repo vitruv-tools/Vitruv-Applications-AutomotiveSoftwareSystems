@@ -20,6 +20,7 @@ import org.eclipse.uml2.uml.Element;
 import org.eclipse.uml2.uml.Model;
 import org.eclipse.uml2.uml.Port;
 import org.eclipse.uml2.uml.PrimitiveType;
+import org.eclipse.uml2.uml.Property;
 import org.eclipse.uml2.uml.Type;
 import org.eclipse.uml2.uml.util.UMLUtil;
 
@@ -311,6 +312,31 @@ public class ASEMSysMLHelper {
         org.eclipse.uml2.uml.Class baseClass = (org.eclipse.uml2.uml.Class) portOwner;
         return (Block) UMLUtil.getStereotypeApplication(baseClass, Block.class);
 
+    }
+
+    /**
+     * This method checks if the given property represents a property of an UML port. This is needed
+     * to distinguish between properties of a port and a part reference.
+     * 
+     * @param property
+     *            The property to check.
+     * @return <code>True</code> if the property is a property of an UML port, otherwise
+     *         <code>false</code>.
+     */
+    public static boolean isPropertyAPortProperty(final Property property) {
+
+        boolean isPort = false;
+
+        for (ConnectorEnd propertyEnd : property.getEnds()) {
+            final Connector connector = getConnector(propertyEnd);
+            for (ConnectorEnd connectorEnd : connector.getEnds()) {
+                if (connectorEnd.getRole() instanceof Port) {
+                    isPort = true;
+                }
+            }
+        }
+
+        return isPort;
     }
 
     /**

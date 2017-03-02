@@ -6,7 +6,6 @@ import org.apache.log4j.Logger;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.papyrus.sysml14.blocks.Block;
-import org.eclipse.uml2.uml.AggregationKind;
 import org.eclipse.uml2.uml.Property;
 import org.eclipse.uml2.uml.util.UMLUtil;
 
@@ -67,7 +66,7 @@ public class PartDeletionTransformation extends AbstractTransformationRealizatio
     protected boolean checkPreconditions(RemoveEReference<EObject, EObject> change) {
 
         return (isAffectedObjectABlock(change) && isOldValueAProperty(change) && isPropertyTypeABlock(change)
-                && isAggregationKindSetToComposite(change));
+                && isPropertyAPartProperty(change));
     }
 
     private boolean isAffectedObjectABlock(RemoveEReference<EObject, EObject> change) {
@@ -89,9 +88,9 @@ public class PartDeletionTransformation extends AbstractTransformationRealizatio
                 && prop.getType().getAppliedStereotype(ASEMSysMLConstants.QUALIFIED_BLOCK_NAME) != null);
     }
 
-    private boolean isAggregationKindSetToComposite(RemoveEReference<EObject, EObject> change) {
+    private boolean isPropertyAPartProperty(RemoveEReference<EObject, EObject> change) {
         Property prop = (Property) change.getOldValue();
-        return (prop.getAggregation() != null && prop.getAggregation().equals(AggregationKind.COMPOSITE_LITERAL));
+        return (!ASEMSysMLHelper.isPropertyAPortProperty(prop));
     }
 
 }
