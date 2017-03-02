@@ -380,7 +380,8 @@ public final class ASEMSysMLAssertionHelper {
 
             } else if (flowDirection.equals(FlowDirection.OUT)) {
 
-                // TODO [BR] Check if return type exists!?
+                // [Requirement 2.e)] [Requirement 2.e)i]
+                assertReturnTypeExistsWithSameName(port, correspondenceModel);
             }
 
             // Flow direction INOUT can not be mapped to the method of a ASEM class since the port
@@ -436,6 +437,17 @@ public final class ASEMSysMLAssertionHelper {
         assertTrue("The SysML port " + port.getName() + " has no corresponding ASEM variable.", asemVariable != null);
         assertEquals("The names of the SysML port and the corresponding ASEM variable are not equal.", port.getName(),
                 asemVariable.getName());
+    }
+
+    private static void assertReturnTypeExistsWithSameName(final Port port,
+            final CorrespondenceModel correspondenceModel) {
+
+        ReturnType returnType = ASEMSysMLHelper.getFirstCorrespondingASEMElement(correspondenceModel, port,
+                ReturnType.class);
+
+        assertTrue("The SysML port " + port.getName() + " has no corresponding ASEM return type.", returnType != null);
+        assertEquals("The names of the SysML port and the corresponding ASEM return type are not equal.",
+                port.getName(), returnType.getName());
     }
 
     private static void assertPortDirectionMappingForASEMModule(final Port port,
