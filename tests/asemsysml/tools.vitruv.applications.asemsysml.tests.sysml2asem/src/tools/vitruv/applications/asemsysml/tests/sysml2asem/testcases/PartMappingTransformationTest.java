@@ -16,6 +16,7 @@ import edu.kit.ipd.sdq.ASEM.classifiers.Module;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Constant;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.SysML2ASEMTest;
+import tools.vitruv.applications.asemsysml.tests.util.ASEMSysMLAssertionHelper;
 import tools.vitruv.applications.asemsysml.tests.util.ASEMSysMLTestHelper;
 
 /**
@@ -58,7 +59,8 @@ public class PartMappingTransformationTest extends SysML2ASEMTest {
 
         assertTrue("Block A doesn't contain a part!", !blockA.getParts().isEmpty());
 
-        assertPartReferenceBetweenBlocksExists(blockA, asemComponentType, blockB1, asemComponentType);
+        ASEMSysMLAssertionHelper.assertPartReferenceBetweenBlocksExists(blockA, asemComponentType, blockB1,
+                asemComponentType, this.getCorrespondenceModel());
 
     }
 
@@ -94,8 +96,10 @@ public class PartMappingTransformationTest extends SysML2ASEMTest {
         assertTrue("BlockN1 doesn't contain a part!", !blockN1.getParts().isEmpty());
         assertTrue("BlockN2 doesn't contain a part!", !blockN2.getParts().isEmpty());
 
-        assertPartReferenceBetweenBlocksExists(blockN1, asemComponentType, blockN2, asemComponentType);
-        assertPartReferenceBetweenBlocksExists(blockN2, asemComponentType, blockN3, asemComponentType);
+        ASEMSysMLAssertionHelper.assertPartReferenceBetweenBlocksExists(blockN1, asemComponentType, blockN2,
+                asemComponentType, this.getCorrespondenceModel());
+        ASEMSysMLAssertionHelper.assertPartReferenceBetweenBlocksExists(blockN2, asemComponentType, blockN3,
+                asemComponentType, this.getCorrespondenceModel());
     }
 
     /**
@@ -163,7 +167,8 @@ public class PartMappingTransformationTest extends SysML2ASEMTest {
         saveAndSynchronizeChanges(blockA);
         saveAndSynchronizeChanges(blockB);
 
-        assertPartReferenceBetweenBlocksExists(blockA, asemComponentType, blockB, asemComponentType);
+        ASEMSysMLAssertionHelper.assertPartReferenceBetweenBlocksExists(blockA, asemComponentType, blockB,
+                asemComponentType, this.getCorrespondenceModel());
 
         // Remove part reference in blockA.
         EcoreUtil.delete(partProperty);
@@ -178,25 +183,6 @@ public class PartMappingTransformationTest extends SysML2ASEMTest {
         // Check if correspondence was deleted, too.
         assertPartCorrespondenceDoesNotExist(partProperty);
 
-    }
-
-    private void assertPartReferenceBetweenBlocksExists(final Block blockA,
-            final Class<? extends Component> componentTypeA, final Block blockB,
-            final Class<? extends Component> componentTypeB) {
-
-        Component componentA = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), blockA,
-                componentTypeA);
-        Component componentB = ASEMSysMLHelper.getFirstCorrespondingASEMElement(this.getCorrespondenceModel(), blockB,
-                componentTypeB);
-
-        assertTrue("No corresponding element found for " + blockA.getBase_Class().getName(), componentA != null);
-        assertTrue("No corresponding element found for " + blockB.getBase_Class().getName(), componentB != null);
-        assertTrue("Component " + componentA.getName() + " doesn't contain a typed element!",
-                !componentA.getTypedElements().isEmpty());
-
-        final boolean referenceExists = ASEMSysMLTestHelper.doesPartReferenceExists(componentA, componentB);
-
-        assertTrue("Part reference mapping does not exists in ASEM component " + componentA.getName(), referenceExists);
     }
 
     private void assertPartReferenceBetweenBlocksDoesNotExist(final Block blockA,

@@ -413,6 +413,41 @@ public final class ASEMSysMLAssertionHelper {
 
     }
 
+    /**
+     * Check if a part reference exists for the two given SysML blocks.
+     * 
+     * @param blockWithPart
+     *            The block which must contain the part reference.
+     * @param asemComponentTypeOfBlockWithPart
+     *            The type of the block containing the reference.
+     * @param referencedBlock
+     *            The block which is referenced.
+     * @param asemComponentTypeOfReferencedBlock
+     *            The type of the block which is referenced.
+     * @param correspondenceModel
+     *            The test case correspondence model.
+     */
+    public static void assertPartReferenceBetweenBlocksExists(final Block blockWithPart,
+            final java.lang.Class<? extends Component> asemComponentTypeOfBlockWithPart, final Block referencedBlock,
+            final java.lang.Class<? extends Component> asemComponentTypeOfReferencedBlock,
+            final CorrespondenceModel correspondenceModel) {
+
+        Component componentA = ASEMSysMLHelper.getFirstCorrespondingASEMElement(correspondenceModel, blockWithPart,
+                asemComponentTypeOfBlockWithPart);
+        Component componentB = ASEMSysMLHelper.getFirstCorrespondingASEMElement(correspondenceModel, referencedBlock,
+                asemComponentTypeOfReferencedBlock);
+
+        assertTrue("No corresponding element found for " + blockWithPart.getBase_Class().getName(), componentA != null);
+        assertTrue("No corresponding element found for " + referencedBlock.getBase_Class().getName(),
+                componentB != null);
+        assertTrue("Component " + componentA.getName() + " doesn't contain a typed element!",
+                !componentA.getTypedElements().isEmpty());
+
+        final boolean referenceExists = ASEMSysMLTestHelper.doesPartReferenceExists(componentA, componentB);
+
+        assertTrue("Part reference mapping does not exists in ASEM component " + componentA.getName(), referenceExists);
+    }
+
     private static void assertPortExists(final Port portThatShallExists, final Resource sysmlResource) {
 
         Collection<Port> ports = ASEMSysMLTestHelper.getSysMLPorts(sysmlResource);
