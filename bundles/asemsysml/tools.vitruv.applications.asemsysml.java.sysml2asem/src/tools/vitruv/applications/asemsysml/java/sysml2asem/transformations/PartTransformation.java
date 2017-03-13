@@ -90,7 +90,7 @@ public class PartTransformation
     private boolean isProperty(final ReplaceSingleValuedEAttribute<EObject, Object> change) {
         return (change.getAffectedEObject() instanceof Property);
     }
-    
+
     private boolean isNotAPort(final ReplaceSingleValuedEAttribute<EObject, Object> change) {
         return !(change.getAffectedEObject() instanceof Port);
     }

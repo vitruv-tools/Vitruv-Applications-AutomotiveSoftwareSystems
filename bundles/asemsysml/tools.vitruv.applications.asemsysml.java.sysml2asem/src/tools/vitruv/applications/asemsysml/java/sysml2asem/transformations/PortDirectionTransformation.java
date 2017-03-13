@@ -264,15 +264,17 @@ public class PortDirectionTransformation
         final FlowDirection portDirection = ASEMSysMLHelper.getFlowProperty(port).getDirection();
 
         Method selectedMethod;
-        
+
         if (portDirection.equals(FlowDirection.OUT)) {
-            
-            selectedMethod = ASEMSysMLUserInteractionHelper.selectASEMMethodForReturnType(this.userInteracting, asemResource);
-            
+
+            selectedMethod = ASEMSysMLUserInteractionHelper.selectASEMMethodForReturnType(this.userInteracting,
+                    asemResource);
+
         } else {
-            
-            selectedMethod = ASEMSysMLUserInteractionHelper.selectASEMMethodForParameter(this.userInteracting, asemResource);
-            
+
+            selectedMethod = ASEMSysMLUserInteractionHelper.selectASEMMethodForParameter(this.userInteracting,
+                    asemResource);
+
         }
 
         return selectedMethod;

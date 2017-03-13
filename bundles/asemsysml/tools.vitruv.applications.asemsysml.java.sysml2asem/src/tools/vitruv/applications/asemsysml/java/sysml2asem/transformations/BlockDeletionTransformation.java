@@ -59,11 +59,11 @@ public class BlockDeletionTransformation extends AbstractTransformationRealizati
         try {
 
             component.eResource().delete(null);
-            
+
         } catch (IOException e) {
             logger.warn("Could not delete ASEM model resource for " + component.getName() + "!");
         }
-        
+
         this.executionState.getCorrespondenceModel()
                 .removeCorrespondencesThatInvolveAtLeastAndDependend(Collections.singleton(block));
 
