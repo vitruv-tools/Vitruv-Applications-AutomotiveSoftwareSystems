@@ -237,20 +237,26 @@ public final class ASEMSysMLUserInteractionHelper {
      */
     public static ASEMMethodMode selectASEMParameterMode(final UserInteracting userInteracting) {
 
-        ASEMMethodMode mode = ASEMMethodMode.CREATE_NEW;
+        ASEMMethodMode mode;
 
-        ASEMMethodMode[] modeTypes = ASEMMethodMode.values();
-        List<String> modeNames = new ArrayList<>();
+        try {
 
-        for (ASEMMethodMode asemParameterMode : modeTypes) {
-            modeNames.add(asemParameterMode.toString());
+            ASEMMethodMode[] modeTypes = ASEMMethodMode.values();
+            List<String> modeNames = new ArrayList<>();
+
+            for (ASEMMethodMode asemParameterMode : modeTypes) {
+                modeNames.add(asemParameterMode.toString());
+            }
+
+            int selectedModeType = userInteracting.selectFromMessage(UserInteractionType.MODAL,
+                    ASEMSysMLUserInteractionHelper.MSG_SELECT_PARAMTER_MODE,
+                    modeNames.toArray(new String[modeNames.size()]));
+
+            mode = modeTypes[selectedModeType];
+
+        } catch (IllegalStateException ise) {
+            mode = ASEMMethodMode.CREATE_NEW;
         }
-
-        int selectedModeType = userInteracting.selectFromMessage(UserInteractionType.MODAL,
-                ASEMSysMLUserInteractionHelper.MSG_SELECT_PARAMTER_MODE,
-                modeNames.toArray(new String[modeNames.size()]));
-
-        mode = modeTypes[selectedModeType];
 
         return mode;
     }
