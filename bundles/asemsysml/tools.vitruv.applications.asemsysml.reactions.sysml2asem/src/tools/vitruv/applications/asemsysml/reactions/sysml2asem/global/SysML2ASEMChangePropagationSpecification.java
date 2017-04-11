@@ -1,9 +1,9 @@
 package tools.vitruv.applications.asemsysml.reactions.sysml2asem.global;
 
-import mir.reactions.AbstractChangePropagationSpecificationUMLToEdu_kit_ipd_sdq_asem;
+import mir.reactions.AbstractChangePropagationSpecificationUmlToASEM;
 
 public class SysML2ASEMChangePropagationSpecification
-		extends AbstractChangePropagationSpecificationUMLToEdu_kit_ipd_sdq_asem {
+		extends AbstractChangePropagationSpecificationUmlToASEM {
 
 	@Override
 	protected void setup() {

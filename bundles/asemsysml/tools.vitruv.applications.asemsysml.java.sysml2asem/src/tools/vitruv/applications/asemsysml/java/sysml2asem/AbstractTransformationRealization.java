@@ -124,16 +124,11 @@ public abstract class AbstractTransformationRealization<T extends EChange> imple
         // The element has to be the root element of the resource. Therefore check if this is true.
         final EObject rootElement = EcoreUtil.getRootContainer(element);
 
-        VURI oldVURI = null;
-        if (rootElement.eResource() != null) {
-            oldVURI = VURI.getInstance(rootElement.eResource());
-        }
-
         VURI asemElementVURI = ASEMSysMLHelper.getModelVURI(alreadyPersistedObject, asemProjectModelPath);
 
         EcoreUtil.remove(rootElement);
-        executionState.getTransformationResult().addRootEObjectToSave(rootElement, asemElementVURI);
-        executionState.getTransformationResult().addVuriToDeleteIfNotNull(oldVURI);
+        
+        executionState.getTransformationResult().registerForEstablishPersistence(rootElement, asemElementVURI);
 
     }
 

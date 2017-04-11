@@ -5,7 +5,6 @@ import static org.junit.Assert.assertTrue;
 
 import org.eclipse.papyrus.sysml14.blocks.Block;
 import org.junit.Test;
-import org.junit.runner.Description;
 
 import edu.kit.ipd.sdq.ASEM.classifiers.Class;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Method;
@@ -38,9 +37,9 @@ public class ASEMAdditionExample extends ASEM2SysMLTest {
     private ReturnType returnType;
 
     @Override
-    public void beforeTest(Description description) throws Throwable {
+    public void beforeTest() throws Throwable {
 
-        super.beforeTest(description);
+        super.beforeTest();
 
         this.createASEMAdditionComponent();
 

@@ -11,7 +11,6 @@ import org.eclipse.papyrus.sysml14.portsandflows.FlowDirection;
 import org.eclipse.uml2.uml.Port;
 import org.eclipse.uml2.uml.PrimitiveType;
 import org.junit.Test;
-import org.junit.runner.Description;
 
 import edu.kit.ipd.sdq.ASEM.classifiers.Class;
 import edu.kit.ipd.sdq.ASEM.dataexchange.Method;
@@ -41,11 +40,11 @@ public class SysMLAdditionExample extends SysML2ASEMTest {
     private Port returnType;
 
     @Override
-    public void beforeTest(Description description) throws Throwable {
+    public void beforeTest() throws Throwable {
 
         Logger.getRootLogger().setLevel(Level.INFO);
 
-        super.beforeTest(description);
+        super.beforeTest();
 
         this.createSysMLAdditionBlock();
     }
