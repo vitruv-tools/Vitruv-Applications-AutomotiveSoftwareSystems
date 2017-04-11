@@ -9,7 +9,6 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.papyrus.sysml14.portsandflows.FlowProperty;
 import org.eclipse.uml2.uml.Port;
-import org.eclipse.uml2.uml.Property;
 import org.junit.Test;
 
 import edu.kit.ipd.sdq.ASEM.base.TypedElement;
@@ -73,7 +72,8 @@ public class ASEMElementToPortMappingTransformationTest extends ASEM2SysMLTest {
         final Class asemClassForMessageType = ASEMSysMLTestHelper
                 .createASEMComponentAsModelRootAndSync("ClassForMessageType", Class.class, this);
 
-        Method method = ASEMSysMLTestHelper.createASEMMethodAddToComponentAndSync("MethodForParameters", asemClass, this);
+        Method method = ASEMSysMLTestHelper.createASEMMethodAddToComponentAndSync("MethodForParameters", asemClass,
+                this);
 
         Collection<Parameter> parameters = this.prepareParameters(method, asemClassForMessageType);
 
@@ -119,7 +119,8 @@ public class ASEMElementToPortMappingTransformationTest extends ASEM2SysMLTest {
                 Module.class, this);
         Class asemClass = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ClassForMethods", Class.class,
                 this);
-        Method method = ASEMSysMLTestHelper.createASEMMethodAddToComponentAndSync("MethodForParameters", asemClass, this);
+        Method method = ASEMSysMLTestHelper.createASEMMethodAddToComponentAndSync("MethodForParameters", asemClass,
+                this);
         final Class asemClassForMessageType = ASEMSysMLTestHelper
                 .createASEMComponentAsModelRootAndSync("ClassForMessageType", Class.class, this);
 
@@ -133,13 +134,12 @@ public class ASEMElementToPortMappingTransformationTest extends ASEM2SysMLTest {
             final org.eclipse.uml2.uml.Class portContainerBckp = (org.eclipse.uml2.uml.Class) portBckp.eContainer();
             final EObject rootElement = EcoreUtil.getRootContainer(typedElement);
             final FlowProperty flowPropertyBckp = ASEMSysMLHelper.getFlowProperty(portBckp);
-            final Property propertyBckp = flowPropertyBckp.getBase_Property();
 
             EcoreUtil.delete(typedElement);
             this.saveAndSynchronizeChanges(rootElement);
 
-            ASEMSysMLAssertionHelper.assertPortWasDeleted(typedElement, portBckp, portContainerBckp, propertyBckp,
-                    flowPropertyBckp, this.getCorrespondenceModel(), module);
+            ASEMSysMLAssertionHelper.assertPortWasDeleted(typedElement, portBckp, portContainerBckp, flowPropertyBckp,
+                    this.getCorrespondenceModel(), module);
         }
 
     }
@@ -154,7 +154,8 @@ public class ASEMElementToPortMappingTransformationTest extends ASEM2SysMLTest {
                 Module.class, this);
         Class asemClass = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ClassForMethods", Class.class,
                 this);
-        Method method = ASEMSysMLTestHelper.createASEMMethodAddToComponentAndSync("MethodForParameters", asemClass, this);
+        Method method = ASEMSysMLTestHelper.createASEMMethodAddToComponentAndSync("MethodForParameters", asemClass,
+                this);
         final Class asemClassForMessageType = ASEMSysMLTestHelper
                 .createASEMComponentAsModelRootAndSync("ClassForMessageType", Class.class, this);
 
@@ -228,7 +229,8 @@ public class ASEMElementToPortMappingTransformationTest extends ASEM2SysMLTest {
                 this);
         Class asemClass = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ClassForMethods", Class.class,
                 this);
-        Method method = ASEMSysMLTestHelper.createASEMMethodAddToComponentAndSync("MethodForParameters", asemClass, this);
+        Method method = ASEMSysMLTestHelper.createASEMMethodAddToComponentAndSync("MethodForParameters", asemClass,
+                this);
 
         final PrimitiveType pBoolean = ASEMSysMLPrimitiveTypeHelper
                 .getASEMPrimitiveTypeFromRepository(BooleanType.class, module);
@@ -343,10 +345,14 @@ public class ASEMElementToPortMappingTransformationTest extends ASEM2SysMLTest {
         final PrimitiveType pSignedDiscreteType = ASEMSysMLPrimitiveTypeHelper
                 .getASEMPrimitiveTypeFromRepository(SignedDiscreteType.class, asemClass);
 
-        Method methodA = ASEMSysMLTestHelper.createASEMMethodAddToComponentAndSync("MethodForReturnTypeA", asemClass, this);
-        Method methodB = ASEMSysMLTestHelper.createASEMMethodAddToComponentAndSync("MethodForReturnTypeB", asemClass, this);
-        Method methodC = ASEMSysMLTestHelper.createASEMMethodAddToComponentAndSync("MethodForReturnTypeC", asemClass, this);
-        Method methodD = ASEMSysMLTestHelper.createASEMMethodAddToComponentAndSync("MethodForReturnTypeD", asemClass, this);
+        Method methodA = ASEMSysMLTestHelper.createASEMMethodAddToComponentAndSync("MethodForReturnTypeA", asemClass,
+                this);
+        Method methodB = ASEMSysMLTestHelper.createASEMMethodAddToComponentAndSync("MethodForReturnTypeB", asemClass,
+                this);
+        Method methodC = ASEMSysMLTestHelper.createASEMMethodAddToComponentAndSync("MethodForReturnTypeC", asemClass,
+                this);
+        Method methodD = ASEMSysMLTestHelper.createASEMMethodAddToComponentAndSync("MethodForReturnTypeD", asemClass,
+                this);
 
         returnTypes.add(ASEMSysMLTestHelper.createASEMReturnTypeAddToMethodAndSync("ReturnTypeBoolean", pBoolean,
                 methodA, this));

@@ -16,8 +16,6 @@ import org.eclipse.papyrus.sysml14.portsandflows.FlowProperty;
 import org.eclipse.papyrus.sysml14.portsandflows.PortsandflowsPackage;
 import org.eclipse.uml2.uml.AggregationKind;
 import org.eclipse.uml2.uml.Class;
-import org.eclipse.uml2.uml.Connector;
-import org.eclipse.uml2.uml.ConnectorEnd;
 import org.eclipse.uml2.uml.Model;
 import org.eclipse.uml2.uml.PackageableElement;
 import org.eclipse.uml2.uml.Port;
@@ -123,29 +121,6 @@ public final class ASEMSysMLTestHelper {
         assertTrue("No flow direction for given flow was found.", flowDirection != null);
 
         return flowDirection;
-    }
-
-    /**
-     * Get the property which is connected with a port.
-     * 
-     * @param port
-     *            The port which shall be connected to the property.
-     * @return The property which is connected with the given port.
-     */
-    public static Property getPortProperty(final Port port) {
-
-        Property property = null;
-
-        ConnectorEnd connectorEnd = ASEMSysMLHelper.getConnectorEnd(port);
-        Connector connector = ASEMSysMLHelper.getConnector(connectorEnd);
-
-        for (ConnectorEnd end : connector.getEnds()) {
-            if (!end.equals(connectorEnd) && end.getRole() instanceof Property) {
-                property = (Property) end.getRole();
-            }
-        }
-
-        return property;
     }
 
     /**
@@ -490,26 +465,15 @@ public final class ASEMSysMLTestHelper {
     private static Port addPortToBlock(final Block block, final String portName, final FlowDirection flowDirection,
             final Type portType) {
 
-        // 1) Add SysML flow property to block.
-        Property portProperty = block.getBase_Class().createOwnedAttribute(portName + "Property", portType);
-        FlowProperty flowProperty = (FlowProperty) StereotypeApplicationHelper.getInstance(null)
-                .applyStereotype(portProperty, PortsandflowsPackage.eINSTANCE.getFlowProperty());
-        flowProperty.setDirection(flowDirection);
-
-        // 2) Create UML port for the block.
+        // Add UML port to block.
         Port port = block.getBase_Class().createOwnedPort(portName, portType);
         port.setAggregation(AggregationKind.COMPOSITE_LITERAL);
 
-        // 3) Create SysML binding connector between property and port.
-        Connector connector = block.getBase_Class()
-                .createOwnedConnector("BindingConnector_" + portProperty.getName() + "<->" + port.getName());
-        ConnectorEnd propertyEnd = connector.createEnd();
-        propertyEnd.setRole(portProperty);
-        ConnectorEnd portEnd = connector.createEnd();
-        portEnd.setRole(port);
-
-        StereotypeApplicationHelper.getInstance(null).applyStereotype(connector,
-                BlocksPackage.eINSTANCE.getBindingConnector());
+        // Apply the SysML FlowProperty stereotype to the new UML port, so that the port can have a
+        // flow direction.
+        FlowProperty flowProperty = (FlowProperty) StereotypeApplicationHelper.getInstance(null).applyStereotype(port,
+                PortsandflowsPackage.eINSTANCE.getFlowProperty());
+        flowProperty.setDirection(flowDirection);
 
         return port;
     }

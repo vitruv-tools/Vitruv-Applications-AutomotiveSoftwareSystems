@@ -9,20 +9,16 @@ import java.util.Collection;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.eclipse.papyrus.sysml14.blocks.BindingConnector;
 import org.eclipse.papyrus.sysml14.blocks.Block;
 import org.eclipse.papyrus.sysml14.portsandflows.FlowDirection;
 import org.eclipse.papyrus.sysml14.portsandflows.FlowProperty;
 import org.eclipse.uml2.uml.AggregationKind;
 import org.eclipse.uml2.uml.Class;
-import org.eclipse.uml2.uml.Connector;
-import org.eclipse.uml2.uml.ConnectorEnd;
 import org.eclipse.uml2.uml.Model;
 import org.eclipse.uml2.uml.Port;
 import org.eclipse.uml2.uml.Property;
 import org.eclipse.uml2.uml.Type;
 import org.eclipse.uml2.uml.UMLPackage;
-import org.eclipse.uml2.uml.util.UMLUtil;
 
 import edu.kit.ipd.sdq.ASEM.base.Named;
 import edu.kit.ipd.sdq.ASEM.base.TypedElement;
@@ -263,8 +259,6 @@ public final class ASEMSysMLAssertionHelper {
      *            The port which shall be deleted.
      * @param portContainerBckp
      *            The {@link Class} which contains the port.
-     * @param propertyBckp
-     *            The port {@link Property} which shall be deleted, too.
      * @param flowPropertyBckp
      *            The {@link FlowProperty} which shall be deleted, too.
      * @param correspondenceModel
@@ -274,9 +268,8 @@ public final class ASEMSysMLAssertionHelper {
      *            name, etc.).
      */
     public static void assertPortWasDeleted(final TypedElement typedElement, final Port portBckp,
-            final org.eclipse.uml2.uml.Class portContainerBckp, final Property propertyBckp,
-            final FlowProperty flowPropertyBckp, final CorrespondenceModel correspondenceModel,
-            final EObject alreadyPersistedObject) {
+            final org.eclipse.uml2.uml.Class portContainerBckp, final FlowProperty flowPropertyBckp,
+            final CorrespondenceModel correspondenceModel, final EObject alreadyPersistedObject) {
 
         // Correspondence.
         final Port correspondence = ASEMSysMLHelper.getFirstCorrespondingSysMLElement(correspondenceModel, typedElement,
@@ -301,21 +294,9 @@ public final class ASEMSysMLAssertionHelper {
 
         assertTrue("Port element was not deleted from SysML model!", !modelPorts.contains(portBckp));
 
-        // Port property.
+        // Ports FlowProperty stereotype.
         assertTrue("FlowProperty for port " + portBckp.getName() + " was not deleted!",
                 !sysmlModel.getPackagedElements().contains(flowPropertyBckp));
-        assertTrue("Port property for port " + portBckp.getName() + " was not deleted!",
-                !sysmlModel.getPackagedElements().contains(propertyBckp));
-
-        // Connector.
-        final ConnectorEnd connectorEnd = ASEMSysMLHelper.getConnectorEnd(portBckp);
-        final Connector connector = ASEMSysMLHelper.getConnector(connectorEnd);
-        final BindingConnector bindingConnector = UMLUtil.getStereotypeApplication(connector, BindingConnector.class);
-
-        assertTrue("Connector for port " + portBckp.getName() + " was not deleted!",
-                !portContainerBckp.getOwnedConnectors().contains(connector));
-        assertTrue("BindingConnector stereoptype for port " + portBckp.getName() + " was not deleted!",
-                !sysmlResource.getContents().contains(bindingConnector));
 
     }
 

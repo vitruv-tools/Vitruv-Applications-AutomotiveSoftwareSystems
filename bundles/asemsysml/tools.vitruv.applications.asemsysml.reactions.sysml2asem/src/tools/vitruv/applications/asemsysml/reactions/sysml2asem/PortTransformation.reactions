@@ -42,6 +42,8 @@ routine mapPortToModule(uml::Port port) {
 			
 			// [Requirement 1.d)i]
 			asemMessage.name = port.name;
+			asemMessage.readable = true;
+			asemMessage.writable = true;
 			
 		}
 		call {
@@ -52,16 +54,26 @@ routine mapPortToModule(uml::Port port) {
 }
 
 reaction PortDirectionTransformation {
-	after element replaced at sysml::BindingConnector[base_Connector]
-	call {
-		val bindingConnector = affectedEObject;
-		for(connectorEnds: bindingConnector.base_Connector.ends) {
-			if(connectorEnds.role instanceof Port) {
-				val port = connectorEnds.role as Port;
-				setMessageAccessProperties(port);
-				mapPortToClass(port);
-			}
-		}
+	after attribute replaced at sysml::FlowProperty[direction]
+		with newValue != null
+			&& affectedEObject.base_Property instanceof Port
+	call {	
+		val port = affectedEObject.base_Property as Port;
+		
+		// The mapping of an UML port to an ASEM class is direction specific
+		// and therefore it will be handled in this reaction, too.
+		mapPortToClass(port);
+		
+		// Adapt the message access properties of an ASEM modules method 
+		// based on the new port direction.
+		// Important: The direction INOUT is the default direction of a FlowProperty.
+		// If the direction is INOUT, *no* direction for the FlowDirection element will 
+		// be persisted, therefore no direction change exists:
+		// 		<PortsAndFlows:FlowProperty ... direction="in"/>
+		//  		<PortsAndFlows:FlowProperty ... direction="out"/>
+		//  		<PortsAndFlows:FlowProperty .../>
+		// So the default direction is handled in the message creation routine.
+		setMessageAccessProperties(port);
 	}
 }
 routine setMessageAccessProperties(uml::Port port) {
@@ -80,13 +92,12 @@ routine setMessageAccessProperties(uml::Port port) {
 					asemMessage.readable = true;
 					asemMessage.writable = false;
 				}
-				case INOUT: {
-					asemMessage.readable = true;
-					asemMessage.writable = true;
-				}
 				case OUT: {
 					asemMessage.readable = false;
 					asemMessage.writable = true;
+				}
+				case INOUT: {
+					// Is the default value and will therefore be handled in the creation routine.
 				}
 			}
 			
@@ -212,7 +223,7 @@ routine mapOUTPortToClass(uml::Port port, asem::Component correspondingComponent
 routine createNewMethodWithReturnType(uml::Port port, asem::ReturnType asemReturnType, asem::Component correspondingComponent) {
 	action {
 		val asemMethod = create asem::Method and initialize {
-			var methodName = userInteracting.getTextInput("Please insert a method name which can be used for mapping a SysML port to an ASEM method.")
+			var methodName = userInteracting.getTextInput(ASEMSysMLUserInteractionHelper.MSG_INSERT_METHOD_NAME)
 			if(methodName.empty) {
 				methodName = "SampleMethodName";
 			}

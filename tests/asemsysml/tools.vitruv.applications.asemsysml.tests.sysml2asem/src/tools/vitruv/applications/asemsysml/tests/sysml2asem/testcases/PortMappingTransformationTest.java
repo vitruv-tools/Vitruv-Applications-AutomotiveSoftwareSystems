@@ -1,7 +1,6 @@
 package tools.vitruv.applications.asemsysml.tests.sysml2asem.testcases;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -13,15 +12,11 @@ import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.eclipse.papyrus.sysml14.blocks.BindingConnector;
 import org.eclipse.papyrus.sysml14.blocks.Block;
 import org.eclipse.papyrus.sysml14.portsandflows.FlowDirection;
 import org.eclipse.papyrus.sysml14.portsandflows.FlowProperty;
-import org.eclipse.uml2.uml.Connector;
-import org.eclipse.uml2.uml.ConnectorEnd;
 import org.eclipse.uml2.uml.Port;
 import org.eclipse.uml2.uml.PrimitiveType;
-import org.eclipse.uml2.uml.Property;
 import org.eclipse.uml2.uml.Type;
 import org.eclipse.uml2.uml.util.UMLUtil;
 import org.junit.Test;
@@ -69,6 +64,9 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
     @Test
     public void testIfPortMappingIsRemovedAfterPortDeletion() {
 
+        testUserInteractor.addNextSelections("MethodName1", "MethodName2", "MethodName3", "MethodName4", "MethodName5",
+                "MethodName6");
+        
         this.assertPortDeletionForASEMModule();
         this.assertPortDeletionForASEMClass();
     }
@@ -172,12 +170,7 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
         Port portC = ASEMSysMLTestHelper.createUMLPortAddToBlockAndSync(block, "PortC", FlowDirection.OUT, pInteger,
                 this);
 
-        // Add a port PortD with direction 'out' and try to add its return type to the existing
-        // method of PortB. This attempt must be fail and a new method for the return type of PortD
-        // must be created.
-        final int parameterModeSelectionD = ASEMSysMLUserInteractionHelper
-                .getNextUserInteractionSelectionForASEMMethodMode(ASEMMethodMode.USE_EXISTING);
-
+        // Try to add a return type to an existing method of PortB. This attempt must be fail.
         try {
             // Check user interacting.
             // The message of PortB must NOT be part of the list of available methods in the user
@@ -192,13 +185,9 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
         } catch (IllegalArgumentException iae) {
         }
 
-        this.testUserInteractor.addNextSelections(parameterModeSelectionD);
-        Port portD = ASEMSysMLTestHelper.createUMLPortAddToBlockAndSync(block, "PortD", FlowDirection.OUT, pInteger,
-                this);
-
         // Check transformation result.
         this.assertMethodsForReturnTypeCheckWereAddedCorrectly(block, portA, portB);
-        this.assertReturnTypeWasAddedCorrectly(portA, portB, portC, portD);
+        this.assertReturnTypeWasAddedCorrectly(portA, portC);
 
     }
 
@@ -218,21 +207,13 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
                 methods.contains(methodA) && methods.contains(methodB));
     }
 
-    private void assertReturnTypeWasAddedCorrectly(final Port portA, final Port portB, final Port portC,
-            final Port portD) {
+    private void assertReturnTypeWasAddedCorrectly(final Port portA, final Port portC) {
 
         Method methodA = this.getMethodOfPortCorrespondence(portA);
-        Method methodB = this.getMethodOfPortCorrespondence(portB);
         Method methodC = this.getMethodOfPortCorrespondence(portC);
-        Method methodD = this.getMethodOfPortCorrespondence(portD);
 
         assertEquals("Return type corresponding to port " + portC.getName() + " was not added to the method "
                 + methodA.getName(), methodA, methodC);
-
-        assertTrue("No method for the corresponding return value of port " + portD.getName() + " was created.",
-                methodD != null);
-        assertNotEquals("The return type corresponding to port " + portD.getName() + " was added to method "
-                + methodB.getName() + ". This method already had a return type.", methodB, methodD);
 
     }
 
@@ -433,24 +414,14 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
         EObject rootElementToSave = EcoreUtil.getRootContainer(port);
         Block block = ASEMSysMLHelper.getPortsBlock(port);
 
-        ConnectorEnd connectorEnd = ASEMSysMLHelper.getConnectorEnd(port);
-        Connector connector = ASEMSysMLHelper.getConnector(connectorEnd);
-        BindingConnector bindingConnector = UMLUtil.getStereotypeApplication(connector, BindingConnector.class);
-        Property property = ASEMSysMLTestHelper.getPortProperty(port);
-        FlowProperty flowProperty = UMLUtil.getStereotypeApplication(property, FlowProperty.class);
+        FlowProperty flowProperty = UMLUtil.getStereotypeApplication(port, FlowProperty.class);
 
-        EcoreUtil.remove(connector);
-        EcoreUtil.remove(bindingConnector);
-        EcoreUtil.remove(property);
         EcoreUtil.remove(flowProperty);
         EcoreUtil.remove(port);
         saveAndSynchronizeChanges(rootElementToSave);
 
-        assertTrue("Port was not deleted successfully!",
-                (!sysmlModelResource.getContents().contains(port)
-                        && !sysmlModelResource.getContents().contains(property)
-                        && !sysmlModelResource.getContents().contains(connector)
-                        && !block.getBase_Class().getOwnedPorts().contains(port)));
+        assertTrue("Port was not deleted successfully!", (!sysmlModelResource.getContents().contains(port)
+                && !block.getBase_Class().getOwnedPorts().contains(port)));
 
     }
 

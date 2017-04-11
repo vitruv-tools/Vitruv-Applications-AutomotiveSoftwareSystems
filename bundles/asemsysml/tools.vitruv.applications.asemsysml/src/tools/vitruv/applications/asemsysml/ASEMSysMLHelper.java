@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -386,24 +385,7 @@ public class ASEMSysMLHelper {
     public static FlowProperty getFlowProperty(final Port port) {
 
         FlowProperty flowProperty = null;
-        Block block = getPortsBlock(port);
-        if (block == null) {
-            return null;
-        }
-
-        ConnectorEnd portsConnectorEnd = getConnectorEnd(port);
-
-        Connector connector = getConnector(portsConnectorEnd);
-        EList<ConnectorEnd> connectorEnds = connector.getEnds();
-
-        for (ConnectorEnd connectorEnd : connectorEnds) {
-
-            flowProperty = UMLUtil.getStereotypeApplication(connectorEnd.getRole(), FlowProperty.class);
-
-            if (flowProperty != null) {
-                break;
-            }
-        }
+        flowProperty = UMLUtil.getStereotypeApplication(port, FlowProperty.class);
 
         return flowProperty;
 

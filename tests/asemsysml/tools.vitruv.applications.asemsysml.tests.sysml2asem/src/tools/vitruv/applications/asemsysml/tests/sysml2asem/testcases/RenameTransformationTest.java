@@ -21,6 +21,8 @@ import edu.kit.ipd.sdq.ASEM.classifiers.Class;
 import edu.kit.ipd.sdq.ASEM.classifiers.Module;
 import tools.vitruv.applications.asemsysml.ASEMSysMLConstants;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
+import tools.vitruv.applications.asemsysml.ASEMSysMLUserInteractionHelper;
+import tools.vitruv.applications.asemsysml.ASEMSysMLUserInteractionHelper.ASEMMethodMode;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.SysML2ASEMTest;
 import tools.vitruv.applications.asemsysml.tests.util.ASEMSysMLTestHelper;
 
@@ -106,6 +108,11 @@ public class RenameTransformationTest extends SysML2ASEMTest {
 
         Port portOfModule = ASEMSysMLTestHelper.createUMLPortAddToBlockAndSync(blockToModule, "PortToRename-Module",
                 FlowDirection.IN, blockPortType.getBase_Class(), this);
+        
+        final int parameterModeSelection = ASEMSysMLUserInteractionHelper
+                .getNextUserInteractionSelectionForASEMMethodMode(ASEMMethodMode.CREATE_NEW);
+        this.testUserInteractor.addNextSelections(parameterModeSelection);
+        this.testUserInteractor.addNextSelections("SampleMethod");
         Port portOfClass = ASEMSysMLTestHelper.createUMLPortAddToBlockAndSync(blockToClass, "PortToRename-Class",
                 FlowDirection.IN, blockPortType.getBase_Class(), this);
 
