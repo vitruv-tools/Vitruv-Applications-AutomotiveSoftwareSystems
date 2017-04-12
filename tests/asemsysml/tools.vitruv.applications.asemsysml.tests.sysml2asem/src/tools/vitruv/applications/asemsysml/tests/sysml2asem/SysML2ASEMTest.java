@@ -33,6 +33,8 @@ public class SysML2ASEMTest extends ASEMSysMLTest {
                 SysMlNamspace.FILE_EXTENSION);
         createAndSynchronizeModel(projectModelPath, sysmlModel);
 
+        ASEMSysMLPrimitiveTypeHelper.resetRepoInitializationFlag();
+        
         // Add primitive types to SysML model after the model element was saved and synchronized!
         // This is necessary for VITRUV to detect the primitive type changes.
         sysmlModel.getPackagedElements().add(ASEMSysMLPrimitiveTypeHelper.PRIMITIVE_TYPE_BOOLEAN);

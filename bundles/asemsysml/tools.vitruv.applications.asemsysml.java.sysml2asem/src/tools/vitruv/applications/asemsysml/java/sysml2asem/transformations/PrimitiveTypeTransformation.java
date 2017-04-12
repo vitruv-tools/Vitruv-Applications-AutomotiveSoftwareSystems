@@ -44,7 +44,8 @@ public class PrimitiveTypeTransformation extends AbstractTransformationRealizati
     @Override
     protected void executeTransformation(InsertEReference<EObject, EObject> change) {
 
-        if (!ASEMSysMLPrimitiveTypeHelper.isPrimitiveTypeModelInitialized(change.getAffectedEObject())) {
+        if (!ASEMSysMLPrimitiveTypeHelper.isPrimitiveTypeModelInitialized(change.getAffectedEObject(),
+                this.executionState.getCorrespondenceModel())) {
             logger.info("[ASEMSysML][Java] Initialize ASEM primitive types.");
             initializeASEMPrimitveTypeRepo(change.getAffectedEObject());
         }

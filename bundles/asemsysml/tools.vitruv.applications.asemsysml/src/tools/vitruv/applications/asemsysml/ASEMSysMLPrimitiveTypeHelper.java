@@ -8,7 +8,6 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.uml2.types.TypesPackage;
 import org.eclipse.uml2.uml.Model;
@@ -34,6 +33,8 @@ import tools.vitruv.framework.util.datatypes.VURI;
 public final class ASEMSysMLPrimitiveTypeHelper {
 
     private static final String PRIMITIVE_TYPE_MODEL_NAME = "PrimitiveTypes";
+
+    private static boolean repoIsInitialized = false;
 
     /*
      * Add constants for UML primitive types, because I found no possibility to get a UML Type of
@@ -111,15 +112,17 @@ public final class ASEMSysMLPrimitiveTypeHelper {
      * @param alreadyPersistedObject
      *            An object that already exists. This is needed to get the correct URI (test project
      *            name, etc.).
+     * @param correspondenceModel
+     *            The correspondence model to get the primitive types repository resource.
      * @return The primitive type instance or <code>null</code> if no instance of this type exists.
      */
     @SuppressWarnings("unchecked")
     public static <T extends edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType> edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType getASEMPrimitiveTypeFromRepository(
-            final Class<T> type, final EObject alreadyPersistedObject) {
+            final Class<T> type, final EObject alreadyPersistedObject, final CorrespondenceModel correspondenceModel) {
 
         edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType primitiveType = null;
 
-        Resource resource = getPrimitiveTypesResource(alreadyPersistedObject);
+        Resource resource = getPrimitiveTypesResource(alreadyPersistedObject, correspondenceModel);
         PrimitiveTypeRepository pRepo = (PrimitiveTypeRepository) resource.getContents().get(0);
 
         for (edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType pType : pRepo.getPrimitiveTypes()) {
@@ -195,28 +198,48 @@ public final class ASEMSysMLPrimitiveTypeHelper {
      * @param alreadyPersistedObject
      *            An object that already exists. This is needed to get the correct URI (test project
      *            name, etc.).
-     * @return <code>True</code> if the primitive types model resource contains at least one
-     *         element, otherwise <code>false</code>.
+     * @param correspondenceModel
+     *            The correspondence model to get the primitive types repository resource.
+     * @return <code>True</code> if the primitive types model resource is initialized, otherwise
+     *         <code>false</code>.
      */
-    public static boolean isPrimitiveTypeModelInitialized(final EObject alreadyPersistedObject) {
+    public static boolean isPrimitiveTypeModelInitialized(final EObject alreadyPersistedObject,
+            final CorrespondenceModel correspondenceModel) {
 
-        boolean isInitialized = false;
+        if (repoIsInitialized) {
+            return true;
+        }
 
         Resource resource = null;
         try {
-            resource = getPrimitiveTypesResource(alreadyPersistedObject);
+            resource = getPrimitiveTypesResource(alreadyPersistedObject, correspondenceModel);
         } catch (Exception e) {
-            isInitialized = false;
+            return false;
         }
 
-        if (resource != null && resource.getContents().size() > 0) {
-            isInitialized = true;
+        if (resource != null) {
+            repoIsInitialized = true;
         }
 
-        return isInitialized;
+        return repoIsInitialized;
     }
 
-    private static Resource getPrimitiveTypesResource(final EObject alreadyPersistedObject) {
+    /**
+     * Reset the {@link #repoIsInitialized} flag to enable a new {@link PrimitiveTypeRepository}
+     * initialization. Please call this method before each test case. <br>
+     * <br>
+     * 
+     * TODO [BR] This mechanism should be reworked. Currently, it is used to initialize the
+     * {@link PrimitiveTypeRepository} only once per test case.
+     * 
+     * @see #isPrimitiveTypeModelInitialized(EObject, CorrespondenceModel)
+     */
+    public static void resetRepoInitializationFlag() {
+        repoIsInitialized = false;
+    }
+
+    private static Resource getPrimitiveTypesResource(final EObject alreadyPersistedObject,
+            final CorrespondenceModel correspondenceModel) {
 
         String existingElementURI = VURI.getInstance(alreadyPersistedObject.eResource()).getEMFUri()
                 .toPlatformString(false);
@@ -224,7 +247,7 @@ public final class ASEMSysMLPrimitiveTypeHelper {
                 existingElementURI.lastIndexOf(ASEMSysMLConstants.MODEL_DIR_NAME + "/"));
         String asemURIString = uriPrefix + getPrimitiveTypeProjectModelPath();
 
-        ResourceSet resourceSet = new ResourceSetImpl();
+        ResourceSet resourceSet = correspondenceModel.getResource().getResourceSet();
         URI uri = URI.createURI(asemURIString);
         Resource primitiveTypesResource = resourceSet.getResource(uri, true);
 

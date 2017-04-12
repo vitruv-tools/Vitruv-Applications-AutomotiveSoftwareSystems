@@ -367,7 +367,7 @@ public class ASEMSysMLHelper {
             primitiveMessageType = ASEMSysMLPrimitiveTypeHelper.PRIMITIVE_TYPE_MAP.get(primitivePortType);
 
             final edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType primitiveVariableType = ASEMSysMLPrimitiveTypeHelper
-                    .getASEMPrimitiveTypeFromRepository(primitiveMessageType, portType);
+                    .getASEMPrimitiveTypeFromRepository(primitiveMessageType, portType, correspondenceModel);
 
             return primitiveVariableType;
         }
