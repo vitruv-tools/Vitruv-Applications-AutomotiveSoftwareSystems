@@ -87,11 +87,10 @@ routine changeNameOfSysMLBlockCorrespondence(sysml::Block block) {
 }
 
 reaction BlockDeletionTransformation {
-	after element uml::Class deleted and removed from uml::Model[packagedElement]
-		with oldValue.getAppliedStereotype(ASEMSysMLConstants.QUALIFIED_BLOCK_NAME) != null
+	after element sysml::Block deleted and removed as root
 	
 	call {
-		val block = UMLUtil.getStereotypeApplication(oldValue, Block);
+		val block = oldValue;
 		logger.info("[ASEMSysML] Remove ASEM component which corresponds to the SysML block " + block.base_Class.name);
 		deleteBlockMapping(block);
 	}
