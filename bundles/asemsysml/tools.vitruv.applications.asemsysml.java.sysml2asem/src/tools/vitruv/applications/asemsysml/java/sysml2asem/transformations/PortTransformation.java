@@ -16,6 +16,7 @@ import tools.vitruv.applications.asemsysml.java.sysml2asem.AbstractTransformatio
 import tools.vitruv.domains.asem.AsemNamespace;
 import tools.vitruv.framework.change.echange.EChange;
 import tools.vitruv.framework.change.echange.feature.attribute.ReplaceSingleValuedEAttribute;
+import tools.vitruv.framework.tuid.TuidManager;
 import tools.vitruv.framework.userinteraction.UserInteracting;
 
 /**
@@ -51,9 +52,10 @@ public class PortTransformation
     @Override
     protected void executeTransformation(ReplaceSingleValuedEAttribute<EObject, Object> change) {
 
-        logger.info("[ASEMSysML][Java] Transforming a SysML port ...");
-
         final Port port = (Port) change.getAffectedEObject();
+
+        logger.info("[ASEMSysML][Java] Transforming the SysML port " + port.getName() + "...");
+
         final Block block = ASEMSysMLHelper.getPortsBlock(port);
         final String blockName = block.getBase_Class().getName();
         final String asemModelName = ASEMSysMLHelper.getASEMModelName(blockName);
@@ -114,7 +116,12 @@ public class PortTransformation
 
         Message message = DataexchangeFactory.eINSTANCE.createMessage();
         message.setName(port.getName());
+        
+        // Set default values for access properties.
+        message.setReadable(true);
+        message.setWritable(true);
 
+        TuidManager.getInstance().registerObjectUnderModification(correspondingASEMModule);
         correspondingASEMModule.getTypedElements().add(message);
 
         persistASEMElement(port, correspondingASEMModule, asemProjectModelPath);

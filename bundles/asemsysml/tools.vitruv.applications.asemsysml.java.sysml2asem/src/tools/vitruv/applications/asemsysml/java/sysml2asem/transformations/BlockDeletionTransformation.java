@@ -4,29 +4,25 @@ import java.io.IOException;
 import java.util.Collections;
 
 import org.apache.log4j.Logger;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.papyrus.sysml14.blocks.Block;
-import org.eclipse.uml2.uml.Model;
-import org.eclipse.uml2.uml.util.UMLUtil;
 
 import edu.kit.ipd.sdq.ASEM.classifiers.Component;
-import tools.vitruv.applications.asemsysml.ASEMSysMLConstants;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.AbstractTransformationRealization;
 import tools.vitruv.framework.change.echange.EChange;
-import tools.vitruv.framework.change.echange.feature.reference.RemoveEReference;
+import tools.vitruv.framework.change.echange.compound.RemoveAndDeleteRoot;
 import tools.vitruv.framework.userinteraction.UserInteracting;
 
 /**
  * The transformation class for transforming the deletion of a SysML block. <br>
  * <br>
  * 
- * Therefore the transformation reacts on a {@link RemoveEReference} change.
+ * Therefore the transformation reacts on a {@link RemoveAndDeleteRoot} change.
  * 
  * @author Benjamin Rupp
  *
  */
-public class BlockDeletionTransformation extends AbstractTransformationRealization<RemoveEReference<EObject, EObject>> {
+public class BlockDeletionTransformation extends AbstractTransformationRealization<RemoveAndDeleteRoot<Block>> {
 
     private static Logger logger = Logger.getLogger(BlockDeletionTransformation.class);
 
@@ -36,14 +32,14 @@ public class BlockDeletionTransformation extends AbstractTransformationRealizati
 
     @Override
     public Class<? extends EChange> getExpectedChangeType() {
-        return RemoveEReference.class;
+        return RemoveAndDeleteRoot.class;
     }
 
     @Override
-    protected void executeTransformation(RemoveEReference<EObject, EObject> change) {
+    protected void executeTransformation(RemoveAndDeleteRoot<Block> change) {
 
-        final org.eclipse.uml2.uml.Class baseClass = (org.eclipse.uml2.uml.Class) change.getOldValue();
-        final Block block = UMLUtil.getStereotypeApplication(baseClass, Block.class);
+        final Block block = change.getRemoveChange().getOldValue();
+        final org.eclipse.uml2.uml.Class baseClass = block.getBase_Class();
 
         logger.info("[ASEMSysML][Java] Delete ASEM component which corresponds to the SysML block "
                 + baseClass.getName() + " ...");
@@ -70,22 +66,11 @@ public class BlockDeletionTransformation extends AbstractTransformationRealizati
     }
 
     @Override
-    protected boolean checkPreconditions(RemoveEReference<EObject, EObject> change) {
-        return (affectedObjectIsModel(change) && deletedElementWasABlock(change));
+    protected boolean checkPreconditions(RemoveAndDeleteRoot<Block> change) {
+        return (affectedObjectIsBlock(change));
     }
 
-    private boolean affectedObjectIsModel(RemoveEReference<EObject, EObject> change) {
-        return change.getAffectedEObject() instanceof Model;
-    }
-
-    private boolean deletedElementWasABlock(RemoveEReference<EObject, EObject> change) {
-
-        if (!(change.getOldValue() instanceof org.eclipse.uml2.uml.Class)) {
-            return false;
-        }
-
-        org.eclipse.uml2.uml.Class baseClass = (org.eclipse.uml2.uml.Class) change.getOldValue();
-
-        return baseClass.getAppliedStereotype(ASEMSysMLConstants.QUALIFIED_BLOCK_NAME) != null;
+    private boolean affectedObjectIsBlock(RemoveAndDeleteRoot<Block> change) {
+        return change.getRemoveChange().getOldValue() instanceof Block;
     }
 }
