@@ -2,6 +2,7 @@ package tools.vitruv.applications.asemsysml.tests.asem2sysml.testcases;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -111,9 +112,12 @@ public class ASEMElementToPortMappingTransformationTest extends ASEM2SysMLTest {
     /**
      * After deleting an ASEM message or ASEM parameter, the corresponding UML port and the
      * correspondence between both must be deleted, too.
+     * 
+     * @throws IOException
+     *             If saving and synchronizing the changed object failed.
      */
     @Test
-    public void testIfAPortWillBeDeleted() {
+    public void testIfAPortWillBeDeleted() throws IOException {
 
         Module module = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ModuleForMessageToDelete",
                 Module.class, this);
@@ -146,9 +150,12 @@ public class ASEMElementToPortMappingTransformationTest extends ASEM2SysMLTest {
 
     /**
      * After renaming an ASEM message or ASEM parameter, the port must be renamed, too.
+     * 
+     * @throws IOException
+     *             If saving and synchronizing the changed object failed.
      */
     @Test
-    public void testIfPortWillBeRenamed() {
+    public void testIfPortWillBeRenamed() throws IOException {
 
         Module module = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ModuleForMessagesToRename",
                 Module.class, this);
@@ -182,9 +189,12 @@ public class ASEMElementToPortMappingTransformationTest extends ASEM2SysMLTest {
     /**
      * After changing the access parameters of an ASEM message (readable, writable), the port
      * direction must be adapted.
+     * 
+     * @throws IOException
+     *             If saving and synchronizing the changed object failed.
      */
     @Test
-    public void testIfPortDirectionWillBeUpdated() {
+    public void testIfPortDirectionWillBeUpdated() throws IOException {
 
         Module module = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ModuleForMessages", Module.class,
                 this);
@@ -221,9 +231,12 @@ public class ASEMElementToPortMappingTransformationTest extends ASEM2SysMLTest {
 
     /**
      * After changing the type of an ASEM message or ASEM parameter, the port type must be adapted.
+     * 
+     * @throws IOException
+     *             If saving and synchronizing the changed object failed.
      */
     @Test
-    public void testIfPortTypeWillBeUpdated() {
+    public void testIfPortTypeWillBeUpdated() throws IOException {
 
         Module module = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ModuleForMessages", Module.class,
                 this);

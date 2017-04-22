@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,9 +39,12 @@ public class RenameTransformationTest extends SysML2ASEMTest {
 
     /**
      * If a SysML Named element is renamed, the corresponding ASEM element must be renamed, too.
+     * 
+     * @throws IOException
+     *             If saving and synchronizing the changed object failed.
      */
     @Test
-    public void testRenamingOfNamedElements() {
+    public void testRenamingOfNamedElements() throws IOException {
 
         final String renameSuffix = "-Renamed";
         String oldName = "";
@@ -82,7 +86,8 @@ public class RenameTransformationTest extends SysML2ASEMTest {
         if (namedElement.getAppliedStereotype(ASEMSysMLConstants.QUALIFIED_BLOCK_NAME) != null) {
 
             final String asemProjectModelPath = ASEMSysMLHelper.getASEMProjectModelPath(oldName);
-            final String platformModelPath = this.getPlatformModelPath(asemProjectModelPath);
+            final String platformModelPath = this.getCurrentTestProject().getName() + "/" + asemProjectModelPath;
+
             String workspacePath = ResourcesPlugin.getWorkspace().getRoot().getLocation().toString();
 
             File workspace = new File(workspacePath);
@@ -108,11 +113,11 @@ public class RenameTransformationTest extends SysML2ASEMTest {
 
         Port portOfModule = ASEMSysMLTestHelper.createUMLPortAddToBlockAndSync(blockToModule, "PortToRename-Module",
                 FlowDirection.IN, blockPortType.getBase_Class(), this);
-        
+
         final int parameterModeSelection = ASEMSysMLUserInteractionHelper
                 .getNextUserInteractionSelectionForASEMMethodMode(ASEMMethodMode.CREATE_NEW);
-        this.testUserInteractor.addNextSelections(parameterModeSelection);
-        this.testUserInteractor.addNextSelections("SampleMethod");
+        getUserInteractor().addNextSelections(parameterModeSelection);
+        getUserInteractor().addNextSelections("SampleMethod");
         Port portOfClass = ASEMSysMLTestHelper.createUMLPortAddToBlockAndSync(blockToClass, "PortToRename-Class",
                 FlowDirection.IN, blockPortType.getBase_Class(), this);
 

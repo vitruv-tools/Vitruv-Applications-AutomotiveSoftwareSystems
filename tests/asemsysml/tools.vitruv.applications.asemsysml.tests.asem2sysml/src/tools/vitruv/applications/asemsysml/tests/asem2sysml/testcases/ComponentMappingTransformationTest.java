@@ -3,6 +3,8 @@ package tools.vitruv.applications.asemsysml.tests.asem2sysml.testcases;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.papyrus.sysml14.blocks.Block;
@@ -57,9 +59,12 @@ public class ComponentMappingTransformationTest extends ASEM2SysMLTest {
     /**
      * After changing the name of an ASEM component, the name of the corresponding SysML block must
      * be changed, too.
+     * 
+     * @throws IOException
+     *             If saving and synchronizing the changed object failed.
      */
     @Test
-    public void testIfASysMLBlockIsRenamed() {
+    public void testIfASysMLBlockIsRenamed() throws IOException {
 
         final String componentNameBefore = "Sample";
         final String componentNameAfter = "RenamedSample";
@@ -102,9 +107,12 @@ public class ComponentMappingTransformationTest extends ASEM2SysMLTest {
     /**
      * After a ASEM component was deleted, the corresponding SysML block and the correspondence
      * between both must be deleted, too.
+     * 
+     * @throws IOException
+     *             If the model synchronization fails.
      */
     @Test
-    public void testIfASysMLBlockIsDeleted() {
+    public void testIfASysMLBlockIsDeleted() throws IOException {
 
         Class asemClass = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("SampleClassToDelete", Class.class,
                 this);

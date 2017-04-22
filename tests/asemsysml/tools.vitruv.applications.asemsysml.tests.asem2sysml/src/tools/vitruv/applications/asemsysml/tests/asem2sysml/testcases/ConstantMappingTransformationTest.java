@@ -3,6 +3,8 @@ package tools.vitruv.applications.asemsysml.tests.asem2sysml.testcases;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.papyrus.sysml14.blocks.Block;
 import org.eclipse.uml2.uml.Property;
@@ -56,9 +58,12 @@ public class ConstantMappingTransformationTest extends ASEM2SysMLTest {
     /**
      * After changing the name of an ASEM constant, the name of the corresponding part reference
      * must be adapted.
+     * 
+     * @throws IOException
+     *             If saving and synchronizing the changed object failed.
      */
     @Test
-    public void testIfPartReferenceWillBeRenamed() {
+    public void testIfPartReferenceWillBeRenamed() throws IOException {
 
         final Class asemClass = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ClassForConstants",
                 Class.class, this);
@@ -104,9 +109,12 @@ public class ConstantMappingTransformationTest extends ASEM2SysMLTest {
 
     /**
      * After deleting an ASEM constant, the corresponding part reference must be deleted, too.
+     * 
+     * @throws IOException
+     *             If saving and synchronizing the changed object failed.
      */
     @Test
-    public void testIfPartReferenceWillBeDeleted() {
+    public void testIfPartReferenceWillBeDeleted() throws IOException {
 
         final Class asemClass = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ClassForConstants",
                 Class.class, this);
@@ -144,9 +152,12 @@ public class ConstantMappingTransformationTest extends ASEM2SysMLTest {
     /**
      * After changing the type of an ASEM constant, the type of the corresponding part property must
      * be adapted.
+     * 
+     * @throws IOException
+     *             If saving and synchronizing the changed object failed.
      */
     @Test
-    public void testIfPartReferenceTypeWillBeUpdated() {
+    public void testIfPartReferenceTypeWillBeUpdated() throws IOException {
 
         final Class asemClass = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ClassForConstants",
                 Class.class, this);

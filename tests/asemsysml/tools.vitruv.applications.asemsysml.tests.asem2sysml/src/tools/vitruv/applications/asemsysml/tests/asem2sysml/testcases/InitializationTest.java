@@ -49,7 +49,7 @@ public class InitializationTest extends ASEM2SysMLTest {
         this.assertModelExists(primitiveTypesProjectModelPath);
         ASEMSysMLAssertionHelper.assertValidModelResource(primitiveTypesResource, PrimitiveTypeRepository.class);
 
-        PrimitiveTypeRepository repo = (PrimitiveTypeRepository) this.getRoot(primitiveTypesProjectModelPath);
+        PrimitiveTypeRepository repo = (PrimitiveTypeRepository) this.getFirstRootElement(primitiveTypesProjectModelPath);
         assertTrue("The ASEM primitive types repository must contain at least one primitive type.",
                 !repo.getPrimitiveTypes().isEmpty());
 

@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -54,19 +55,25 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
     @Test
     public void testIfPortsMappedCorrectly() {
 
+        getUserInteractor().addNextSelections("MethodName1", "MethodName2", "MethodName3", "MethodName4", "MethodName5",
+                "MethodName6");
+
         this.assertPortMappingForASEMModuleExists();
         this.assertPortMappingForASEMClassExists();
     }
 
     /**
      * If a SysML port is deleted, the corresponding ASEM element must be deleted, too.
+     * 
+     * @throws IOException
+     *             If saving and synchronizing the changed object failed.
      */
     @Test
-    public void testIfPortMappingIsRemovedAfterPortDeletion() {
+    public void testIfPortMappingIsRemovedAfterPortDeletion() throws IOException {
 
-        testUserInteractor.addNextSelections("MethodName1", "MethodName2", "MethodName3", "MethodName4", "MethodName5",
+        getUserInteractor().addNextSelections("MethodName1", "MethodName2", "MethodName3", "MethodName4", "MethodName5",
                 "MethodName6");
-        
+
         this.assertPortDeletionForASEMModule();
         this.assertPortDeletionForASEMClass();
     }
@@ -94,15 +101,15 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
         // interacting.
         final int parameterModeSelection = ASEMSysMLUserInteractionHelper
                 .getNextUserInteractionSelectionForASEMMethodMode(ASEMMethodMode.CREATE_NEW);
-        this.testUserInteractor.addNextSelections(parameterModeSelection);
-        this.testUserInteractor.addNextSelections("MethodWithoutSecondParameter");
+        getUserInteractor().addNextSelections(parameterModeSelection);
+        getUserInteractor().addNextSelections("MethodWithoutSecondParameter");
         ASEMSysMLTestHelper.createUMLPortAddToBlockAndSync(blockA, "PortX", FlowDirection.IN, pInteger, this);
 
         // Add a port PortA which will be mapped to an ASEM parameter in a new ASEM method.
         final int parameterModeSelectionA = ASEMSysMLUserInteractionHelper
                 .getNextUserInteractionSelectionForASEMMethodMode(ASEMMethodMode.CREATE_NEW);
-        this.testUserInteractor.addNextSelections(parameterModeSelectionA);
-        this.testUserInteractor.addNextSelections(methodName);
+        getUserInteractor().addNextSelections(parameterModeSelectionA);
+        getUserInteractor().addNextSelections(methodName);
         final Port portA = ASEMSysMLTestHelper.createUMLPortAddToBlockAndSync(blockA, "PortA", FlowDirection.IN,
                 pInteger, this);
 
@@ -112,7 +119,7 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
         final int methodSelection = ASEMSysMLUserInteractionHelper
                 .getNextUserInteractionSelectionForASEMMethodSelection(this.getMethodOfPortCorrespondence(portA),
                         FlowDirection.IN, this.getCorrespondenceModel());
-        this.testUserInteractor.addNextSelections(parameterModeSelectionB, methodSelection);
+        getUserInteractor().addNextSelections(parameterModeSelectionB, methodSelection);
         final Port portB = ASEMSysMLTestHelper.createUMLPortAddToBlockAndSync(blockA, "PortB", FlowDirection.IN,
                 pInteger, this);
 
@@ -145,8 +152,8 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
         // ASEM method. The created method will NOT have a return type.
         final int parameterModeSelectionA = ASEMSysMLUserInteractionHelper
                 .getNextUserInteractionSelectionForASEMMethodMode(ASEMMethodMode.CREATE_NEW);
-        this.testUserInteractor.addNextSelections(parameterModeSelectionA);
-        this.testUserInteractor.addNextSelections("MethodWithoutReturnValue");
+        getUserInteractor().addNextSelections(parameterModeSelectionA);
+        getUserInteractor().addNextSelections("MethodWithoutReturnValue");
         Port portA = ASEMSysMLTestHelper.createUMLPortAddToBlockAndSync(block, "PortA", FlowDirection.IN, pInteger,
                 this);
 
@@ -154,8 +161,8 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
         // new ASEM method. The created method will have a return type.
         final int parameterModeSelectionB = ASEMSysMLUserInteractionHelper
                 .getNextUserInteractionSelectionForASEMMethodMode(ASEMMethodMode.CREATE_NEW);
-        this.testUserInteractor.addNextSelections(parameterModeSelectionB);
-        this.testUserInteractor.addNextSelections("MethodWithReturnValue");
+        getUserInteractor().addNextSelections(parameterModeSelectionB);
+        getUserInteractor().addNextSelections("MethodWithReturnValue");
         Port portB = ASEMSysMLTestHelper.createUMLPortAddToBlockAndSync(block, "PortB", FlowDirection.OUT, pInteger,
                 this);
 
@@ -166,7 +173,7 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
         final int methodSelectionC = ASEMSysMLUserInteractionHelper
                 .getNextUserInteractionSelectionForASEMMethodSelection(this.getMethodOfPortCorrespondence(portA),
                         FlowDirection.OUT, this.getCorrespondenceModel());
-        this.testUserInteractor.addNextSelections(parameterModeSelectionC, methodSelectionC);
+        getUserInteractor().addNextSelections(parameterModeSelectionC, methodSelectionC);
         Port portC = ASEMSysMLTestHelper.createUMLPortAddToBlockAndSync(block, "PortC", FlowDirection.OUT, pInteger,
                 this);
 
@@ -262,7 +269,7 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
                 methodWithParameter.getParameters().contains(portBCorrespondence));
     }
 
-    private void assertPortDeletionForASEMModule() {
+    private void assertPortDeletionForASEMModule() throws IOException {
 
         Collection<Port> portsToDelete = preparePorts(Module.class);
 
@@ -271,7 +278,7 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
         }
     }
 
-    private void assertPortDeletionForASEMClass() {
+    private void assertPortDeletionForASEMClass() throws IOException {
 
         Collection<Port> portsToDelete = preparePorts(edu.kit.ipd.sdq.ASEM.classifiers.Class.class);
 
@@ -295,7 +302,7 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
         }
     }
 
-    private void doDeletionAndCheck(final Port port) {
+    private void doDeletionAndCheck(final Port port) throws IOException {
 
         // Backup data for deletion check.
         final Block block = ASEMSysMLHelper.getPortsBlock(port);
@@ -360,7 +367,7 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
 
     private void assertPortMappingForASEMClassExists() {
 
-        testUserInteractor.addNextSelections("MethodName1", "MethodName2", "MethodName3", "MethodName4", "MethodName5",
+        getUserInteractor().addNextSelections("MethodName1", "MethodName2", "MethodName3", "MethodName4", "MethodName5",
                 "MethodName6");
 
         Resource sysmlModelResource = this.getModelResource(sysmlProjectModelPath);
@@ -408,7 +415,7 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
         return portsToTest;
     }
 
-    private void deletePortAndSync(final Port port) {
+    private void deletePortAndSync(final Port port) throws IOException {
 
         Resource sysmlModelResource = this.getModelResource(sysmlProjectModelPath);
         EObject rootElementToSave = EcoreUtil.getRootContainer(port);

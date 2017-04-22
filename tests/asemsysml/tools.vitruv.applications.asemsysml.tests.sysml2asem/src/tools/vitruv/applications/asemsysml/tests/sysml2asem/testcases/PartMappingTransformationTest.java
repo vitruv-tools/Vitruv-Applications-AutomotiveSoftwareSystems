@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
+
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.papyrus.sysml14.blocks.Block;
@@ -66,9 +68,12 @@ public class PartMappingTransformationTest extends SysML2ASEMTest {
 
     /**
      * Check if nested part references are mapped, too.
+     * 
+     * @throws IOException
+     *             If saving and synchronizing the changed object failed.
      */
     @Test
-    public void testIfNestedPartMappingExists() {
+    public void testIfNestedPartMappingExists() throws IOException {
         /*
          * Add a block BlockN1 which has a part reference to a block BlockN2 which itself has a part
          * reference to a third block BlockN3. In ASEM a module cannot be used as a subcomponent of
@@ -105,9 +110,12 @@ public class PartMappingTransformationTest extends SysML2ASEMTest {
     /**
      * An ASEM module can not be used as a subcomponent of another ASEM component. Therefore part
      * references to a SysML block which corresponds with an ASEM module are ignored.
+     * 
+     * @throws IOException
+     *             If saving and synchronizing the changed object failed.
      */
     @Test
-    public void testIfPartMappingToModuleIsIgnored() {
+    public void testIfPartMappingToModuleIsIgnored() throws IOException {
         /*
          * An ASEM module can not be used as a subcomponent in other ASEM components. Therefore
          * SysML part references to a SysML block which corresponds to an ASEM module must be
@@ -149,9 +157,12 @@ public class PartMappingTransformationTest extends SysML2ASEMTest {
      * If a part reference of a SysML block is deleted the reference mapping on the ASEM model must
      * be deleted, too. If both SysML blocks are not deleted, the corresponding ASEM components
      * shall not be deleted, too.
+     * 
+     * @throws IOException
+     *             If saving and synchronizing the changed object failed.
      */
     @Test
-    public void testIfPartMappingIsRemovedAfterPartDeletion() {
+    public void testIfPartMappingIsRemovedAfterPartDeletion() throws IOException {
 
         Resource sysmlResource = this.getModelResource(sysmlProjectModelPath);
         Class<? extends Component> asemComponentType = edu.kit.ipd.sdq.ASEM.classifiers.Class.class;

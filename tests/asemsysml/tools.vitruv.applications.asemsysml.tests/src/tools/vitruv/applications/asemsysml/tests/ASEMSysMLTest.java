@@ -13,6 +13,7 @@ import org.eclipse.emf.ecore.resource.Resource;
 import edu.kit.ipd.sdq.ASEM.classifiers.Component;
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.ASEMSysMLUserInteractionHelper;
+import tools.vitruv.applications.asemsysml.tests.util.ASEMSysMLTestHelper;
 import tools.vitruv.applications.asemsysml.tests.util.ASEMSysMLTestHelper.TransformationType;
 import tools.vitruv.domains.asem.AsemDomain;
 import tools.vitruv.domains.asem.AsemNamespace;
@@ -21,7 +22,7 @@ import tools.vitruv.domains.sysml.SysMlNamspace;
 import tools.vitruv.framework.change.processing.ChangePropagationSpecification;
 import tools.vitruv.framework.correspondence.CorrespondenceModel;
 import tools.vitruv.framework.metamodel.Metamodel;
-import tools.vitruv.framework.tests.VitruviusChangePropagationTest;
+import tools.vitruv.framework.tests.VitruviusEmfApplicationTest;
 
 /**
  * Abstract test case class for ASEM <-> SysML transformation test cases. Encapsulates the
@@ -31,7 +32,7 @@ import tools.vitruv.framework.tests.VitruviusChangePropagationTest;
  * @author Benjamin Rupp
  *
  */
-public abstract class ASEMSysMLTest extends VitruviusChangePropagationTest {
+public abstract class ASEMSysMLTest extends VitruviusEmfApplicationTest {
 
     private static TransformationType transformationType = TransformationType.REACTIONS;
 
@@ -95,26 +96,25 @@ public abstract class ASEMSysMLTest extends VitruviusChangePropagationTest {
 
     /**
      * Save and synchronize the changes of the given object. This method will save the resource and
-     * trigger the synchronization of the virtual model.
+     * trigger the synchronization of the virtual model. This wrapper method is used to access the
+     * {@link #saveAndSynchronizeChanges(EObject)} method in the {@link ASEMSysMLTestHelper}.
      *
      * @param object
      *            EObject which should be saved and synchronized.
      */
-    public void saveAndSynchronizeChanges(final EObject object) {
-        super.saveAndSynchronizeChanges(object);
-    }
+    public abstract void saveAndSynchronizeChangesWrapper(final EObject object);
 
     /**
      * Create and synchronize a model with the given project model path and the given root element.
+     * This wrapper method is used to access the {@link #createAndSynchronizeModel(String, EObject)}
+     * method in the {@link ASEMSysMLTestHelper}.
      * 
      * @param modelPathInProject
      *            The project model path of the model to create.
      * @param rootElement
      *            The model root element.
      */
-    public void createAndSynchronizeModel(final String modelPathInProject, final EObject rootElement) {
-        super.createAndSynchronizeModel(modelPathInProject, rootElement);
-    }
+    public abstract void createAndSynchronizeModelWrapper(final String modelPathInProject, final EObject rootElement);
 
     /**
      * Get the ASEM model resource which belongs to a SysML block, because for each SysML block a
@@ -169,6 +169,6 @@ public abstract class ASEMSysMLTest extends VitruviusChangePropagationTest {
         final int componentSelectionClass = ASEMSysMLUserInteractionHelper
                 .getNextUserInteractionSelectionForASEMComponent(asemComponentType);
 
-        this.testUserInteractor.addNextSelections(componentSelectionClass);
+        getUserInteractor().addNextSelections(componentSelectionClass);
     }
 }

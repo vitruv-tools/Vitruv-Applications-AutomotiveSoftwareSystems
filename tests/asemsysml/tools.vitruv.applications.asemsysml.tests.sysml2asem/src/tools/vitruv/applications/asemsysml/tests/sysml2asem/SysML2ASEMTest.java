@@ -2,10 +2,24 @@ package tools.vitruv.applications.asemsysml.tests.sysml2asem;
 
 import static tools.vitruv.applications.asemsysml.ASEMSysMLConstants.TEST_SYSML_MODEL_NAME;
 
+import static org.junit.Assert.fail;
+
+import java.io.IOException;
 import java.util.Collections;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.papyrus.sysml14.util.SysMLResource;
 import org.eclipse.uml2.uml.Model;
+import org.eclipse.uml2.uml.Profile;
+import org.eclipse.uml2.uml.UMLFactory;
+import org.eclipse.uml2.uml.UMLPackage;
+import org.eclipse.uml2.uml.resource.UMLResource;
 
 import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.ASEMSysMLPrimitiveTypeHelper;
@@ -25,25 +39,48 @@ import tools.vitruv.framework.change.processing.ChangePropagationSpecification;
 public class SysML2ASEMTest extends ASEMSysMLTest {
 
     @Override
-    protected void initializeTestModel() {
+    protected void setup() {
 
-        Model sysmlModel = SysMLResource.createSysMLModel(this.resourceSet, "SysMLResource", TEST_SYSML_MODEL_NAME);
+        try {
 
-        String projectModelPath = ASEMSysMLHelper.getProjectModelPath(TEST_SYSML_MODEL_NAME,
-                SysMlNamspace.FILE_EXTENSION);
-        createAndSynchronizeModel(projectModelPath, sysmlModel);
+            Logger.getRootLogger().setLevel(Level.INFO);
 
-        ASEMSysMLPrimitiveTypeHelper.resetRepoInitializationFlag();
-        
-        // Add primitive types to SysML model after the model element was saved and synchronized!
-        // This is necessary for VITRUV to detect the primitive type changes.
-        sysmlModel.getPackagedElements().add(ASEMSysMLPrimitiveTypeHelper.PRIMITIVE_TYPE_BOOLEAN);
-        sysmlModel.getPackagedElements().add(ASEMSysMLPrimitiveTypeHelper.PRIMITIVE_TYPE_INTEGER);
-        sysmlModel.getPackagedElements().add(ASEMSysMLPrimitiveTypeHelper.PRIMITIVE_TYPE_REAL);
-        sysmlModel.getPackagedElements().add(ASEMSysMLPrimitiveTypeHelper.PRIMITIVE_TYPE_UNLIMITED_NATURAL);
-        sysmlModel.getPackagedElements().add(ASEMSysMLPrimitiveTypeHelper.PRIMITIVE_TYPE_STRING);
+            Model sysmlModel = UMLFactory.eINSTANCE.createModel();
+            sysmlModel.setName(TEST_SYSML_MODEL_NAME);
 
-        saveAndSynchronizeChanges(sysmlModel);
+            ResourceSet resourceSet = getCorrespondenceModel().getResource().getResourceSet();
+
+            Resource umlStdProfileResource = resourceSet.getResource(URI.createURI(UMLResource.STANDARD_PROFILE_URI),
+                    true);
+            Profile umlStdProfile = (Profile) EcoreUtil.getObjectByType(umlStdProfileResource.getContents(),
+                    UMLPackage.Literals.PACKAGE);
+            sysmlModel.applyProfile(umlStdProfile);
+
+            Resource sysmlProfileResource = resourceSet.getResource(URI.createURI(SysMLResource.PROFILE_PATH), true);
+            Profile sysmlProfile = (Profile) EcoreUtil.getObjectByType(sysmlProfileResource.getContents(),
+                    UMLPackage.Literals.PACKAGE);
+            sysmlModel.applyProfile(sysmlProfile);
+
+            String projectModelPath = ASEMSysMLHelper.getProjectModelPath(TEST_SYSML_MODEL_NAME,
+                    SysMlNamspace.FILE_EXTENSION);
+            createAndSynchronizeModel(projectModelPath, sysmlModel);
+
+            ASEMSysMLPrimitiveTypeHelper.resetRepoInitializationFlag();
+
+            // Add primitive types to SysML model after the model element was saved and
+            // synchronized! This is necessary for VITRUV to detect the primitive type changes.
+            sysmlModel.getPackagedElements().add(ASEMSysMLPrimitiveTypeHelper.PRIMITIVE_TYPE_BOOLEAN);
+            sysmlModel.getPackagedElements().add(ASEMSysMLPrimitiveTypeHelper.PRIMITIVE_TYPE_INTEGER);
+            sysmlModel.getPackagedElements().add(ASEMSysMLPrimitiveTypeHelper.PRIMITIVE_TYPE_REAL);
+            sysmlModel.getPackagedElements().add(ASEMSysMLPrimitiveTypeHelper.PRIMITIVE_TYPE_UNLIMITED_NATURAL);
+            sysmlModel.getPackagedElements().add(ASEMSysMLPrimitiveTypeHelper.PRIMITIVE_TYPE_STRING);
+
+            saveAndSynchronizeChanges(sysmlModel);
+
+        } catch (IOException e) {
+            fail("Could not create and synchronize the SysML model!");
+            e.printStackTrace();
+        }
 
     }
 
@@ -62,4 +99,31 @@ public class SysML2ASEMTest extends ASEMSysMLTest {
             return null;
         }
     }
+
+    @Override
+    protected void cleanup() {
+    }
+
+    @Override
+    public void saveAndSynchronizeChangesWrapper(final EObject object) {
+
+        try {
+            saveAndSynchronizeChanges(object);
+        } catch (IOException e) {
+            fail("Could not save and synchronize change!");
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void createAndSynchronizeModelWrapper(String modelPathInProject, EObject rootElement) {
+
+        try {
+            createAndSynchronizeModel(modelPathInProject, rootElement);
+        } catch (IOException e) {
+            fail("Could not create and synchronize model " + modelPathInProject + "!");
+            e.printStackTrace();
+        }
+    }
+
 }

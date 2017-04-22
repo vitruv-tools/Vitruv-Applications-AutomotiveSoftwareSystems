@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
+
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -73,9 +75,12 @@ public class BlockMappingTransformationTest extends SysML2ASEMTest {
      * <br>
      * 
      * [Requirement 1.c)] [Requirement 2.c)]
+     * 
+     * @throws IOException
+     *             If saving and synchronizing the changed object failed.
      */
     @Test
-    public void testIfNamesAreEqual() {
+    public void testIfNamesAreEqual() throws IOException {
 
         Block blockToModule;
         Block blockToClass;
@@ -112,9 +117,12 @@ public class BlockMappingTransformationTest extends SysML2ASEMTest {
      * After the deletion of a SysML block, the corresponding ASEM component must be deleted. Since
      * the ASEM component is the root element of the ASEM model, the whole ASEM model must be
      * deleted, too.
+     * 
+     * @throws IOException
+     *             If saving and synchronizing the changed object failed.
      */
     @Test
-    public void testIfMappingIsRemovedAfterBlockDeletion() {
+    public void testIfMappingIsRemovedAfterBlockDeletion() throws IOException {
 
         Resource sysmlModelResource = this.getModelResource(sysmlProjectModelPath);
 
@@ -123,8 +131,8 @@ public class BlockMappingTransformationTest extends SysML2ASEMTest {
         EObject rootElement = EcoreUtil.getRootContainer(block.getBase_Class());
         org.eclipse.uml2.uml.Class baseClassBckp = block.getBase_Class();
 
-        EcoreUtil.delete(block.getBase_Class());
-        EcoreUtil.delete(block);
+        EcoreUtil.remove(block);
+        EcoreUtil.remove(block.getBase_Class());
         saveAndSynchronizeChanges(rootElement);
 
         assertComponentAndASEMModelAreDeleted(baseClassBckp);

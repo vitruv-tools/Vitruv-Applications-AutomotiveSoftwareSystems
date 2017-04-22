@@ -40,7 +40,7 @@ public class SysMLAdditionExample extends SysML2ASEMTest {
     private Port returnType;
 
     @Override
-    public void beforeTest() throws Throwable {
+    public void setup() {
 
         Logger.getRootLogger().setLevel(Level.INFO);
 
@@ -97,7 +97,8 @@ public class SysMLAdditionExample extends SysML2ASEMTest {
 
         Resource sysmlModelResource = this.getModelResource(this.sysmlProjectModelPath);
 
-        block = ASEMSysMLTestHelper.createSysMLBlockAddToModelAndSync(sysmlModelResource, "Addition", true, Class.class, this);
+        block = ASEMSysMLTestHelper.createSysMLBlockAddToModelAndSync(sysmlModelResource, "Addition", true, Class.class,
+                this);
 
         final PrimitiveType pType = ASEMSysMLPrimitiveTypeHelper.getSysMLTypeByASEMType(ContinuousType.class);
         final PrimitiveType pTypeInstance = ASEMSysMLPrimitiveTypeHelper
@@ -106,10 +107,11 @@ public class SysMLAdditionExample extends SysML2ASEMTest {
         // Add input parameter 1 corresponding to a new ASEM method.
         final int methodModeSelectionA = ASEMSysMLUserInteractionHelper
                 .getNextUserInteractionSelectionForASEMMethodMode(ASEMMethodMode.CREATE_NEW);
-        this.testUserInteractor.addNextSelections(methodModeSelectionA);
-        this.testUserInteractor.addNextSelections("doAddition");
+        getUserInteractor().addNextSelections(methodModeSelectionA);
+        getUserInteractor().addNextSelections("doAddition");
 
-        input1 = ASEMSysMLTestHelper.createUMLPortAddToBlockAndSync(block, "input1", FlowDirection.IN, pTypeInstance, this);
+        input1 = ASEMSysMLTestHelper.createUMLPortAddToBlockAndSync(block, "input1", FlowDirection.IN, pTypeInstance,
+                this);
 
         // Add input parameter 2 corresponding to the existing ASEM method of input parameter 1.
         final Parameter parameterInput1 = ASEMSysMLHelper
@@ -122,12 +124,14 @@ public class SysMLAdditionExample extends SysML2ASEMTest {
         final int methodSelection = ASEMSysMLUserInteractionHelper
                 .getNextUserInteractionSelectionForASEMMethodSelection(method, FlowDirection.IN,
                         this.getCorrespondenceModel());
-        this.testUserInteractor.addNextSelections(methodModeSelectionB, methodSelection);
-        input2 = ASEMSysMLTestHelper.createUMLPortAddToBlockAndSync(block, "input2", FlowDirection.IN, pTypeInstance, this);
+        getUserInteractor().addNextSelections(methodModeSelectionB, methodSelection);
+        input2 = ASEMSysMLTestHelper.createUMLPortAddToBlockAndSync(block, "input2", FlowDirection.IN, pTypeInstance,
+                this);
 
         // Add return type corresponding to the existing ASEM method of input parameter 1.
-        this.testUserInteractor.addNextSelections(methodModeSelectionB, methodSelection);
-        returnType = ASEMSysMLTestHelper.createUMLPortAddToBlockAndSync(block, "return", FlowDirection.OUT, pTypeInstance, this);
+        getUserInteractor().addNextSelections(methodModeSelectionB, methodSelection);
+        returnType = ASEMSysMLTestHelper.createUMLPortAddToBlockAndSync(block, "return", FlowDirection.OUT,
+                pTypeInstance, this);
 
     }
 

@@ -157,7 +157,7 @@ public final class ASEMSysMLTestHelper {
                 BlocksPackage.eINSTANCE.getBlock());
         sysmlBlock.setIsEncapsulated(isEncapsulated);
 
-        testCaseClass.saveAndSynchronizeChanges(sysmlRootModel);
+        testCaseClass.saveAndSynchronizeChangesWrapper(sysmlRootModel);
 
         return sysmlBlock;
 
@@ -198,7 +198,7 @@ public final class ASEMSysMLTestHelper {
 
         // Create new ASEM model and add component as root element.
         final String asemProjectModelPath = ASEMSysMLHelper.getASEMProjectModelPath(componentName);
-        testCaseClass.createAndSynchronizeModel(asemProjectModelPath, asemComponent);
+        testCaseClass.createAndSynchronizeModelWrapper(asemProjectModelPath, asemComponent);
 
         return asemComponent;
     }
@@ -221,7 +221,7 @@ public final class ASEMSysMLTestHelper {
         Method method = DataexchangeFactory.eINSTANCE.createMethod();
         method.setName(methodName);
         component.getMethods().add(method);
-        testCaseClass.saveAndSynchronizeChanges(component);
+        testCaseClass.saveAndSynchronizeChangesWrapper(component);
 
         return method;
     }
@@ -254,7 +254,7 @@ public final class ASEMSysMLTestHelper {
         message.setType(type);
 
         module.getTypedElements().add(message);
-        testCaseClass.saveAndSynchronizeChanges(module);
+        testCaseClass.saveAndSynchronizeChangesWrapper(module);
 
         return message;
     }
@@ -281,7 +281,7 @@ public final class ASEMSysMLTestHelper {
         parameter.setType(type);
 
         method.getParameters().add(parameter);
-        testCaseClass.saveAndSynchronizeChanges(method);
+        testCaseClass.saveAndSynchronizeChangesWrapper(method);
 
         return parameter;
     }
@@ -308,7 +308,7 @@ public final class ASEMSysMLTestHelper {
         returnType.setType(type);
 
         method.setReturnType(returnType);
-        testCaseClass.saveAndSynchronizeChanges(method);
+        testCaseClass.saveAndSynchronizeChangesWrapper(method);
 
         return returnType;
     }
@@ -336,7 +336,7 @@ public final class ASEMSysMLTestHelper {
         constant.setType(type);
 
         component.getTypedElements().add(constant);
-        testCaseClass.saveAndSynchronizeChanges(component);
+        testCaseClass.saveAndSynchronizeChangesWrapper(component);
 
         return constant;
     }
@@ -370,7 +370,7 @@ public final class ASEMSysMLTestHelper {
         variable.setType(variableType);
 
         component.getTypedElements().add(variable);
-        testCaseClass.saveAndSynchronizeChanges(component);
+        testCaseClass.saveAndSynchronizeChangesWrapper(component);
 
         return variable;
 
@@ -398,7 +398,7 @@ public final class ASEMSysMLTestHelper {
             final FlowDirection flowDirection, final Type portType, final ASEMSysMLTest testCaseClass) {
 
         Port port = addPortToBlock(block, portName, flowDirection, portType);
-        testCaseClass.saveAndSynchronizeChanges(port);
+        testCaseClass.saveAndSynchronizeChangesWrapper(port);
 
         return port;
 
@@ -426,7 +426,7 @@ public final class ASEMSysMLTestHelper {
         // The aggregation kind is needed for the getParts() method.
         partProperty.setAggregation(AggregationKind.COMPOSITE_LITERAL);
 
-        testCaseClass.saveAndSynchronizeChanges(blockWithPart);
+        testCaseClass.saveAndSynchronizeChangesWrapper(blockWithPart);
 
         return partProperty;
     }

@@ -2,6 +2,9 @@ package tools.vitruv.applications.asemsysml.tests.asem2sysml.examples;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.io.IOException;
 
 import org.eclipse.papyrus.sysml14.blocks.Block;
 import org.junit.Test;
@@ -37,12 +40,16 @@ public class ASEMAdditionExample extends ASEM2SysMLTest {
     private ReturnType returnType;
 
     @Override
-    public void beforeTest() throws Throwable {
+    public void setup() {
 
-        super.beforeTest();
+        super.setup();
 
-        this.createASEMAdditionComponent();
-
+        try {
+            this.createASEMAdditionComponent();
+        } catch (IOException e) {
+            fail("Could not create ASEMAddition example!");
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -71,7 +78,7 @@ public class ASEMAdditionExample extends ASEM2SysMLTest {
 
     }
 
-    private void createASEMAdditionComponent() {
+    private void createASEMAdditionComponent() throws IOException {
 
         asemClass = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("Addition", Class.class, this);
 

@@ -1,8 +1,12 @@
 package tools.vitruv.applications.asemsysml.tests.asem2sysml;
 
+import static org.junit.Assert.fail;
+
+import java.io.IOException;
 import java.util.Collections;
 
 import org.apache.log4j.Logger;
+import org.eclipse.emf.ecore.EObject;
 
 import edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType;
 import edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveTypeRepository;
@@ -24,28 +28,34 @@ public class ASEM2SysMLTest extends ASEMSysMLTest {
     private static Logger logger = Logger.getLogger(ASEM2SysMLTest.class);
 
     @Override
-    protected void initializeTestModel() {
+    protected void setup() {
 
         final String primitiveTypesProjectModelPath = ASEMSysMLPrimitiveTypeHelper.getPrimitiveTypeProjectModelPath();
 
-        // First, add the primitive type repository to a new model. This will trigger the SysML
-        // model initialization reaction.
-        // TODO [BR] Make the initialization process order independent.
-        PrimitiveTypeRepository primitiveTypeRepo = PrimitivetypesFactory.eINSTANCE.createPrimitiveTypeRepository();
-        primitiveTypeRepo.setName("PrimitiveTypeRepo");
-        this.createAndSynchronizeModel(primitiveTypesProjectModelPath, primitiveTypeRepo);
+        try {
+            // First, add the primitive type repository to a new model. This will trigger the SysML
+            // model initialization reaction.
+            // TODO [BR] Make the initialization process order independent.
+            PrimitiveTypeRepository primitiveTypeRepo = PrimitivetypesFactory.eINSTANCE.createPrimitiveTypeRepository();
+            primitiveTypeRepo.setName("PrimitiveTypeRepo");
+            this.createAndSynchronizeModel(primitiveTypesProjectModelPath, primitiveTypeRepo);
 
-        // Now, add the primitive types to the repository.
-        PrimitiveType pUnsignedDiscrete = PrimitivetypesFactory.eINSTANCE.createUnsignedDiscreteType();
-        PrimitiveType pSignedDiscrete = PrimitivetypesFactory.eINSTANCE.createSignedDiscreteType();
-        PrimitiveType pBoolean = PrimitivetypesFactory.eINSTANCE.createBooleanType();
-        PrimitiveType pContinuous = PrimitivetypesFactory.eINSTANCE.createContinuousType();
+            // Now, add the primitive types to the repository.
+            PrimitiveType pUnsignedDiscrete = PrimitivetypesFactory.eINSTANCE.createUnsignedDiscreteType();
+            PrimitiveType pSignedDiscrete = PrimitivetypesFactory.eINSTANCE.createSignedDiscreteType();
+            PrimitiveType pBoolean = PrimitivetypesFactory.eINSTANCE.createBooleanType();
+            PrimitiveType pContinuous = PrimitivetypesFactory.eINSTANCE.createContinuousType();
 
-        primitiveTypeRepo.getPrimitiveTypes().add(pUnsignedDiscrete);
-        primitiveTypeRepo.getPrimitiveTypes().add(pSignedDiscrete);
-        primitiveTypeRepo.getPrimitiveTypes().add(pBoolean);
-        primitiveTypeRepo.getPrimitiveTypes().add(pContinuous);
-        this.saveAndSynchronizeChanges(primitiveTypeRepo);
+            primitiveTypeRepo.getPrimitiveTypes().add(pUnsignedDiscrete);
+            primitiveTypeRepo.getPrimitiveTypes().add(pSignedDiscrete);
+            primitiveTypeRepo.getPrimitiveTypes().add(pBoolean);
+            primitiveTypeRepo.getPrimitiveTypes().add(pContinuous);
+            this.saveAndSynchronizeChanges(primitiveTypeRepo);
+
+        } catch (IOException e) {
+            fail("Could not save and synchronize the primitive type repository!");
+            e.printStackTrace();
+        }
 
     }
 
@@ -67,6 +77,32 @@ public class ASEM2SysMLTest extends ASEMSysMLTest {
             return null;
         }
 
+    }
+
+    @Override
+    protected void cleanup() {
+    }
+
+    @Override
+    public void saveAndSynchronizeChangesWrapper(EObject object) {
+
+        try {
+            saveAndSynchronizeChanges(object);
+        } catch (IOException e) {
+            fail("Could not save and synchronize change!");
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void createAndSynchronizeModelWrapper(String modelPathInProject, EObject rootElement) {
+
+        try {
+            createAndSynchronizeModel(modelPathInProject, rootElement);
+        } catch (IOException e) {
+            fail("Could not create and synchronize model " + modelPathInProject + "!");
+            e.printStackTrace();
+        }
     }
 
 }
