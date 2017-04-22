@@ -127,7 +127,7 @@ public abstract class AbstractTransformationRealization<T extends EChange> imple
         VURI asemElementVURI = ASEMSysMLHelper.getModelVURI(alreadyPersistedObject, asemProjectModelPath);
 
         EcoreUtil.remove(rootElement);
-        
+
         executionState.getTransformationResult().registerForEstablishPersistence(rootElement, asemElementVURI);
 
     }
@@ -141,8 +141,13 @@ public abstract class AbstractTransformationRealization<T extends EChange> imple
      *            The ASEM element which corresponds to the SysML element.
      */
     protected void addCorrespondence(final EObject sysmlElement, final Named asemElement) {
-        TuidManager.getInstance().updateTuidsOfRegisteredObjects();
+
+        TuidManager.getInstance().registerObjectUnderModification(sysmlElement);
+        TuidManager.getInstance().registerObjectUnderModification(asemElement);
+
         executionState.getCorrespondenceModel().createAndAddCorrespondence(Collections.singletonList(sysmlElement),
                 Collections.singletonList(asemElement));
+
+        TuidManager.getInstance().updateTuidsOfRegisteredObjects();
     }
 }
