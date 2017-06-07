@@ -1,7 +1,9 @@
 package tools.vitruv.applications.asemsysml;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -214,10 +216,8 @@ public final class ASEMSysMLUserInteractionHelper {
         asemComponentTypes.add(Module.class);
         asemComponentTypes.add(edu.kit.ipd.sdq.ASEM.classifiers.Class.class);
 
-        List<String> asemComponentNames = new ArrayList<String>();
-        for (Class<?> asemComponent : asemComponentTypes) {
-            asemComponentNames.add(asemComponent.getName());
-        }
+        List<String> asemComponentNames = asemComponentTypes.stream().map(c -> c.getName())
+                .collect(Collectors.toCollection(ArrayList::new));
 
         int selectedComponentType = userInteracting.selectFromMessage(UserInteractionType.MODAL,
                 ASEMSysMLUserInteractionHelper.MSG_SELECT_COMPONENT_TYPE,

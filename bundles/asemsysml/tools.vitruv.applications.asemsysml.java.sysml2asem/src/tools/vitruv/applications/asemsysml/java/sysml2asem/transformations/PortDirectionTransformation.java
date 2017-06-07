@@ -1,16 +1,11 @@
 package tools.vitruv.applications.asemsysml.java.sysml2asem.transformations;
 
 import org.apache.log4j.Logger;
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.papyrus.sysml14.blocks.BindingConnector;
 import org.eclipse.papyrus.sysml14.blocks.Block;
-import org.eclipse.papyrus.sysml14.blocks.BlocksPackage;
 import org.eclipse.papyrus.sysml14.portsandflows.FlowDirection;
 import org.eclipse.papyrus.sysml14.portsandflows.FlowProperty;
-import org.eclipse.uml2.uml.Connector;
-import org.eclipse.uml2.uml.ConnectorEnd;
 import org.eclipse.uml2.uml.Port;
 
 import edu.kit.ipd.sdq.ASEM.classifiers.Classifier;
@@ -27,21 +22,16 @@ import tools.vitruv.applications.asemsysml.ASEMSysMLUserInteractionHelper.ASEMMe
 import tools.vitruv.applications.asemsysml.java.sysml2asem.AbstractTransformationRealization;
 import tools.vitruv.domains.asem.AsemNamespace;
 import tools.vitruv.framework.change.echange.EChange;
-import tools.vitruv.framework.change.echange.feature.reference.ReplaceSingleValuedEReference;
+import tools.vitruv.framework.change.echange.feature.attribute.ReplaceSingleValuedEAttribute;
+import tools.vitruv.framework.tuid.TuidManager;
 import tools.vitruv.framework.userinteraction.UserInteracting;
 
 /**
  * The transformation class for transforming the direction of a SysML port.<br>
  * <br>
  * 
- * To transform the port direction the following elements must exist:
- * <ul>
- * <li>{@link FlowProperty} with a valid direction</li>
- * <li>{@link BindingConnector} which links the flow property to the given port</li>
- * </ul>
- * 
- * Therefore the transformation reacts on a {@link ReplaceSingleValuedEReference} change which will
- * be triggered if the <code>base connector</code> of a SysML binding connector was set. <br>
+ * Therefore the transformation reacts on a {@link ReplaceSingleValuedEAttribute} change which will
+ * be triggered if the <code>direction</code> of a SysML flow property was set. <br>
  * <br>
  * 
  * [Requirement 1.d)ii] [Requirement 2.d)iii] [Requirement 2.e)ii]
@@ -50,7 +40,7 @@ import tools.vitruv.framework.userinteraction.UserInteracting;
  *
  */
 public class PortDirectionTransformation
-        extends AbstractTransformationRealization<ReplaceSingleValuedEReference<EObject, EObject>> {
+        extends AbstractTransformationRealization<ReplaceSingleValuedEAttribute<EObject, Object>> {
 
     private static Logger logger = Logger.getLogger(PortDirectionTransformation.class);
 
@@ -60,11 +50,11 @@ public class PortDirectionTransformation
 
     @Override
     public Class<? extends EChange> getExpectedChangeType() {
-        return ReplaceSingleValuedEReference.class;
+        return ReplaceSingleValuedEAttribute.class;
     }
 
     @Override
-    protected void executeTransformation(ReplaceSingleValuedEReference<EObject, EObject> change) {
+    protected void executeTransformation(ReplaceSingleValuedEAttribute<EObject, Object> change) {
 
         logger.info("[ASEMSysML][Java] Transform direction of a SysML port ...");
 
@@ -72,27 +62,17 @@ public class PortDirectionTransformation
     }
 
     @Override
-    protected boolean checkPreconditions(ReplaceSingleValuedEReference<EObject, EObject> change) {
-        return (isBindingConnector(change) && isConnectorReferenceSet(change));
+    protected boolean checkPreconditions(ReplaceSingleValuedEAttribute<EObject, Object> change) {
+        return (isFlowProperty(change) && isFlowPropertyOfAPort(change));
     }
 
-    private void transformPortDirection(ReplaceSingleValuedEReference<EObject, EObject> change) {
+    private void transformPortDirection(ReplaceSingleValuedEAttribute<EObject, Object> change) {
 
-        final BindingConnector bindingConnector = (BindingConnector) change.getAffectedEObject();
-        final Connector connector = bindingConnector.getBase_Connector();
-        EList<ConnectorEnd> connectorEnds = connector.getEnds();
-
-        Port port = null;
-
-        for (ConnectorEnd connectorEnd : connectorEnds) {
-            if (connectorEnd.getRole() instanceof Port) {
-                port = (Port) connectorEnd.getRole();
-            }
-        }
+        FlowProperty flowProperty = (FlowProperty) change.getAffectedEObject();
+        Port port = (Port) flowProperty.getBase_Property();
 
         if (port == null) {
-            logger.warn("[ASEMSysML][Java] No port was found in the list of the connector ends. "
-                    + "ASEM message access properties are NOT set!");
+            logger.warn("[ASEMSysML][Java] No port was found. ASEM message access properties are NOT set!");
             return;
         }
 
@@ -118,12 +98,15 @@ public class PortDirectionTransformation
 
     }
 
-    private boolean isBindingConnector(final ReplaceSingleValuedEReference<EObject, EObject> change) {
-        return (change.getAffectedEObject() instanceof BindingConnector);
+    private boolean isFlowProperty(final ReplaceSingleValuedEAttribute<EObject, Object> change) {
+        return (change.getAffectedEObject() instanceof FlowProperty);
     }
 
-    private boolean isConnectorReferenceSet(final ReplaceSingleValuedEReference<EObject, EObject> change) {
-        return (change.getAffectedFeature().equals(BlocksPackage.Literals.BINDING_CONNECTOR__BASE_CONNECTOR));
+    private boolean isFlowPropertyOfAPort(final ReplaceSingleValuedEAttribute<EObject, Object> change) {
+
+        FlowProperty flowProperty = (FlowProperty) change.getAffectedEObject();
+
+        return (flowProperty.getBase_Property() instanceof Port);
     }
 
     private void setMessageAccessParameters(final Port port, final String asemProjectModelPath) {
@@ -213,6 +196,7 @@ public class PortDirectionTransformation
             parameter.setType(type);
             method.getParameters().add(parameter);
 
+            TuidManager.getInstance().registerObjectUnderModification(correspondingASEMClass);
             correspondingASEMClass.getMethods().add(method);
 
             persistASEMElement(port, correspondingASEMClass, asemProjectModelPath);
@@ -226,6 +210,7 @@ public class PortDirectionTransformation
             returnType.setName(port.getName());
             method.setReturnType(returnType);
 
+            TuidManager.getInstance().registerObjectUnderModification(correspondingASEMClass);
             correspondingASEMClass.getMethods().add(method);
             persistASEMElement(port, correspondingASEMClass, asemProjectModelPath);
 

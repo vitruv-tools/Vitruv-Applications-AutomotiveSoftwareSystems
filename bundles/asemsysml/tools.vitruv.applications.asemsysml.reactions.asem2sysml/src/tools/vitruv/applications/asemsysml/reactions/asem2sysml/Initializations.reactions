@@ -1,21 +1,21 @@
-import tools.vitruv.applications.asemsysml.ASEMSysMLHelper
-import tools.vitruv.applications.asemsysml.ASEMSysMLConstants
-import tools.vitruv.domains.sysml.SysMlNamspace
-import org.eclipse.emf.ecore.util.EcoreUtil
 import org.eclipse.emf.common.util.URI
-import org.eclipse.uml2.uml.resource.UMLResource
-import org.eclipse.uml2.uml.UMLPackage
-import org.eclipse.uml2.uml.Profile
+import org.eclipse.emf.ecore.util.EcoreUtil
 import org.eclipse.papyrus.sysml14.util.SysMLResource
 import org.eclipse.uml2.types.TypesPackage
+import org.eclipse.uml2.uml.Profile
+import org.eclipse.uml2.uml.UMLPackage
+import org.eclipse.uml2.uml.resource.UMLResource
+import tools.vitruv.applications.asemsysml.ASEMSysMLConstants
+import tools.vitruv.applications.asemsysml.ASEMSysMLHelper
+import tools.vitruv.domains.sysml.SysMlNamspace
 
 import "edu.kit.ipd.sdq.asem" as asem
 import "http://www.eclipse.org/papyrus/sysml/1.4/SysML" as sysml
 import "http://www.eclipse.org/uml2/5.0.0/UML" as uml
 
 reactions: asem2sysmlInit
-in reaction to changes in asem
-execute actions in uml
+in reaction to changes in ASEM
+execute actions in SysML
 
 
 reaction Initialization{

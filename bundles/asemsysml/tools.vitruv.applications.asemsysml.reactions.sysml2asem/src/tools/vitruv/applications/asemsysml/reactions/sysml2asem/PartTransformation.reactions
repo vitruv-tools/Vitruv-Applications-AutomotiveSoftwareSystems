@@ -13,8 +13,8 @@ import "http://www.eclipse.org/papyrus/sysml/1.4/SysML" as sysml
 import "http://www.eclipse.org/uml2/5.0.0/UML" as uml
 
 reactions: sysml2asemPart
-in reaction to changes in uml
-execute actions in asem
+in reaction to changes in SysML
+execute actions in ASEM
 
 reaction PartTransformation {
  	// For the part transformation the part name and type are necessary.

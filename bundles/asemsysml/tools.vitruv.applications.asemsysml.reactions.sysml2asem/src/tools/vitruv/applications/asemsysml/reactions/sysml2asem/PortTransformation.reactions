@@ -14,8 +14,8 @@ import "http://www.eclipse.org/papyrus/sysml/1.4/SysML" as sysml
 import "http://www.eclipse.org/uml2/5.0.0/UML" as uml
 
 reactions: sysml2asemPort
-in reaction to changes in uml
-execute actions in asem
+in reaction to changes in SysML
+execute actions in ASEM
 
 
 reaction PortTransformation {
@@ -300,7 +300,7 @@ routine transformPrimitivePortType(uml::Port port) {
 		
 		update asemMessage {			
 			val messageType = ASEMSysMLPrimitiveTypeHelper.PRIMITIVE_TYPE_MAP.get(port.type);
-			asemMessage.type = ASEMSysMLPrimitiveTypeHelper.getASEMPrimitiveTypeFromRepository(messageType, asemMessage);
+			asemMessage.type = ASEMSysMLPrimitiveTypeHelper.getASEMPrimitiveTypeFromRepository(messageType, asemMessage, correspondenceModel);
 		}
 	}
 }

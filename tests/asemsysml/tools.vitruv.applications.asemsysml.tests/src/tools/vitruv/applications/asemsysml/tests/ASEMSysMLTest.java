@@ -4,9 +4,6 @@ import static tools.vitruv.applications.asemsysml.ASEMSysMLConstants.TEST_SYSML_
 
 import static org.junit.Assert.fail;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 
@@ -15,14 +12,11 @@ import tools.vitruv.applications.asemsysml.ASEMSysMLHelper;
 import tools.vitruv.applications.asemsysml.ASEMSysMLUserInteractionHelper;
 import tools.vitruv.applications.asemsysml.tests.util.ASEMSysMLTestHelper;
 import tools.vitruv.applications.asemsysml.tests.util.ASEMSysMLTestHelper.TransformationType;
-import tools.vitruv.domains.asem.AsemDomain;
 import tools.vitruv.domains.asem.AsemNamespace;
-import tools.vitruv.domains.sysml.SysMlDomain;
 import tools.vitruv.domains.sysml.SysMlNamspace;
 import tools.vitruv.framework.change.processing.ChangePropagationSpecification;
 import tools.vitruv.framework.correspondence.CorrespondenceModel;
-import tools.vitruv.framework.metamodel.Metamodel;
-import tools.vitruv.framework.tests.VitruviusEmfApplicationTest;
+import tools.vitruv.framework.tests.VitruviusApplicationTest;
 
 /**
  * Abstract test case class for ASEM <-> SysML transformation test cases. Encapsulates the
@@ -32,7 +26,7 @@ import tools.vitruv.framework.tests.VitruviusEmfApplicationTest;
  * @author Benjamin Rupp
  *
  */
-public abstract class ASEMSysMLTest extends VitruviusEmfApplicationTest {
+public abstract class ASEMSysMLTest extends VitruviusApplicationTest {
 
     private static TransformationType transformationType = TransformationType.REACTIONS;
 
@@ -44,17 +38,18 @@ public abstract class ASEMSysMLTest extends VitruviusEmfApplicationTest {
      * VitruviusEMFCasestudyTest methods which should be implemented.
      */
 
-    @Override
-    protected List<Metamodel> createMetamodels() {
-
-        List<Metamodel> createdMetaModels = new ArrayList<Metamodel>();
-
-        createdMetaModels.add(new AsemDomain().getMetamodel());
-        createdMetaModels.add(new SysMlDomain().getMetamodel());
-
-        return createdMetaModels;
-
-    }
+//    @Override
+//    protected List<Metamodel> createMetamodels() {
+//
+//        List<Metamodel> createdMetaModels = new ArrayList<Metamodel>();
+//
+//        createdMetaModels.add(new AsemDomain().getMetamodel());
+//        createdMetaModels.add(new SysMlDomain().getMetamodel());
+//
+//        return createdMetaModels;
+//
+//    }
+    
 
     /**
      * Create the change propagation specifications for the given transformation type. This method

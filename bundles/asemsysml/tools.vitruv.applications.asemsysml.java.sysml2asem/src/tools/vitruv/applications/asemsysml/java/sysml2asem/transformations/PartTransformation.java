@@ -19,6 +19,7 @@ import tools.vitruv.applications.asemsysml.java.sysml2asem.AbstractTransformatio
 import tools.vitruv.domains.asem.AsemNamespace;
 import tools.vitruv.framework.change.echange.EChange;
 import tools.vitruv.framework.change.echange.feature.attribute.ReplaceSingleValuedEAttribute;
+import tools.vitruv.framework.tuid.TuidManager;
 import tools.vitruv.framework.userinteraction.UserInteracting;
 import tools.vitruv.framework.userinteraction.UserInteractionType;
 
@@ -120,7 +121,8 @@ public class PartTransformation
         Constant asemConstant = DataexchangeFactory.eINSTANCE.createConstant();
         asemConstant.setName(partProperty.getName());
         asemConstant.setType(correspondingASEMPartComponent);
-
+        
+        TuidManager.getInstance().registerObjectUnderModification(correspondingASEMBlockComponent);
         correspondingASEMBlockComponent.getTypedElements().add(asemConstant);
 
         // Persist component which corresponds to the SysML block and add correspondence between

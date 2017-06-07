@@ -5,7 +5,9 @@ import static tools.vitruv.applications.asemsysml.ASEMSysMLConstants.TEST_SYSML_
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -27,8 +29,11 @@ import tools.vitruv.applications.asemsysml.java.sysml2asem.global.SysML2ASEMJava
 import tools.vitruv.applications.asemsysml.reactions.sysml2asem.global.SysML2ASEMChangePropagationSpecification;
 import tools.vitruv.applications.asemsysml.tests.ASEMSysMLTest;
 import tools.vitruv.applications.asemsysml.tests.util.ASEMSysMLTestHelper.TransformationType;
+import tools.vitruv.domains.asem.AsemDomainProvider;
+import tools.vitruv.domains.sysml.SysMlDomainProvider;
 import tools.vitruv.domains.sysml.SysMlNamspace;
 import tools.vitruv.framework.change.processing.ChangePropagationSpecification;
+import tools.vitruv.framework.domains.VitruvDomain;
 
 /**
  * Test case class for transforming a SysML model to ASEM models.
@@ -124,6 +129,14 @@ public class SysML2ASEMTest extends ASEMSysMLTest {
             fail("Could not create and synchronize model " + modelPathInProject + "!");
             e.printStackTrace();
         }
+    }
+
+    @Override
+    protected Iterable<VitruvDomain> getVitruvDomains() {
+        List<VitruvDomain> domains = new ArrayList<VitruvDomain>();
+        domains.add(new SysMlDomainProvider().getDomain());
+        domains.add(new AsemDomainProvider().getDomain());
+        return domains;
     }
 
 }

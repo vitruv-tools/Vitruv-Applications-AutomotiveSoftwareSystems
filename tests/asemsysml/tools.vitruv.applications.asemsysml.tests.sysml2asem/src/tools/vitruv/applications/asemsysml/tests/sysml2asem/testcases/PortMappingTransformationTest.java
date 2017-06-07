@@ -423,8 +423,8 @@ public class PortMappingTransformationTest extends SysML2ASEMTest {
 
         FlowProperty flowProperty = UMLUtil.getStereotypeApplication(port, FlowProperty.class);
 
-        EcoreUtil.remove(flowProperty);
-        EcoreUtil.remove(port);
+        EcoreUtil.delete(flowProperty);
+        EcoreUtil.delete(port);
         saveAndSynchronizeChanges(rootElementToSave);
 
         assertTrue("Port was not deleted successfully!", (!sysmlModelResource.getContents().contains(port)

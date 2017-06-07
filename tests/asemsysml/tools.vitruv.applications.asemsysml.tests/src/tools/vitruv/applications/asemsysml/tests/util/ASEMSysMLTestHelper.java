@@ -16,6 +16,8 @@ import org.eclipse.papyrus.sysml14.portsandflows.FlowProperty;
 import org.eclipse.papyrus.sysml14.portsandflows.PortsandflowsPackage;
 import org.eclipse.uml2.uml.AggregationKind;
 import org.eclipse.uml2.uml.Class;
+import org.eclipse.uml2.uml.Connector;
+import org.eclipse.uml2.uml.ConnectorEnd;
 import org.eclipse.uml2.uml.Model;
 import org.eclipse.uml2.uml.PackageableElement;
 import org.eclipse.uml2.uml.Port;
@@ -465,15 +467,27 @@ public final class ASEMSysMLTestHelper {
     private static Port addPortToBlock(final Block block, final String portName, final FlowDirection flowDirection,
             final Type portType) {
 
-        // Add UML port to block.
+        // A) Property with and SysML FlowProperty stereotype.
+        Property prop = block.getBase_Class().createOwnedAttribute(portName + "-Property", portType);
+        prop.setAggregation(AggregationKind.COMPOSITE_LITERAL);
+        // FlowProperty flowProp = (FlowProperty)
+        // StereotypeApplicationHelper.getInstance(null).applyStereotype(prop,
+        // PortsandflowsPackage.eINSTANCE.getFlowProperty());
+        // flowProp.setDirection(FlowDirection.IN);
+
+        // B) Port
         Port port = block.getBase_Class().createOwnedPort(portName, portType);
         port.setAggregation(AggregationKind.COMPOSITE_LITERAL);
-
-        // Apply the SysML FlowProperty stereotype to the new UML port, so that the port can have a
-        // flow direction.
-        FlowProperty flowProperty = (FlowProperty) StereotypeApplicationHelper.getInstance(null).applyStereotype(port,
+        FlowProperty flowProp = (FlowProperty) StereotypeApplicationHelper.getInstance(null).applyStereotype(port,
                 PortsandflowsPackage.eINSTANCE.getFlowProperty());
-        flowProperty.setDirection(flowDirection);
+        flowProp.setDirection(flowDirection);
+
+        // C) Connector with SysML BindingConnector stereotype connecting port and property.
+        Connector conn = block.getBase_Class().createOwnedConnector("ConnectorForPortAndProperty");
+        ConnectorEnd propertyEnd = conn.createEnd();
+        propertyEnd.setRole(prop);
+        ConnectorEnd portEnd = conn.createEnd();
+        portEnd.setRole(port);
 
         return port;
     }

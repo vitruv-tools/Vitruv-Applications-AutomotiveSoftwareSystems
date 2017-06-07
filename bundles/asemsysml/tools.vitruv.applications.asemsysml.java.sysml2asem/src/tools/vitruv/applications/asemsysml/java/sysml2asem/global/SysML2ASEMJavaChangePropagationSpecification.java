@@ -20,6 +20,8 @@ import tools.vitruv.applications.asemsysml.java.sysml2asem.JavaTransformationRea
 import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.BlockDeletionTransformation;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.BlockNameTransformation;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.util.Change2TransformationMap;
+import tools.vitruv.domains.asem.AsemDomainProvider;
+import tools.vitruv.domains.sysml.SysMlDomainProvider;
 import tools.vitruv.framework.change.echange.AtomicEChange;
 import tools.vitruv.framework.change.echange.EChange;
 import tools.vitruv.framework.change.echange.compound.CompoundEChange;
@@ -48,7 +50,7 @@ public class SysML2ASEMJavaChangePropagationSpecification extends AbstractEChang
      *
      */
     public SysML2ASEMJavaChangePropagationSpecification() {
-        super(new UserInteractor());
+        super(new UserInteractor(), new SysMlDomainProvider().getDomain(), new AsemDomainProvider().getDomain());
         this.change2TransformationMap = new Change2TransformationMap();
         this.metamodelPair = new MetamodelPair(UMLPackage.eNS_URI, ASEMPackage.eNS_URI);
         this.setup();
@@ -70,11 +72,6 @@ public class SysML2ASEMJavaChangePropagationSpecification extends AbstractEChang
         this.addTransformation(new PartDeletionTransformation(this.getUserInteracting()));
         this.addTransformation(new NamedElementNameTransformation(this.getUserInteracting()));
 
-    }
-
-    @Override
-    public MetamodelPair getMetamodelPair() {
-        return this.metamodelPair;
     }
 
     @Override
