@@ -50,6 +50,32 @@ public final class ASEMSysMLAssertionHelper {
     }
 
     /**
+     * Check if the given element does not correspond with a element of the given type.
+     * 
+     * @param element
+     *            The element which shall not correspond to another element of the given type.
+     * @param type
+     *            The type of the corresponding element.
+     * @param correspondenceModel
+     *            The current correspondence model.
+     */
+    public static void assertCorrespondenceWasDeleted(EObject element, java.lang.Class<? extends EObject> type,
+            CorrespondenceModel correspondenceModel) {
+
+        final String msg = "The correspondence for '" + element + "' was not deleted!";
+
+        try {
+
+            EObject correspondence = ASEMSysMLHelper.getFirstCorrespondingASEMElement(correspondenceModel, element,
+                    type);
+            assertEquals(msg, null, correspondence);
+
+        } catch (Exception e) {
+            fail(msg);
+        }
+    }
+
+    /**
      * The given model resource should exists.
      * 
      * @param modelResource

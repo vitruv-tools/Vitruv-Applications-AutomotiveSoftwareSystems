@@ -10,6 +10,7 @@ import tools.vitruv.applications.asemsysml.tests.sysml2asem.testcases.BlockMappi
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.testcases.ModelInitializationTest;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.testcases.PartMappingTransformationTest;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.testcases.PortMappingTransformationTest;
+import tools.vitruv.applications.asemsysml.tests.sysml2asem.testcases.PropertyMappingTest;
 import tools.vitruv.applications.asemsysml.tests.sysml2asem.testcases.RenameTransformationTest;
 import tools.vitruv.applications.asemsysml.tests.util.ASEMSysMLTestHelper.TransformationType;
 
@@ -21,7 +22,8 @@ import tools.vitruv.applications.asemsysml.tests.util.ASEMSysMLTestHelper.Transf
  */
 @RunWith(Suite.class)
 @SuiteClasses({ ModelInitializationTest.class, BlockMappingTransformationTest.class,
-        PartMappingTransformationTest.class, PortMappingTransformationTest.class, RenameTransformationTest.class })
+        PartMappingTransformationTest.class, PortMappingTransformationTest.class, RenameTransformationTest.class,
+        PropertyMappingTest.class })
 public final class SysML2ASEMJavaTestSuite {
 
     /**

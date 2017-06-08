@@ -10,6 +10,10 @@ import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.Block
 import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.PortTransformation;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.PortTypeTransformation;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.PrimitiveTypeTransformation;
+import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.PropertyAccessTransformation;
+import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.PropertyDeletionTransformation;
+import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.PropertyTransformation;
+import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.PropertyTypeTransformation;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.DebugTransformation;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.NamedElementNameTransformation;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.PartDeletionTransformation;
@@ -71,6 +75,10 @@ public class SysML2ASEMJavaChangePropagationSpecification extends AbstractEChang
         this.addTransformation(new PartTransformation(this.getUserInteracting()));
         this.addTransformation(new PartDeletionTransformation(this.getUserInteracting()));
         this.addTransformation(new NamedElementNameTransformation(this.getUserInteracting()));
+        this.addTransformation(new PropertyTransformation(this.getUserInteracting()));
+        this.addTransformation(new PropertyTypeTransformation(this.getUserInteracting()));
+        this.addTransformation(new PropertyAccessTransformation(this.getUserInteracting()));
+        this.addTransformation(new PropertyDeletionTransformation(this.getUserInteracting()));
 
     }
 

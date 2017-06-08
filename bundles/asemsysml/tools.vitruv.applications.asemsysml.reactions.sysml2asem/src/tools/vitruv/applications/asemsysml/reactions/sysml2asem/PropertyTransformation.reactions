@@ -1,0 +1,85 @@
+import org.eclipse.uml2.uml.Port
+
+import "edu.kit.ipd.sdq.asem" as asem
+import "http://www.eclipse.org/papyrus/sysml/1.4/SysML" as sysml
+import "http://www.eclipse.org/uml2/5.0.0/UML" as uml
+
+reactions: sysml2asemProperty
+in reaction to changes in SysML
+execute actions in ASEM
+
+reaction PropertyTransformation {
+	after attribute replaced at uml::Property[name]
+	with !(affectedEObject instanceof Port)
+	call {
+		logger.info("[ASEMSysML] Property with name " + newValue + " was created.");
+		createVariable(affectedEObject);
+	}
+}
+routine createVariable(uml::Property property) {
+	action {
+		val asemVariable = create asem::Variable and initialize {
+			asemVariable.name = property.name;
+		}
+		add correspondence between property and asemVariable
+	}
+}
+
+reaction PropertyTypeTransformation {
+	after element replaced at uml::Property[type]
+	call {
+		logger.info("[ASEMSysML] Property was typed with " + newValue.name + ".");
+		addVariableType(affectedEObject, newValue);
+	}
+}
+routine addVariableType(uml::Property property, uml::Type type) {
+	match {
+		val asemVariable = retrieve asem::Variable corresponding to property
+		val correspondingTypeElement = retrieve asem::Classifier corresponding to type
+	}
+	action {
+		update asemVariable {
+			asemVariable.type = correspondingTypeElement
+		}
+	}
+}
+
+reaction PropertyAccessTransformation {
+	after attribute replaced at uml::Property[isReadOnly]
+	call {
+		logger.info("[ASEMSysML] The isReadOnly property for the SysML property " 
+			+ affectedEObject.name + " was changed to: " + newValue
+		);
+		setAccessParameter(affectedEObject);
+	}
+}
+routine setAccessParameter(uml::Property property) {
+	match {
+		val asemVariable = retrieve asem::Variable corresponding to property
+	}
+	action {
+		update asemVariable {
+			if(property.isReadOnly) {
+				asemVariable.writable = false;
+			}else{
+				asemVariable.writable = true;
+			}
+		}
+	}
+}
+
+reaction PropertyDeletionTransformation {
+	after element uml::Property removed from uml::Class[ownedAttribute]
+	call {
+		logger.info("[ASEMSysML] The property " + oldValue.name + " was deleted.");
+		deleteVariable(oldValue);
+	}
+}
+routine deleteVariable(uml::Property property) {
+	match {
+		val asemVariable = retrieve asem::Variable corresponding to property
+	}
+	action {
+		delete asemVariable
+	}
+}

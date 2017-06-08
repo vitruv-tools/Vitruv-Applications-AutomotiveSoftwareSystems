@@ -407,6 +407,54 @@ public final class ASEMSysMLTestHelper {
     }
 
     /**
+     * Add an UML property with the given name and the given type to an existing block. The method
+     * will save and synchronize the model, too.
+     * 
+     * @param block
+     *            The SysML block to which the port shall be added to.
+     * @param propertyName
+     *            The name of the property.
+     * @param propertyType
+     *            The type of the property.
+     * @param testCaseClass
+     *            Test case class. Needed for accessing synchronization method.
+     * @return The added property.
+     */
+    public static Property createUMLPropertyAddToBlockAndSync(final Block block, final String propertyName,
+            final Type propertyType, final ASEMSysMLTest testCaseClass) {
+
+        Property property = addPropertyToBlock(block, propertyName, propertyType, false);
+        testCaseClass.saveAndSynchronizeChangesWrapper(property);
+
+        return property;
+    }
+
+    /**
+     * Add an UML property with the given name and the given type to an existing block. The method
+     * will save and synchronize the model, too.
+     * 
+     * @param block
+     *            The SysML block to which the port shall be added to.
+     * @param propertyName
+     *            The name of the property.
+     * @param propertyType
+     *            The type of the property.
+     * @param readOnly
+     *            Set to <code>true</code> if the property shall be read only.
+     * @param testCaseClass
+     *            Test case class. Needed for accessing synchronization method.
+     * @return The added property.
+     */
+    public static Property createUMLPropertyAddToBlockAndSync(final Block block, final String propertyName,
+            final Type propertyType, final boolean readOnly, final ASEMSysMLTest testCaseClass) {
+
+        Property property = addPropertyToBlock(block, propertyName, propertyType, readOnly);
+        testCaseClass.saveAndSynchronizeChangesWrapper(property);
+
+        return property;
+    }
+
+    /**
      * Create a part reference and it to an existing SysML block. This method will save and
      * synchronize the SysML model, too.
      * 
@@ -490,5 +538,14 @@ public final class ASEMSysMLTestHelper {
         portEnd.setRole(port);
 
         return port;
+    }
+
+    private static Property addPropertyToBlock(final Block block, final String propertyName, final Type propertyType,
+            final boolean readOnly) {
+
+        Property prop = block.getBase_Class().createOwnedAttribute(propertyName, propertyType);
+        prop.setIsReadOnly(readOnly);
+
+        return prop;
     }
 }

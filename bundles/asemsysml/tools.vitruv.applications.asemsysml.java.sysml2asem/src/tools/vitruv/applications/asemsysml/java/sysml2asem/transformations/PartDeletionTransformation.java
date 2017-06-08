@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.papyrus.sysml14.blocks.Block;
+import org.eclipse.uml2.uml.AggregationKind;
 import org.eclipse.uml2.uml.Property;
 import org.eclipse.uml2.uml.util.UMLUtil;
 
@@ -90,7 +91,8 @@ public class PartDeletionTransformation extends AbstractTransformationRealizatio
 
     private boolean isPropertyAPartProperty(RemoveEReference<EObject, EObject> change) {
         Property prop = (Property) change.getOldValue();
-        return (!ASEMSysMLHelper.isPropertyAPortProperty(prop));
+        return (!ASEMSysMLHelper.isPropertyAPortProperty(prop)
+                && prop.getAggregation().equals(AggregationKind.COMPOSITE_LITERAL));
     }
 
 }
