@@ -96,13 +96,11 @@ public class ASEMSysMLHelper {
      */
     public static VURI getModelVURI(final EObject alreadyPersistedObject, final String projectModelPath) {
 
-        String existingElementURI = VURI.getInstance(alreadyPersistedObject.eResource()).getEMFUri()
-                .toPlatformString(false);
+        String existingElementURI = VURI.getInstance(alreadyPersistedObject.eResource()).getEMFUri().toFileString();
         String uriPrefix = existingElementURI.substring(0,
                 existingElementURI.lastIndexOf(ASEMSysMLConstants.MODEL_DIR_NAME + "/"));
         String uriString = uriPrefix + projectModelPath;
-        VURI modelVURI = VURI.getInstance(URI.createPlatformResourceURI(uriString, true));
-
+        VURI modelVURI = VURI.getInstance(URI.createFileURI(uriString));
         return modelVURI;
     }
 

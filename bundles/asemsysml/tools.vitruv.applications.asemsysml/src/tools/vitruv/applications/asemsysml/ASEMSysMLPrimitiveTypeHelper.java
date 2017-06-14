@@ -241,14 +241,13 @@ public final class ASEMSysMLPrimitiveTypeHelper {
     private static Resource getPrimitiveTypesResource(final EObject alreadyPersistedObject,
             final CorrespondenceModel correspondenceModel) {
 
-        String existingElementURI = VURI.getInstance(alreadyPersistedObject.eResource()).getEMFUri()
-                .toPlatformString(false);
+        String existingElementURI = VURI.getInstance(alreadyPersistedObject.eResource()).getEMFUri().toFileString();
         String uriPrefix = existingElementURI.substring(0,
                 existingElementURI.lastIndexOf(ASEMSysMLConstants.MODEL_DIR_NAME + "/"));
         String asemURIString = uriPrefix + getPrimitiveTypeProjectModelPath();
 
         ResourceSet resourceSet = correspondenceModel.getResource().getResourceSet();
-        URI uri = URI.createURI(asemURIString);
+        URI uri = URI.createFileURI(asemURIString);
         Resource primitiveTypesResource = resourceSet.getResource(uri, true);
 
         return primitiveTypesResource;

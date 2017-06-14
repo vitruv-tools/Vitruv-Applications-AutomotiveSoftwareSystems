@@ -83,7 +83,7 @@ public final class ASEMSysMLAssertionHelper {
      */
     public static void assertResourceExists(final Resource modelResource) {
 
-        final Boolean modelResourceExists = (modelResource != null);
+        final boolean modelResourceExists = (modelResource != null);
         assertTrue("Model resource doesn't exist.", modelResourceExists);
     }
 

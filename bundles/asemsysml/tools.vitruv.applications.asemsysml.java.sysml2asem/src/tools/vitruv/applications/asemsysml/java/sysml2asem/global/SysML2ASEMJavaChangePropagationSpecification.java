@@ -6,7 +6,16 @@ import java.util.Set;
 import org.eclipse.uml2.uml.UMLPackage;
 
 import edu.kit.ipd.sdq.ASEM.ASEMPackage;
+import tools.vitruv.applications.asemsysml.java.sysml2asem.JavaTransformationRealization;
+import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.BlockDeletionTransformation;
+import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.BlockNameTransformation;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.BlockTransformation;
+import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.DebugTransformation;
+import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.NamedElementNameTransformation;
+import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.PartDeletionTransformation;
+import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.PartTransformation;
+import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.PortDeletionTransformation;
+import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.PortDirectionTransformation;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.PortTransformation;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.PortTypeTransformation;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.PrimitiveTypeTransformation;
@@ -14,15 +23,6 @@ import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.Prope
 import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.PropertyDeletionTransformation;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.PropertyTransformation;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.PropertyTypeTransformation;
-import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.DebugTransformation;
-import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.NamedElementNameTransformation;
-import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.PartDeletionTransformation;
-import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.PartTransformation;
-import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.PortDeletionTransformation;
-import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.PortDirectionTransformation;
-import tools.vitruv.applications.asemsysml.java.sysml2asem.JavaTransformationRealization;
-import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.BlockDeletionTransformation;
-import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.BlockNameTransformation;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.util.Change2TransformationMap;
 import tools.vitruv.domains.asem.AsemDomainProvider;
 import tools.vitruv.domains.sysml.SysMlDomainProvider;
@@ -32,7 +32,6 @@ import tools.vitruv.framework.change.echange.compound.CompoundEChange;
 import tools.vitruv.framework.change.processing.impl.AbstractEChangePropagationSpecification;
 import tools.vitruv.framework.correspondence.CorrespondenceModel;
 import tools.vitruv.framework.userinteraction.UserInteracting;
-import tools.vitruv.framework.userinteraction.impl.UserInteractor;
 import tools.vitruv.framework.util.command.ChangePropagationResult;
 import tools.vitruv.framework.util.datatypes.MetamodelPair;
 
@@ -54,7 +53,7 @@ public class SysML2ASEMJavaChangePropagationSpecification extends AbstractEChang
      *
      */
     public SysML2ASEMJavaChangePropagationSpecification() {
-        super(new UserInteractor(), new SysMlDomainProvider().getDomain(), new AsemDomainProvider().getDomain());
+        super(new SysMlDomainProvider().getDomain(), new AsemDomainProvider().getDomain());
         this.change2TransformationMap = new Change2TransformationMap();
         this.metamodelPair = new MetamodelPair(UMLPackage.eNS_URI, ASEMPackage.eNS_URI);
         this.setup();

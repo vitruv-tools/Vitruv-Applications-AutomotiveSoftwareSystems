@@ -86,8 +86,9 @@ public class RenameTransformationTest extends SysML2ASEMTest {
         if (namedElement.getAppliedStereotype(ASEMSysMLConstants.QUALIFIED_BLOCK_NAME) != null) {
 
             final String asemProjectModelPath = ASEMSysMLHelper.getASEMProjectModelPath(oldName);
-            final String platformModelPath = this.getCurrentTestProject().getName() + "/" + asemProjectModelPath;
-
+            final String platformModelPath = this.getCurrentTestProjectFolder().getAbsolutePath() + "/" + asemProjectModelPath;
+            
+            
             String workspacePath = ResourcesPlugin.getWorkspace().getRoot().getLocation().toString();
 
             File workspace = new File(workspacePath);
