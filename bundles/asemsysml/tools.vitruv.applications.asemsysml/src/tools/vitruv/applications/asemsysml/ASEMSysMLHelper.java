@@ -98,7 +98,7 @@ public class ASEMSysMLHelper {
 
         String existingElementURI = VURI.getInstance(alreadyPersistedObject.eResource()).getEMFUri().toFileString();
         String uriPrefix = existingElementURI.substring(0,
-                existingElementURI.lastIndexOf(ASEMSysMLConstants.MODEL_DIR_NAME + "/"));
+                existingElementURI.lastIndexOf(ASEMSysMLConstants.MODEL_DIR_NAME + java.io.File.separatorChar));
         String uriString = uriPrefix + projectModelPath;
         VURI modelVURI = VURI.getInstance(URI.createFileURI(uriString));
         return modelVURI;
