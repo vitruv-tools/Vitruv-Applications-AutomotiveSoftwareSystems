@@ -3,9 +3,6 @@ package tools.vitruv.applications.asemsysml.java.sysml2asem.global;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.uml2.uml.UMLPackage;
-
-import edu.kit.ipd.sdq.ASEM.ASEMPackage;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.JavaTransformationRealization;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.BlockDeletionTransformation;
 import tools.vitruv.applications.asemsysml.java.sysml2asem.transformations.BlockNameTransformation;
@@ -33,7 +30,6 @@ import tools.vitruv.framework.change.processing.impl.AbstractEChangePropagationS
 import tools.vitruv.framework.correspondence.CorrespondenceModel;
 import tools.vitruv.framework.userinteraction.UserInteracting;
 import tools.vitruv.framework.util.command.ChangePropagationResult;
-import tools.vitruv.framework.util.datatypes.MetamodelPair;
 
 /**
  * Change propagation specification for the SysML2ASEM transformation using java transformations.
@@ -46,7 +42,6 @@ import tools.vitruv.framework.util.datatypes.MetamodelPair;
 public class SysML2ASEMJavaChangePropagationSpecification extends AbstractEChangePropagationSpecification {
 
     private Change2TransformationMap change2TransformationMap;
-    private final MetamodelPair metamodelPair;
 
     /**
      * Create a new change executor with the given user interactor.
@@ -55,7 +50,6 @@ public class SysML2ASEMJavaChangePropagationSpecification extends AbstractEChang
     public SysML2ASEMJavaChangePropagationSpecification() {
         super(new SysMlDomainProvider().getDomain(), new AsemDomainProvider().getDomain());
         this.change2TransformationMap = new Change2TransformationMap();
-        this.metamodelPair = new MetamodelPair(UMLPackage.eNS_URI, ASEMPackage.eNS_URI);
         this.setup();
     }
 
