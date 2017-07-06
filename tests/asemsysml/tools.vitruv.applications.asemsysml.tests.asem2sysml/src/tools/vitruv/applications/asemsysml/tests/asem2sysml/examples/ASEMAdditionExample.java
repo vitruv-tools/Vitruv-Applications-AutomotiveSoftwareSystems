@@ -85,7 +85,7 @@ public class ASEMAdditionExample extends ASEM2SysMLTest {
         method = ASEMSysMLTestHelper.createASEMMethodAddToComponentAndSync("doAddition", asemClass, this);
 
         final PrimitiveType pContinuous = ASEMSysMLPrimitiveTypeHelper
-                .getASEMPrimitiveTypeFromRepository(ContinuousType.class, asemClass, this.getCorrespondenceModel());
+                .getASEMPrimitiveTypeFromRepository(ContinuousType.class, asemClass);
         input1 = ASEMSysMLTestHelper.createASEMParameterAddToMethodAndSync("input1", pContinuous, method, this);
         input2 = ASEMSysMLTestHelper.createASEMParameterAddToMethodAndSync("input2", pContinuous, method, this);
         returnType = ASEMSysMLTestHelper.createASEMReturnTypeAddToMethodAndSync("return", pContinuous, method, this);

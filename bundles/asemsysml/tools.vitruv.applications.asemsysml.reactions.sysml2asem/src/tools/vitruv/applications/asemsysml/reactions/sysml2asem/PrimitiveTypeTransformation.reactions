@@ -19,7 +19,7 @@ reaction PrimitiveTypeTransformation {
 		logger.info("[ASEMSysML] Primitive type " + primitiveType.name + " added.");
 		
 		// Add all ASEM primitive types to primitive types model.
-		if(!ASEMSysMLPrimitiveTypeHelper.isPrimitiveTypeModelInitialized(primitiveType, correspondenceModel)) {
+		if(!ASEMSysMLPrimitiveTypeHelper.isPrimitiveTypeModelInitialized(primitiveType)) {
 			logger.info("[ASEMSysML] Initialize primitive types for " + primitiveType.eResource);
 			addASEMPrimitiveTypes(primitiveType);
 		}

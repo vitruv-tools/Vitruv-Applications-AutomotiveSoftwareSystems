@@ -112,17 +112,15 @@ public final class ASEMSysMLPrimitiveTypeHelper {
      * @param alreadyPersistedObject
      *            An object that already exists. This is needed to get the correct URI (test project
      *            name, etc.).
-     * @param correspondenceModel
-     *            The correspondence model to get the primitive types repository resource.
      * @return The primitive type instance or <code>null</code> if no instance of this type exists.
      */
     @SuppressWarnings("unchecked")
     public static <T extends edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType> edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType getASEMPrimitiveTypeFromRepository(
-            final Class<T> type, final EObject alreadyPersistedObject, final CorrespondenceModel correspondenceModel) {
+            final Class<T> type, final EObject alreadyPersistedObject) {
 
         edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType primitiveType = null;
 
-        Resource resource = getPrimitiveTypesResource(alreadyPersistedObject, correspondenceModel);
+        Resource resource = getPrimitiveTypesResource(alreadyPersistedObject);
         PrimitiveTypeRepository pRepo = (PrimitiveTypeRepository) resource.getContents().get(0);
 
         for (edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType pType : pRepo.getPrimitiveTypes()) {
@@ -198,13 +196,10 @@ public final class ASEMSysMLPrimitiveTypeHelper {
      * @param alreadyPersistedObject
      *            An object that already exists. This is needed to get the correct URI (test project
      *            name, etc.).
-     * @param correspondenceModel
-     *            The correspondence model to get the primitive types repository resource.
      * @return <code>True</code> if the primitive types model resource is initialized, otherwise
      *         <code>false</code>.
      */
-    public static boolean isPrimitiveTypeModelInitialized(final EObject alreadyPersistedObject,
-            final CorrespondenceModel correspondenceModel) {
+    public static boolean isPrimitiveTypeModelInitialized(final EObject alreadyPersistedObject) {
 
         if (repoIsInitialized) {
             return true;
@@ -212,7 +207,7 @@ public final class ASEMSysMLPrimitiveTypeHelper {
 
         Resource resource = null;
         try {
-            resource = getPrimitiveTypesResource(alreadyPersistedObject, correspondenceModel);
+            resource = getPrimitiveTypesResource(alreadyPersistedObject);
         } catch (Exception e) {
             return false;
         }
@@ -238,15 +233,14 @@ public final class ASEMSysMLPrimitiveTypeHelper {
         repoIsInitialized = false;
     }
 
-    private static Resource getPrimitiveTypesResource(final EObject alreadyPersistedObject,
-            final CorrespondenceModel correspondenceModel) {
+    private static Resource getPrimitiveTypesResource(final EObject alreadyPersistedObject) {
 
         String existingElementURI = VURI.getInstance(alreadyPersistedObject.eResource()).getEMFUri().toFileString();
         String uriPrefix = existingElementURI.substring(0,
                 existingElementURI.lastIndexOf(ASEMSysMLConstants.MODEL_DIR_NAME + "/"));
         String asemURIString = uriPrefix + getPrimitiveTypeProjectModelPath();
 
-        ResourceSet resourceSet = correspondenceModel.getResource().getResourceSet();
+        ResourceSet resourceSet = alreadyPersistedObject.eResource().getResourceSet();
         URI uri = URI.createFileURI(asemURIString);
         Resource primitiveTypesResource = resourceSet.getResource(uri, true);
 
