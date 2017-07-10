@@ -5,9 +5,6 @@ import tools.vitruv.applications.asemsysml.ASEMSysMLHelper
 import tools.vitruv.applications.asemsysml.ASEMSysMLPrimitiveTypeHelper
 import tools.vitruv.domains.sysml.SysMlNamspace
 import edu.kit.ipd.sdq.ASEM.classifiers.Component
-import org.eclipse.uml2.uml.util.UMLUtil
-import org.eclipse.papyrus.sysml14.blocks.BindingConnector
-import edu.kit.ipd.sdq.ASEM.dataexchange.Method
 import org.eclipse.uml2.uml.AggregationKind
 
 import "edu.kit.ipd.sdq.asem" as asem
@@ -44,19 +41,7 @@ routine createPortWithComponentType(asem::Message message) {
 		val baseClassType = retrieve uml::Class corresponding to message.type
 	}
 	action {
-		// TODO [BR] Remove code duplication!
-		// Create the port property and apply the SysML FlowProperty stereotype.
-		val portProperty = create uml::Property and initialize {
-			portProperty.name = message.name + "Property";
-			portProperty.type = baseClassType;
-			
-			baseClass.ownedAttributes.add(portProperty);
-		}
-		val flowProperty = create sysml::FlowProperty and initialize {
-			flowProperty.base_Property = portProperty;
-		}
-		
-		// Create the port.
+		// TODO [BR] Remove code duplication!	
 		val port = create uml::Port and initialize {
 			port.name = message.name;
 			port.type = baseClassType;
@@ -65,12 +50,18 @@ routine createPortWithComponentType(asem::Message message) {
 			baseClass.ownedPorts.add(port);
 		}
 		
+		val flowProperty = create sysml::FlowProperty and initialize {
+			flowProperty.base_Property = port;
+		}
+
+		add correspondence between message and port
+
 		call {
 			changeFlowDirection(flowProperty, message);
-			createConnector(message, portProperty, flowProperty, port, baseClass);
+
+			persistProjectRelative(message, flowProperty, ASEMSysMLHelper.getProjectModelPath(ASEMSysMLConstants.TEST_SYSML_MODEL_NAME, SysMlNamspace.FILE_EXTENSION));
 		}
 		
-		add correspondence between message and port
 	}
 }
 routine createPortWithPrimitiveType(asem::Message message, uml::PrimitiveType portType) {
@@ -78,18 +69,7 @@ routine createPortWithPrimitiveType(asem::Message message, uml::PrimitiveType po
 		val baseClass = retrieve uml::Class corresponding to message.eContainer
 	}
 	action {
-		// Create the port property and apply the SysML FlowProperty stereotype.
-		val portProperty = create uml::Property and initialize {
-			portProperty.name = message.name + "Property";
-			portProperty.type = ASEMSysMLPrimitiveTypeHelper.getSysMLPrimitiveTypeFromSysMLModel(this.correspondenceModel, message, portType);
-			
-			baseClass.ownedAttributes.add(portProperty);
-		}
-		val flowProperty = create sysml::FlowProperty and initialize {
-			flowProperty.base_Property = portProperty;
-		}
 		
-		// Create the port.
 		val port = create uml::Port and initialize {
 			port.name = message.name;
 			port.type = ASEMSysMLPrimitiveTypeHelper.getSysMLPrimitiveTypeFromSysMLModel(this.correspondenceModel, message, portType);
@@ -98,39 +78,17 @@ routine createPortWithPrimitiveType(asem::Message message, uml::PrimitiveType po
 			baseClass.ownedPorts.add(port);
 		}
 		
+		val flowProperty = create sysml::FlowProperty and initialize {
+			flowProperty.base_Property = port;
+		}
+
+		add correspondence between message and port
+		
 		call {
 			changeFlowDirection(flowProperty, message);
-			createConnector(message, portProperty, flowProperty, port, baseClass);
+			persistProjectRelative(message, flowProperty, ASEMSysMLHelper.getProjectModelPath(ASEMSysMLConstants.TEST_SYSML_MODEL_NAME, SysMlNamspace.FILE_EXTENSION));
 		}
 		
-		add correspondence between message and port
-	}
-}
-routine createConnector(asem::Named alreadyPersistedElement, uml::Property portProperty, sysml::FlowProperty flowProperty, uml::Port port, uml::Class baseClass) {
-	action {
-		// Create the connector which connects the port property and the port and apply the SysML BindingConnector stereotype.
-		val propertyEnd = create uml::ConnectorEnd and initialize {
-			propertyEnd.role = portProperty;
-		}
-		val portEnd = create uml::ConnectorEnd and initialize {
-			portEnd.role = port;
-		}
-		val connector = create uml::Connector and initialize {
-			connector.name = "BindingConnector_" + portProperty.name + "-" + port.name;
-			connector.ends.add(propertyEnd);
-			connector.ends.add(portEnd);
-			
-			baseClass.ownedConnectors.add(connector);
-		}
-		val bindingConnector = create sysml::BindingConnector and initialize {
-			bindingConnector.base_Connector = connector;
-		}
-		
-		call {
-			// Persist the root elements at the end of the reaction to prevent empty resource element in the action block.
-			persistProjectRelative(alreadyPersistedElement, flowProperty, ASEMSysMLHelper.getProjectModelPath(ASEMSysMLConstants.TEST_SYSML_MODEL_NAME, SysMlNamspace.FILE_EXTENSION));
-			persistProjectRelative(alreadyPersistedElement, bindingConnector, ASEMSysMLHelper.getProjectModelPath(ASEMSysMLConstants.TEST_SYSML_MODEL_NAME, SysMlNamspace.FILE_EXTENSION));
-		}
 	}
 }
 
@@ -163,25 +121,18 @@ routine removePort(asem::TypedElement typedElement) {
 	}
 	action {
 		call {
-		
-			val connectorEnd = ASEMSysMLHelper.getConnectorEnd(port);
-			val connector = ASEMSysMLHelper.getConnector(connectorEnd);
-			val bindingConnector = UMLUtil.getStereotypeApplication(connector, BindingConnector);
 			
 			val flowProperty = ASEMSysMLHelper.getFlowProperty(port);
 			val property = flowProperty.base_Property;
 			
-			deletePortWithAllElements(port, connector, bindingConnector, property, flowProperty);
-			
+			deletePortWithAllElements(port, property, flowProperty);
 		}
 	}
 }
-routine deletePortWithAllElements(uml::Port port, uml::Connector connector, sysml::BindingConnector bindingConnector, uml::Property property, sysml::FlowProperty flowProperty) {
+routine deletePortWithAllElements(uml::Port port, uml::Property property, sysml::FlowProperty flowProperty) {
 	action {
 		delete property
 		delete flowProperty
-		delete connector
-		delete bindingConnector
 		delete port
 	}
 }
@@ -298,18 +249,6 @@ routine createPortForParameterWithPrimitiveType(asem::Parameter parameter, uml::
 	}
 	action {
 		
-		val property = create uml::Property and initialize {
-			property.name = parameter.name + "Property";
-			property.type = ASEMSysMLPrimitiveTypeHelper.getSysMLPrimitiveTypeFromSysMLModel(this.correspondenceModel, parameter, type);
-			
-			baseClass.ownedAttributes.add(property);
-		}
-		
-		val flowProperty = create sysml::FlowProperty and initialize {
-			flowProperty.base_Property = property;
-			flowProperty.direction = FlowDirection.IN;
-		}
-		
 		val port = create uml::Port and initialize {
 			port.name = parameter.name;
 			port.type = ASEMSysMLPrimitiveTypeHelper.getSysMLPrimitiveTypeFromSysMLModel(this.correspondenceModel, parameter, type);
@@ -317,13 +256,18 @@ routine createPortForParameterWithPrimitiveType(asem::Parameter parameter, uml::
 			
 			baseClass.ownedPorts.add(port);
 		}
+
+		val flowProperty = create sysml::FlowProperty and initialize {
+			flowProperty.base_Property = port;
+			flowProperty.direction = FlowDirection.IN;
+		}
+
+		add correspondence between parameter and port
 		
 		call {
-			val method = parameter.eContainer as Method;
-			createConnector(method, property, flowProperty, port, baseClass);
+			persistProjectRelative(parameter, flowProperty, ASEMSysMLHelper.getProjectModelPath(ASEMSysMLConstants.TEST_SYSML_MODEL_NAME, SysMlNamspace.FILE_EXTENSION));
 		}
 		
-		add correspondence between parameter and port
 	}
 }
 routine createPortForParameterWithComponentType(asem::Parameter parameter) {
@@ -334,18 +278,6 @@ routine createPortForParameterWithComponentType(asem::Parameter parameter) {
 		
 	}
 	action {
-		// TODO [BR] Remove code duplication!
-		val property = create uml::Property and initialize {
-			property.name = parameter.name + "Property";
-			property.type = baseClassType;
-			
-			baseClass.ownedAttributes.add(property);
-		}
-		
-		val flowProperty = create sysml::FlowProperty and initialize {
-			flowProperty.base_Property = property;
-			flowProperty.direction = FlowDirection.IN;
-		}
 		
 		val port = create uml::Port and initialize {
 			port.name = parameter.name;
@@ -355,12 +287,17 @@ routine createPortForParameterWithComponentType(asem::Parameter parameter) {
 			baseClass.ownedPorts.add(port);
 		}
 		
+		val flowProperty = create sysml::FlowProperty and initialize {
+			flowProperty.base_Property = port;
+			flowProperty.direction = FlowDirection.IN;
+		}
+
+		add correspondence between parameter and port
+		
 		call {
-			val method = parameter.eContainer as Method;
-			createConnector(method, property, flowProperty, port, baseClass);
+			persistProjectRelative(parameter, flowProperty, ASEMSysMLHelper.getProjectModelPath(ASEMSysMLConstants.TEST_SYSML_MODEL_NAME, SysMlNamspace.FILE_EXTENSION));
 		}
 		
-		add correspondence between parameter and port
 	}
 }
 
@@ -389,18 +326,6 @@ routine createPortForReturnTypeWithPrimitiveType(asem::ReturnType returnType, um
 		val baseClass = retrieve uml::Class corresponding to returnType.eContainer.eContainer
 	}
 	action {
-		// TODO [BR] Remove code duplication!
-		val property = create uml::Property and initialize {
-			property.name = returnType.name + "Property";
-			property.type = ASEMSysMLPrimitiveTypeHelper.getSysMLPrimitiveTypeFromSysMLModel(this.correspondenceModel, returnType, type);
-			
-			baseClass.ownedAttributes.add(property);
-		}
-		
-		val flowProperty = create sysml::FlowProperty and initialize {
-			flowProperty.base_Property = property;
-			flowProperty.direction = FlowDirection.OUT;
-		}
 		
 		val port = create uml::Port and initialize {
 			port.name = returnType.name;
@@ -410,12 +335,17 @@ routine createPortForReturnTypeWithPrimitiveType(asem::ReturnType returnType, um
 			baseClass.ownedPorts.add(port);
 		}
 		
+		val flowProperty = create sysml::FlowProperty and initialize {
+			flowProperty.base_Property = port;
+			flowProperty.direction = FlowDirection.OUT;
+		}
+
+		add correspondence between returnType and port
+		
 		call {
-			val method = returnType.eContainer as Method;
-			createConnector(method, property, flowProperty, port, baseClass);
+			persistProjectRelative(returnType, flowProperty, ASEMSysMLHelper.getProjectModelPath(ASEMSysMLConstants.TEST_SYSML_MODEL_NAME, SysMlNamspace.FILE_EXTENSION));
 		}
 		
-		add correspondence between returnType and port
 	}
 }
 routine createPortForReturnTypeWithComponentType(asem::ReturnType returnType) {
@@ -426,18 +356,6 @@ routine createPortForReturnTypeWithComponentType(asem::ReturnType returnType) {
 		
 	}
 	action {
-		// TODO [BR] Remove code duplication!
-		val property = create uml::Property and initialize {
-			property.name = returnType.name + "Property";
-			property.type = baseClassType;
-			
-			baseClass.ownedAttributes.add(property);
-		}
-		
-		val flowProperty = create sysml::FlowProperty and initialize {
-			flowProperty.base_Property = property;
-			flowProperty.direction = FlowDirection.OUT;
-		}
 		
 		val port = create uml::Port and initialize {
 			port.name = returnType.name;
@@ -447,11 +365,16 @@ routine createPortForReturnTypeWithComponentType(asem::ReturnType returnType) {
 			baseClass.ownedPorts.add(port);
 		}
 		
-		call {
-			val method = returnType.eContainer as Method;
-			createConnector(method, property, flowProperty, port, baseClass);
+		val flowProperty = create sysml::FlowProperty and initialize {
+			flowProperty.base_Property = port;
+			flowProperty.direction = FlowDirection.OUT;
 		}
 		
 		add correspondence between returnType and port
+		
+		call {
+			persistProjectRelative(returnType, flowProperty, ASEMSysMLHelper.getProjectModelPath(ASEMSysMLConstants.TEST_SYSML_MODEL_NAME, SysMlNamspace.FILE_EXTENSION));
+		}
+		
 	}
 }

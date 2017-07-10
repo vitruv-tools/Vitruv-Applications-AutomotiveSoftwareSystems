@@ -1,3 +1,6 @@
+import edu.kit.ipd.sdq.ASEM.dataexchange.Message
+import edu.kit.ipd.sdq.ASEM.dataexchange.Parameter
+
 import "edu.kit.ipd.sdq.asem" as asem
 import "http://www.eclipse.org/papyrus/sysml/1.4/SysML" as sysml
 import "http://www.eclipse.org/uml2/5.0.0/UML" as uml
@@ -8,6 +11,8 @@ execute actions in SysML
 
 reaction VariableTransformation {
 	after attribute replaced at asem::Variable[name]
+	with !(affectedEObject instanceof Message) &&
+	!(affectedEObject instanceof Parameter)
 	call {
 		logger.info("[ASEMSysML] Create SysML property for ASEM variable " + newValue + " ...");
 		createProperty(affectedEObject);
