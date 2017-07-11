@@ -4,9 +4,8 @@ import static tools.vitruv.applications.asemsysml.ASEMSysMLConstants.TEST_SYSML_
 
 import static org.junit.Assert.assertTrue;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.junit.Test;
 
 import edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveTypeRepository;
@@ -53,18 +52,22 @@ public class ModelInitializationTest extends SysML2ASEMTest {
      */
     @Test
     public void testIfPrimitiveTypesRepositoryIsCreatedAndInitialized() {
-        
-        Logger.getRootLogger().setLevel(Level.DEBUG);
-        
+
         final String repositoryProjectModelPath = ASEMSysMLPrimitiveTypeHelper.getPrimitiveTypeProjectModelPath();
         this.assertModelExists(repositoryProjectModelPath);
-        
-        final Resource repoModelResource = this.getModelResource(repositoryProjectModelPath);
-        ASEMSysMLAssertionHelper.assertValidModelResource(repoModelResource, PrimitiveTypeRepository.class);
-        
-        final int numberOfRootElements = repoModelResource.getContents().size();
-        assertTrue("The primitive type repository resource contains more than one root element!", !(numberOfRootElements > 1));
-        assertTrue("The primitive type repository resource does not contain a repository element!", numberOfRootElements == 1);
+
+        final String primitiveTypesProjectModelPath = ASEMSysMLPrimitiveTypeHelper.getPrimitiveTypeProjectModelPath();
+        final ResourceSet resourceSet = this.getVirtualModel().getCorrespondenceModel().getResource().getResourceSet();
+        final Resource primitiveTypesRepoResource = resourceSet
+                .getResource(getModelVuri(primitiveTypesProjectModelPath).getEMFUri(), true);
+
+        ASEMSysMLAssertionHelper.assertValidModelResource(primitiveTypesRepoResource, PrimitiveTypeRepository.class);
+
+        final int numberOfRootElements = primitiveTypesRepoResource.getContents().size();
+        assertTrue("The primitive type repository resource contains more than one root element!",
+                !(numberOfRootElements > 1));
+        assertTrue("The primitive type repository resource does not contain a repository element!",
+                numberOfRootElements == 1);
     }
 
     private void assertModelRootExists(final String projectModelPath) {

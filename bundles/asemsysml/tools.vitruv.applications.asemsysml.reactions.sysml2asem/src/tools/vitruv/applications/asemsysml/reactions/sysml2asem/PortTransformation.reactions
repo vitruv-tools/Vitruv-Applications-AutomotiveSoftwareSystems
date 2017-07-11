@@ -300,7 +300,8 @@ routine transformPrimitivePortType(uml::Port port) {
 		
 		update asemMessage {			
 			val messageType = ASEMSysMLPrimitiveTypeHelper.PRIMITIVE_TYPE_MAP.get(port.type);
-			asemMessage.type = ASEMSysMLPrimitiveTypeHelper.getASEMPrimitiveTypeFromRepository(messageType, asemMessage);
+			val resourceSet = this.correspondenceModel.resource.resourceSet;
+			asemMessage.type = ASEMSysMLPrimitiveTypeHelper.getASEMPrimitiveTypeFromRepository(messageType, port, resourceSet);
 		}
 	}
 }

@@ -7,6 +7,8 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.papyrus.sysml14.portsandflows.FlowProperty;
 import org.eclipse.uml2.uml.Port;
@@ -196,10 +198,14 @@ public class ASEMElementToPortMappingTransformationTest extends ASEM2SysMLTest {
     @Test
     public void testIfPortDirectionWillBeUpdated() throws IOException {
 
+        final String primitiveTypesProjectModelPath = ASEMSysMLPrimitiveTypeHelper.getPrimitiveTypeProjectModelPath();
+        final Resource primitiveTypesResource = this.getModelResource(primitiveTypesProjectModelPath);
+        ResourceSet resourceSet = primitiveTypesResource.getResourceSet();
+
         Module module = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ModuleForMessages", Module.class,
                 this);
         final PrimitiveType pBoolean = ASEMSysMLPrimitiveTypeHelper
-                .getASEMPrimitiveTypeFromRepository(BooleanType.class, module);
+                .getASEMPrimitiveTypeFromRepository(BooleanType.class, module, resourceSet);
         final Class asemClassForMessageType = ASEMSysMLTestHelper
                 .createASEMComponentAsModelRootAndSync("ClassForMessageType", Class.class, this);
 
@@ -238,6 +244,10 @@ public class ASEMElementToPortMappingTransformationTest extends ASEM2SysMLTest {
     @Test
     public void testIfPortTypeWillBeUpdated() throws IOException {
 
+        final String primitiveTypesProjectModelPath = ASEMSysMLPrimitiveTypeHelper.getPrimitiveTypeProjectModelPath();
+        final Resource primitiveTypesResource = this.getModelResource(primitiveTypesProjectModelPath);
+        ResourceSet resourceSet = primitiveTypesResource.getResourceSet();
+
         Module module = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ModuleForMessages", Module.class,
                 this);
         Class asemClass = ASEMSysMLTestHelper.createASEMComponentAsModelRootAndSync("ClassForMethods", Class.class,
@@ -246,9 +256,9 @@ public class ASEMElementToPortMappingTransformationTest extends ASEM2SysMLTest {
                 this);
 
         final PrimitiveType pBoolean = ASEMSysMLPrimitiveTypeHelper
-                .getASEMPrimitiveTypeFromRepository(BooleanType.class, module);
+                .getASEMPrimitiveTypeFromRepository(BooleanType.class, module, resourceSet);
         final PrimitiveType pContinuous = ASEMSysMLPrimitiveTypeHelper
-                .getASEMPrimitiveTypeFromRepository(ContinuousType.class, module);
+                .getASEMPrimitiveTypeFromRepository(ContinuousType.class, module, resourceSet);
         final Class asemClassForMessageTypeA = ASEMSysMLTestHelper
                 .createASEMComponentAsModelRootAndSync("ClassForMessageTypeA", Class.class, this);
         final Class asemClassForMessageTypeB = ASEMSysMLTestHelper
@@ -289,12 +299,16 @@ public class ASEMElementToPortMappingTransformationTest extends ASEM2SysMLTest {
 
     private Collection<Message> prepareMessages(final Module module, final Class classAsType) {
 
+        final String primitiveTypesProjectModelPath = ASEMSysMLPrimitiveTypeHelper.getPrimitiveTypeProjectModelPath();
+        final Resource primitiveTypesResource = this.getModelResource(primitiveTypesProjectModelPath);
+        ResourceSet resourceSet = primitiveTypesResource.getResourceSet();
+
         final PrimitiveType pBoolean = ASEMSysMLPrimitiveTypeHelper
-                .getASEMPrimitiveTypeFromRepository(BooleanType.class, module);
+                .getASEMPrimitiveTypeFromRepository(BooleanType.class, module, resourceSet);
         final PrimitiveType pContinuous = ASEMSysMLPrimitiveTypeHelper
-                .getASEMPrimitiveTypeFromRepository(ContinuousType.class, module);
+                .getASEMPrimitiveTypeFromRepository(ContinuousType.class, module, resourceSet);
         final PrimitiveType pSignedDiscreteType = ASEMSysMLPrimitiveTypeHelper
-                .getASEMPrimitiveTypeFromRepository(SignedDiscreteType.class, module);
+                .getASEMPrimitiveTypeFromRepository(SignedDiscreteType.class, module, resourceSet);
 
         Collection<Message> messages = new HashSet<Message>();
         messages.add(ASEMSysMLTestHelper.createASEMMessageAddToModuleAndSync("MessageBooleanIN", true, false, pBoolean,
@@ -326,12 +340,16 @@ public class ASEMElementToPortMappingTransformationTest extends ASEM2SysMLTest {
 
     private Collection<Parameter> prepareParameters(final Method method, final Class classAsType) {
 
+        final String primitiveTypesProjectModelPath = ASEMSysMLPrimitiveTypeHelper.getPrimitiveTypeProjectModelPath();
+        final Resource primitiveTypesResource = this.getModelResource(primitiveTypesProjectModelPath);
+        ResourceSet resourceSet = primitiveTypesResource.getResourceSet();
+
         final PrimitiveType pBoolean = ASEMSysMLPrimitiveTypeHelper
-                .getASEMPrimitiveTypeFromRepository(BooleanType.class, method);
+                .getASEMPrimitiveTypeFromRepository(BooleanType.class, method, resourceSet);
         final PrimitiveType pContinuous = ASEMSysMLPrimitiveTypeHelper
-                .getASEMPrimitiveTypeFromRepository(ContinuousType.class, method);
+                .getASEMPrimitiveTypeFromRepository(ContinuousType.class, method, resourceSet);
         final PrimitiveType pSignedDiscreteType = ASEMSysMLPrimitiveTypeHelper
-                .getASEMPrimitiveTypeFromRepository(SignedDiscreteType.class, method);
+                .getASEMPrimitiveTypeFromRepository(SignedDiscreteType.class, method, resourceSet);
 
         Collection<Parameter> parameters = new HashSet<>();
 
@@ -351,12 +369,16 @@ public class ASEMElementToPortMappingTransformationTest extends ASEM2SysMLTest {
 
         Collection<ReturnType> returnTypes = new HashSet<>();
 
+        final String primitiveTypesProjectModelPath = ASEMSysMLPrimitiveTypeHelper.getPrimitiveTypeProjectModelPath();
+        final Resource primitiveTypesResource = this.getModelResource(primitiveTypesProjectModelPath);
+        ResourceSet resourceSet = primitiveTypesResource.getResourceSet();
+
         final PrimitiveType pBoolean = ASEMSysMLPrimitiveTypeHelper
-                .getASEMPrimitiveTypeFromRepository(BooleanType.class, asemClass);
+                .getASEMPrimitiveTypeFromRepository(BooleanType.class, asemClass, resourceSet);
         final PrimitiveType pContinuous = ASEMSysMLPrimitiveTypeHelper
-                .getASEMPrimitiveTypeFromRepository(ContinuousType.class, asemClass);
+                .getASEMPrimitiveTypeFromRepository(ContinuousType.class, asemClass, resourceSet);
         final PrimitiveType pSignedDiscreteType = ASEMSysMLPrimitiveTypeHelper
-                .getASEMPrimitiveTypeFromRepository(SignedDiscreteType.class, asemClass);
+                .getASEMPrimitiveTypeFromRepository(SignedDiscreteType.class, asemClass, resourceSet);
 
         Method methodA = ASEMSysMLTestHelper.createASEMMethodAddToComponentAndSync("MethodForReturnTypeA", asemClass,
                 this);

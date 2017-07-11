@@ -114,13 +114,39 @@ public final class ASEMSysMLPrimitiveTypeHelper {
      *            name, etc.).
      * @return The primitive type instance or <code>null</code> if no instance of this type exists.
      */
-    @SuppressWarnings("unchecked")
     public static <T extends edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType> edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType getASEMPrimitiveTypeFromRepository(
             final Class<T> type, final EObject alreadyPersistedObject) {
 
         edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType primitiveType = null;
 
-        Resource resource = getPrimitiveTypesResource(alreadyPersistedObject);
+        getASEMPrimitiveTypeFromRepository(type, alreadyPersistedObject,
+                alreadyPersistedObject.eResource().getResourceSet());
+
+        return primitiveType;
+
+    }
+
+    /**
+     * Get the primitive type instance from the ASEM primitive type repository.
+     * 
+     * @param <T>
+     *            Type of the needed primitive type instance.
+     * @param type
+     *            Type of the primitive type which shall be returned.
+     * @param alreadyPersistedObject
+     *            An object that already exists. This is needed to get the correct URI (test project
+     *            name, etc.).
+     * @param resourceSet
+     *            The resource set which must contain the primitive type repository.
+     * @return The primitive type instance or <code>null</code> if no instance of this type exists.
+     */
+    @SuppressWarnings("unchecked")
+    public static <T extends edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType> edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType getASEMPrimitiveTypeFromRepository(
+            final Class<T> type, final EObject alreadyPersistedObject, final ResourceSet resourceSet) {
+
+        edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType primitiveType = null;
+
+        Resource resource = getPrimitiveTypesResource(alreadyPersistedObject, resourceSet);
         PrimitiveTypeRepository pRepo = (PrimitiveTypeRepository) resource.getContents().get(0);
 
         for (edu.kit.ipd.sdq.ASEM.primitivetypes.PrimitiveType pType : pRepo.getPrimitiveTypes()) {
@@ -207,7 +233,8 @@ public final class ASEMSysMLPrimitiveTypeHelper {
 
         Resource resource = null;
         try {
-            resource = getPrimitiveTypesResource(alreadyPersistedObject);
+            resource = getPrimitiveTypesResource(alreadyPersistedObject,
+                    alreadyPersistedObject.eResource().getResourceSet());
         } catch (Exception e) {
             return false;
         }
@@ -233,14 +260,13 @@ public final class ASEMSysMLPrimitiveTypeHelper {
         repoIsInitialized = false;
     }
 
-    private static Resource getPrimitiveTypesResource(final EObject alreadyPersistedObject) {
+    private static Resource getPrimitiveTypesResource(final EObject alreadyPersistedObject, ResourceSet resourceSet) {
 
         String existingElementURI = VURI.getInstance(alreadyPersistedObject.eResource()).getEMFUri().toFileString();
         String uriPrefix = existingElementURI.substring(0,
                 existingElementURI.lastIndexOf(ASEMSysMLConstants.MODEL_DIR_NAME + "/"));
         String asemURIString = uriPrefix + getPrimitiveTypeProjectModelPath();
 
-        ResourceSet resourceSet = alreadyPersistedObject.eResource().getResourceSet();
         URI uri = URI.createFileURI(asemURIString);
         Resource primitiveTypesResource = resourceSet.getResource(uri, true);
 
