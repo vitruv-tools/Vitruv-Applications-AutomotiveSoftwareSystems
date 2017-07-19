@@ -1,5 +1,6 @@
 package tools.vitruv.applications.asemsysml;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -264,7 +265,7 @@ public final class ASEMSysMLPrimitiveTypeHelper {
 
         String existingElementURI = VURI.getInstance(alreadyPersistedObject.eResource()).getEMFUri().toFileString();
         String uriPrefix = existingElementURI.substring(0,
-                existingElementURI.lastIndexOf(ASEMSysMLConstants.MODEL_DIR_NAME + "/"));
+                existingElementURI.lastIndexOf(ASEMSysMLConstants.MODEL_DIR_NAME + File.separatorChar));
         String asemURIString = uriPrefix + getPrimitiveTypeProjectModelPath();
 
         URI uri = URI.createFileURI(asemURIString);
