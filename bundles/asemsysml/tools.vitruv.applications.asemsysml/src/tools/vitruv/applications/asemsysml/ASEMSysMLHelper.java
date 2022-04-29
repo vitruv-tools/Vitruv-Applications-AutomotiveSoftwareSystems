@@ -1,5 +1,6 @@
 package tools.vitruv.applications.asemsysml;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -50,7 +51,7 @@ public class ASEMSysMLHelper {
      * @return Project model path.
      */
     public static String getProjectModelPath(final String modelName, final String fileExtension) {
-        return (((ASEMSysMLConstants.MODEL_DIR_NAME + "/" + modelName) + ".") + fileExtension);
+        return (((ASEMSysMLConstants.MODEL_DIR_NAME + File.separatorChar + modelName) + ".") + fileExtension);
     }
 
     /**
